@@ -11,4 +11,3 @@ const catalogs = {
 export function getMessages(locale: InterfaceLocale) {
   return catalogs[locale];
 }
-

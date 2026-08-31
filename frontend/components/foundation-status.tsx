@@ -52,4 +52,3 @@ export function FoundationStatus({
     </div>
   );
 }
-
