@@ -1,0 +1,13 @@
+{
+  "foundation": {
+    "eyebrow": "FluentLoop MVP",
+    "title": "Turn what you know into what you can say.",
+    "description": "A focused English interview practice loop built around retrieval, transfer, and evidence of real progress.",
+    "primaryAction": "Training begins after onboarding",
+    "actionHint": "Foundation is ready for the first learning-loop slice.",
+    "statusChecking": "Checking the FluentLoop API…",
+    "statusOnline": "FluentLoop API is online.",
+    "statusOffline": "API is offline. Start the backend to connect this screen."
+  }
+}
+
