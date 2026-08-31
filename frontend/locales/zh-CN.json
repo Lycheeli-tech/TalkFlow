@@ -1,0 +1,12 @@
+{
+  "foundation": {
+    "eyebrow": "FluentLoop MVP",
+    "title": "把你学过的英语，变成你真正说得出的英语。",
+    "description": "围绕主动提取、迁移运用和真实进步证据构建的英语面试训练闭环。",
+    "primaryAction": "完成引导后开始训练",
+    "actionHint": "基础架构已准备好验证第一个学习闭环。",
+    "statusChecking": "正在检查 FluentLoop API…",
+    "statusOnline": "FluentLoop API 已连接。",
+    "statusOffline": "API 尚未连接。启动后端即可连接此页面。"
+  }
+}

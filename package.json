@@ -1,0 +1,15 @@
+{
+  "name": "talkflow",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "dev": "pnpm --filter @fluentloop/frontend dev",
+    "build": "pnpm --filter @fluentloop/frontend build",
+    "lint": "pnpm --filter @fluentloop/frontend lint",
+    "typecheck": "pnpm --filter @fluentloop/frontend typecheck",
+    "test:migrations": "node scripts/validate-migrations.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8"
+  }
+}
