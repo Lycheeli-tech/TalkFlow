@@ -67,3 +67,7 @@ Question categories and order are deterministic: EXPERIENCE, MOTIVATION, PROJECT
 ### ADR-016 — Recoverable Voice Ordering
 
 Persist learner audio and link the attempt before STT; persist the transcript before analysis. Downstream failure must preserve prior artifacts and retry the same attempt idempotently.
+
+### ADR-017 — Bounded Adaptive Daily Planning
+
+The 30-Day Interview Bootcamp has a fixed BUILD → TRANSFER → PERFORM stage backbone, bounded MVP inventories, deterministic target selection, and LLM-generated personalized lesson content. Day 1 is Career Transition; Day 2–30 topics are selected by the planner, not hard-coded as a calendar.

@@ -72,6 +72,10 @@
 
 ## Milestone 3 — Core Daily Session
 
-**Status:** NOT STARTED
+**Status:** IN PROGRESS
 
-Do not begin Milestone 3 until Milestone 2 has been reviewed and implementation is explicitly resumed.
+**Branch:** `feat/daily-session`
+
+**Base:** `m2-voice-calibration` (`c910377`)
+
+Scope: bounded inventories, deterministic Daily Planner, minimum daily-session persistence, the canonical session shell, and Today. The fixed backbone is BUILD → TRANSFER → PERFORM, not a hard-coded Day 2–30 topic calendar. Formal Memory/Mastery, Story Bank, Review Scheduler, Mock Interview, and Quick Review remain later-milestone scope.
