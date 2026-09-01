@@ -5,8 +5,11 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.fakes import FakeProfileExtractor
+from app.ai.interfaces import ProfileExtractor
 from app.core.security import JWTVerificationError, SupabaseTokenVerifier, TokenVerifier
 from app.db.session import get_database_session
+from app.repositories.profiles import ProfileRepository, SQLProfileRepository
 from app.repositories.users import SQLUserRepository, UserRepository
 from app.schemas import AuthenticatedUser
 
@@ -41,3 +44,14 @@ async def get_user_repository(
     session: AsyncSession = Depends(get_database_session),
 ) -> AsyncIterator[UserRepository]:
     yield SQLUserRepository(session)
+
+
+async def get_profile_repository(
+    session: AsyncSession = Depends(get_database_session),
+) -> AsyncIterator[ProfileRepository]:
+    yield SQLProfileRepository(session)
+
+
+@lru_cache
+def get_profile_extractor() -> ProfileExtractor:
+    return FakeProfileExtractor()

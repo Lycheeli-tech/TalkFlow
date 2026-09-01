@@ -21,22 +21,29 @@ class ProfileService:
         cleaned_text = raw_text.strip()
         if not cleaned_text:
             raise ValueError("Background text cannot be empty.")
-        source = new_source_document(
-            source_id=uuid4(),
+        return await self._create_candidate(
             user_id=user_id,
+            target_role=target_role,
+            raw_text=cleaned_text,
             source_type="background_text",
             filename=None,
-            raw_text=cleaned_text,
         )
-        await self._repository.create_source(source)
-        candidate = await self._extractor.extract(raw_text=cleaned_text, target_role=target_role)
-        source = await self._repository.save_candidate(
-            source.id,
-            user_id,
-            candidate,
-            self._extractor.version,
+
+    async def create_pdf_candidate(
+        self,
+        *,
+        user_id: UUID,
+        target_role: str,
+        filename: str,
+        raw_text: str,
+    ) -> tuple[SourceDocument, CandidateProfile]:
+        return await self._create_candidate(
+            user_id=user_id,
+            target_role=target_role,
+            raw_text=raw_text,
+            source_type="resume_pdf",
+            filename=filename,
         )
-        return source, candidate
 
     async def confirm_candidate(
         self,
@@ -57,3 +64,26 @@ class ProfileService:
 
     async def get_confirmed(self, user_id: UUID) -> ConfirmedProfile | None:
         return await self._repository.get_confirmed(user_id)
+
+    async def _create_candidate(
+        self,
+        *,
+        user_id: UUID,
+        target_role: str,
+        raw_text: str,
+        source_type: str,
+        filename: str | None,
+    ) -> tuple[SourceDocument, CandidateProfile]:
+        source = new_source_document(
+            source_id=uuid4(),
+            user_id=user_id,
+            source_type=source_type,
+            filename=filename,
+            raw_text=raw_text,
+        )
+        await self._repository.create_source(source)
+        candidate = await self._extractor.extract(raw_text=raw_text, target_role=target_role)
+        source = await self._repository.save_candidate(
+            source.id, user_id, candidate, self._extractor.version
+        )
+        return source, candidate

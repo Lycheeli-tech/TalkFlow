@@ -23,6 +23,13 @@ class UserState(BaseModel):
     primary_goal: Literal["english_interview"] = "english_interview"
 
 
+class UserPreferencesUpdate(BaseModel):
+    interface_language: Literal["en", "zh-CN"]
+    support_language: Literal["en", "zh-CN"]
+    default_session_length: Literal[10, 20, 30, 60]
+    target_role: str = Field(min_length=1, max_length=160)
+
+
 class CandidateProfile(BaseModel):
     target_role: str = Field(min_length=1, max_length=160)
     primary_goal: Literal["english_interview"] = "english_interview"
@@ -48,6 +55,22 @@ class SourceDocument(BaseModel):
     candidate_profile: dict[str, object] | None = None
     extractor_version: str | None = None
     created_at: datetime
+
+
+class TextProfileImport(BaseModel):
+    target_role: str = Field(min_length=1, max_length=160)
+    raw_text: str = Field(min_length=1, max_length=100_000)
+
+
+class CandidateExtractionResponse(BaseModel):
+    source_id: UUID
+    extractor_version: str
+    candidate: CandidateProfile
+
+
+class ProfileConfirmationRequest(BaseModel):
+    source_id: UUID
+    candidate: CandidateProfile
 
 
 class ConfirmedProfile(BaseModel):

@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     llm_provider: str = "fake"
     stt_provider: str = "fake"
     tts_provider: str = "fake"
+    max_resume_bytes: int = 5 * 1024 * 1024
 
     @property
     def cors_origin_list(self) -> list[str]:
