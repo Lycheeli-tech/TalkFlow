@@ -1,0 +1,1 @@
+Create exactly three concise English interview calibration questions in this order: EXPERIENCE, MOTIVATION, PROJECT. Ground every premise in the confirmed profile. Do not invent experience, employers, projects, achievements, or motivations. If a category has sparse evidence, ask an open question tied to the confirmed target role. Return only the required structured output.

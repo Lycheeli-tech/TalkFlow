@@ -74,3 +74,34 @@ export function confirmProfile(token: string, sourceId: string, candidate: Candi
     body: JSON.stringify({ source_id: sourceId, candidate }),
   });
 }
+
+export type CalibrationQuestion = { category: "EXPERIENCE" | "MOTIVATION" | "PROJECT"; text: string };
+export type CalibrationSession = { id: string; status: "IN_PROGRESS" | "COMPLETED"; questions: CalibrationQuestion[] };
+export type VoiceAttempt = { id: string; question_type: CalibrationQuestion["category"]; transcript: string | null; status: "AUDIO_SAVED" | "STT_FAILED" | "TRANSCRIBED" | "ANALYSIS_FAILED" | "ANALYZED"; provider_error: string | null };
+export type LearnerAssessment = { fluency: string; naturalness: string; grammar: string; retrieval: string; structure: string; strengths: string[]; primary_focus: string; secondary_focus: string | null; observed_patterns: string[]; assessment_version: string };
+
+export function startCalibration(token: string) {
+  return apiFetch<CalibrationSession>("/api/v1/calibration/sessions", token, { method: "POST" });
+}
+
+export async function calibrationTts(token: string, sessionId: string, category: string) {
+  const response = await fetch(`${API_BASE_URL}/api/v1/calibration/sessions/${sessionId}/questions/${category}/tts`, { headers: { Authorization: `Bearer ${token}` } });
+  if (!response.ok) throw new Error("Question audio is unavailable. Read the question and continue.");
+  return response.blob();
+}
+
+export function submitCalibrationAttempt(token: string, sessionId: string, category: string, recording: Blob, durationMs: number) {
+  const body = new FormData();
+  body.set("category", category);
+  body.set("response_duration_ms", String(durationMs));
+  body.set("recording", recording, "calibration.webm");
+  return apiFetch<VoiceAttempt>(`/api/v1/calibration/sessions/${sessionId}/attempts`, token, { method: "POST", body });
+}
+
+export function retryCalibrationAttempt(token: string, attemptId: string) {
+  return apiFetch<VoiceAttempt>(`/api/v1/calibration/attempts/${attemptId}/retry`, token, { method: "POST" });
+}
+
+export function getCalibration(token: string, sessionId: string) {
+  return apiFetch<{ session: CalibrationSession; attempts: VoiceAttempt[]; assessment: LearnerAssessment | null }>(`/api/v1/calibration/sessions/${sessionId}`, token);
+}

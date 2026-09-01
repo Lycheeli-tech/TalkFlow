@@ -6,6 +6,10 @@
 **Branch:** `feat/onboarding-profile`  
 **Verified HEAD:** `2ce8dd2`
 
+**Merged to main:** `2c2943c`
+
+**Stable tag:** `m1-profile`
+
 ### Verified checks
 
 - Backend tests: 18 passed.
@@ -28,6 +32,46 @@
 
 ## Milestone 2 — Voice Calibration
 
+**Status:** COMPLETE
+
+**Branch:** `feat/voice-calibration`
+
+**Base:** `m1-profile` (`2c2943c`)
+
+**Verified implementation HEAD:** `021667e`
+
+### Implemented
+
+- Three category-constrained, confirmed-profile-grounded calibration questions in EXPERIENCE → MOTIVATION → PROJECT order.
+- Turn-based browser recording with TTS playback and visible-text fallback.
+- Private learner-audio storage abstraction and Supabase adapter.
+- Minimum reusable `Session` model with `session_type = CALIBRATION`.
+- Durable, user-scoped attempts with audio references, read-only transcripts, processing status, and structured observations.
+- Raw audio persistence before attempt processing, STT, transcript persistence, and analysis.
+- Idempotent user-triggered retry/re-analysis without duplicate attempts.
+- A separate, historical `LearnerAssessment` using qualitative ordinal levels and versioned assessment output.
+- Fake and OpenAI provider adapters for questions, STT, TTS, and answer analysis; fake providers remain the default.
+
+### Verified checks
+
+- Backend: 24 tests passed, including service failure recovery and `/api/v1` fixture golden path.
+- Ruff lint and format checks passed.
+- Three versioned migrations and user provisioning validated.
+- Frontend ESLint, TypeScript, and production build passed.
+- Desktop and 375 px browser smoke QA passed with no horizontal overflow or page console errors.
+- Existing onboarding, Memory Gate, user isolation, and Day 1 → Day 2 fixture regressions remain passing.
+
+### Known limitations / Live Integration Gate
+
+- The new migration has not been applied to a live Supabase project.
+- OpenAI STT/TTS/question/analysis adapters and Supabase learner-audio storage have contract/code coverage but have not been exercised with live credentials.
+- Real microphone permission, recording format compatibility, live audio upload, and provider latency/error behavior require a live browser integration pass.
+- Fake-provider validation is not equivalent to live-service validation. The Live Integration Gate must pass before FluentLoop is considered deployable for real personal use.
+- The known Starlette/httpx 2 deprecation warning remains.
+- The production Daily Session and cross-session memory/mastery loop remain future milestone scope.
+
+## Milestone 3 — Core Daily Session
+
 **Status:** NOT STARTED
 
-Do not begin Milestone 2 until the repository-memory documents have been reviewed and implementation is explicitly resumed.
+Do not begin Milestone 3 until Milestone 2 has been reviewed and implementation is explicitly resumed.

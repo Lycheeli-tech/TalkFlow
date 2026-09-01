@@ -1,6 +1,6 @@
 from typing import Any, Protocol
 
-from app.schemas import CandidateProfile
+from app.schemas import AttemptAnalysis, CalibrationQuestion, CandidateProfile, ConfirmedProfile
 
 
 class LLMService(Protocol):
@@ -14,11 +14,25 @@ class LLMService(Protocol):
 
 
 class SpeechToTextService(Protocol):
+    provider_name: str
+
     async def transcribe(self, *, audio: bytes, content_type: str) -> str: ...
 
 
 class TextToSpeechService(Protocol):
     async def synthesize(self, *, text: str, voice: str) -> bytes: ...
+
+
+class CalibrationQuestionGenerator(Protocol):
+    version: str
+
+    async def generate(self, *, profile: ConfirmedProfile) -> list[CalibrationQuestion]: ...
+
+
+class AnswerAnalyzer(Protocol):
+    version: str
+
+    async def analyze(self, *, question: str, transcript: str) -> AttemptAnalysis: ...
 
 
 class ProfileExtractor(Protocol):

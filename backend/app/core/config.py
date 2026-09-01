@@ -22,8 +22,13 @@ class Settings(BaseSettings):
     profile_extractor_provider: str = "fake"
     openai_api_key: str = ""
     openai_profile_model: str = "gpt-5.6-luna"
+    openai_calibration_model: str = "gpt-4.1-mini"
+    openai_stt_model: str = "gpt-4o-mini-transcribe"
+    openai_tts_model: str = "gpt-4o-mini-tts"
     stt_provider: str = "fake"
     tts_provider: str = "fake"
+    audio_storage_provider: str = "fake"
+    max_audio_bytes: int = 20 * 1024 * 1024
     max_resume_bytes: int = 5 * 1024 * 1024
     document_storage_provider: str = "fake"
 

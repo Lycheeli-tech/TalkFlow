@@ -47,3 +47,23 @@ Keep LLM, STT, and TTS behind provider abstractions. Concrete providers and mode
 ### ADR-011 — Versioned Evolution
 
 Use versioned database migrations and explicit versions for behavior-changing prompts.
+
+### ADR-012 — Shared Calibration Session
+
+Voice Calibration uses the common Session model with `session_type = CALIBRATION`; this does not authorize Daily Session orchestration.
+
+### ADR-013 — Historical Learner Assessments
+
+Speaking ability is stored in a separate, versionable LearnerAssessment associated with its calibration session, not in the confirmed background Profile.
+
+### ADR-014 — Qualitative Calibration Levels
+
+The MVP uses NEEDS_WORK, DEVELOPING, FUNCTIONAL, and STRONG with qualitative observations, avoiding false numerical precision from three answers.
+
+### ADR-015 — Constrained Hybrid Questions
+
+Question categories and order are deterministic: EXPERIENCE, MOTIVATION, PROJECT. A provider may personalize wording from confirmed profile data but may not alter categories or invent experience.
+
+### ADR-016 — Recoverable Voice Ordering
+
+Persist learner audio and link the attempt before STT; persist the transcript before analysis. Downstream failure must preserve prior artifacts and retry the same attempt idempotently.

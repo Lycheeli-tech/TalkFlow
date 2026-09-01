@@ -92,6 +92,90 @@ class ConfirmedProfile(BaseModel):
     updated_at: datetime
 
 
+CalibrationQuestionType = Literal["EXPERIENCE", "MOTIVATION", "PROJECT"]
+AttemptStatus = Literal["AUDIO_SAVED", "STT_FAILED", "TRANSCRIBED", "ANALYSIS_FAILED", "ANALYZED"]
+AssessmentLevel = Literal["NEEDS_WORK", "DEVELOPING", "FUNCTIONAL", "STRONG"]
+
+
+class CalibrationQuestion(BaseModel):
+    category: CalibrationQuestionType
+    text: str = Field(min_length=1, max_length=1000)
+
+
+class CalibrationQuestionSet(BaseModel):
+    questions: list[CalibrationQuestion]
+
+
+class CalibrationSession(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    user_id: UUID
+    session_type: Literal["CALIBRATION"] = "CALIBRATION"
+    status: Literal["IN_PROGRESS", "COMPLETED"] = "IN_PROGRESS"
+    questions: list[CalibrationQuestion]
+    started_at: datetime
+    completed_at: datetime | None = None
+
+
+class VoiceAttempt(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    session_id: UUID
+    user_id: UUID
+    question: str
+    question_type: CalibrationQuestionType
+    audio_path: str
+    audio_content_type: str
+    response_duration_ms: int | None = None
+    transcript: str | None = None
+    analysis: dict[str, object] | None = None
+    status: AttemptStatus = "AUDIO_SAVED"
+    provider_error: str | None = None
+    stt_provider: str | None = None
+    analyzer_version: str | None = None
+    created_at: datetime
+    updated_at: datetime
+
+
+class AttemptAnalysis(BaseModel):
+    fluency: AssessmentLevel
+    naturalness: AssessmentLevel
+    grammar: AssessmentLevel
+    retrieval: AssessmentLevel
+    structure: AssessmentLevel
+    strengths: list[str] = Field(default_factory=list)
+    focus_areas: list[str] = Field(default_factory=list)
+    observed_patterns: list[str] = Field(default_factory=list)
+    evidence: list[str] = Field(default_factory=list)
+
+
+class LearnerAssessment(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    session_id: UUID
+    user_id: UUID
+    fluency: AssessmentLevel
+    naturalness: AssessmentLevel
+    grammar: AssessmentLevel
+    retrieval: AssessmentLevel
+    structure: AssessmentLevel
+    strengths: list[str] = Field(default_factory=list)
+    primary_focus: str
+    secondary_focus: str | None = None
+    observed_patterns: list[str] = Field(default_factory=list)
+    assessment_version: str
+    created_at: datetime
+
+
+class CalibrationResult(BaseModel):
+    session: CalibrationSession
+    attempts: list[VoiceAttempt]
+    assessment: LearnerAssessment | None = None
+
+
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: Literal["fluentloop-api"] = "fluentloop-api"
