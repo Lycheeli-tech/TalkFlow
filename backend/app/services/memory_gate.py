@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
-from app.schemas import ErrorPattern, Story
+from app.schemas import ErrorPattern, ErrorPatternRules, Story
 
 
 class MemoryGate:
@@ -25,11 +25,18 @@ class MemoryGate:
     ) -> ErrorPattern:
         occurrence_count = pattern.occurrence_count + (1 if repeated else 0)
         corrections = pattern.successful_correction_count + (1 if corrected else 0)
-        if pattern.status == "CANDIDATE" and occurrence_count >= 2:
+        if (
+            pattern.status == "CANDIDATE"
+            and occurrence_count >= self.rules.active_occurrences_required
+        ):
             status = "ACTIVE"
         elif corrected and pattern.status == "ACTIVE":
             status = "IMPROVING"
-        elif corrected and pattern.status == "IMPROVING" and corrections >= occurrence_count:
+        elif (
+            corrected
+            and pattern.status == "IMPROVING"
+            and corrections >= self.rules.resolved_corrections_required
+        ):
             status = "RESOLVED"
         else:
             status = pattern.status
@@ -48,8 +55,10 @@ class MemoryGate:
         user_id: UUID,
         title: str,
         content: str,
-        source_document_id: UUID | None = None,
         confirmed_by_user: bool,
+        source_type: str = "USER",
+        source_document_id: UUID | None = None,
+        source_attempt_id: UUID | None = None,
     ) -> Story:
         if not confirmed_by_user:
             raise PermissionError("A story must be confirmed by the user before persistence.")
@@ -59,8 +68,13 @@ class MemoryGate:
             user_id=user_id,
             title=title,
             content=content,
+            source_type=source_type,
             source_document_id=source_document_id,
+            source_attempt_id=source_attempt_id,
             confirmed_by_user=True,
             created_at=now,
             updated_at=now,
         )
+
+    def __init__(self, rules: ErrorPatternRules | None = None) -> None:
+        self.rules = rules or ErrorPatternRules()

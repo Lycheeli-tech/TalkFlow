@@ -231,6 +231,12 @@ class MasteryRules(BaseModel):
     review_intervals_days: list[int] = Field(default_factory=lambda: [1, 3, 7, 14])
 
 
+class ErrorPatternRules(BaseModel):
+    version: Literal["error_pattern_rules_v1"] = "error_pattern_rules_v1"
+    active_occurrences_required: int = Field(default=2, ge=2)
+    resolved_corrections_required: int = Field(default=2, ge=1)
+
+
 class Expression(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -288,7 +294,9 @@ class Story(BaseModel):
     user_id: UUID
     title: str
     content: str
+    source_type: Literal["DOCUMENT", "ATTEMPT", "USER"] = "USER"
     source_document_id: UUID | None = None
+    source_attempt_id: UUID | None = None
     confirmed_by_user: Literal[True]
     created_at: datetime
     updated_at: datetime

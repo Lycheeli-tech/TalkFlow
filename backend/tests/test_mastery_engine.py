@@ -25,12 +25,13 @@ def evidence(
     hint_used: bool = False,
     independent: bool = True,
     result: str = "SUCCESS",
+    session_id=None,
 ) -> ExpressionAttempt:
     return ExpressionAttempt(
         id=uuid4(),
         expression_id=expression.id,
         attempt_id=uuid4(),
-        session_id=uuid4(),
+        session_id=session_id or uuid4(),
         user_id=expression.user_id,
         context="interview answer",
         retrieval_type=retrieval_type,
@@ -55,11 +56,36 @@ def test_direct_hint_success_does_not_count_as_recall_or_transfer() -> None:
 def test_mastery_requires_independent_evidence_across_both_retrieval_types() -> None:
     engine = MasteryEngine()
     expression = make_expression()
+    history = []
     for _ in range(3):
-        expression = engine.apply(expression, evidence(expression))
+        item = evidence(expression)
+        expression = engine.apply(expression, item, tuple(history))
+        history.append(item)
     assert expression.status == "RECALLED"
     for _ in range(2):
-        expression = engine.apply(expression, evidence(expression, retrieval_type="TRANSFER"))
+        item = evidence(expression, retrieval_type="TRANSFER")
+        expression = engine.apply(expression, item, tuple(history))
+        history.append(item)
+    assert expression.status == "MASTERED"
+
+
+def test_mastery_requires_three_distinct_sessions() -> None:
+    engine = MasteryEngine()
+    expression = make_expression()
+    session_ids = [uuid4(), uuid4()]
+    history = []
+    for index in range(3):
+        item = evidence(expression, session_id=session_ids[index % 2])
+        expression = engine.apply(expression, item, tuple(history))
+        history.append(item)
+    for index in range(2):
+        item = evidence(expression, retrieval_type="TRANSFER", session_id=session_ids[index])
+        expression = engine.apply(expression, item, tuple(history))
+        history.append(item)
+    assert expression.status == "TRANSFERRED"
+
+    third_session = evidence(expression, session_id=uuid4())
+    expression = engine.apply(expression, third_session, tuple(history))
     assert expression.status == "MASTERED"
 
 

@@ -115,7 +115,9 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - Versioned mastery and review rules with deterministic evidence-based transitions.
 - Explicit ExpressionAttempt evidence fields for recall/transfer, hint usage, independence, correctness, linked attempt/session, context, and timestamp.
 - Conservative ErrorPattern lifecycle and confirmation-gated durable Story contract.
-- User-scoped memory repository boundary with an in-memory MVP adapter.
+- User-scoped memory repository boundary with PostgreSQL runtime and in-memory fixture adapters.
+- Official application write path enforcing Memory Gate, ownership, evidence provenance, and deterministic mastery rules.
+- Minimal authenticated expression read API for future M5 consumption.
 - Versioned PostgreSQL migration for expressions, evidence, error patterns, and confirmed stories.
 
 ### Verified checks
@@ -126,6 +128,6 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 
 ### Known limitations
 
-- The current repository adapter is in-memory; wiring the M4 tables to a live SQL repository remains a hardening step before production use.
+- The SQL adapter and migration are implemented but have not been exercised against a live Supabase project.
 - M5 hidden retrieval injection, cross-session aha orchestration, and full Daily attempt integration remain out of scope.
 - Fake providers remain the default and live Supabase/provider integration is not yet verified.

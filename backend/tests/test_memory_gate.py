@@ -37,3 +37,17 @@ def test_story_requires_explicit_confirmation() -> None:
         user_id=uuid4(), title="Project", content="Confirmed story", confirmed_by_user=True
     )
     assert story.confirmed_by_user is True
+
+
+def test_confirmed_story_preserves_attempt_provenance() -> None:
+    attempt_id = uuid4()
+    story = MemoryGate().confirm_story(
+        user_id=uuid4(),
+        title="Incident",
+        content="Confirmed",
+        confirmed_by_user=True,
+        source_type="ATTEMPT",
+        source_attempt_id=attempt_id,
+    )
+    assert story.source_type == "ATTEMPT"
+    assert story.source_attempt_id == attempt_id

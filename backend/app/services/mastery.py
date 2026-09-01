@@ -9,7 +9,12 @@ class MasteryEngine:
     def __init__(self, rules: MasteryRules | None = None) -> None:
         self.rules = rules or MasteryRules()
 
-    def apply(self, expression: Expression, evidence: ExpressionAttempt) -> Expression:
+    def apply(
+        self,
+        expression: Expression,
+        evidence: ExpressionAttempt,
+        history: tuple[ExpressionAttempt, ...] = (),
+    ) -> Expression:
         if expression.user_id != evidence.user_id or expression.id != evidence.expression_id:
             raise ValueError("Expression evidence must belong to the same user and expression.")
         if evidence.result != "SUCCESS" or not evidence.usage_correct:
@@ -23,13 +28,23 @@ class MasteryEngine:
         elif evidence.retrieval_type == "TRANSFER":
             updates["transfer_success"] = expression.transfer_success + 1
         updated = expression.model_copy(update=updates)
-        updated_status = self._status(updated)
+        updated_status = self._status(updated, (*history, evidence))
         return updated.model_copy(update={"status": updated_status})
 
-    def _status(self, expression: Expression) -> str:
+    def _status(self, expression: Expression, evidence: tuple[ExpressionAttempt, ...]) -> str:
+        qualifying_sessions = {
+            item.session_id
+            for item in evidence
+            if item.result == "SUCCESS"
+            and item.usage_correct
+            and item.independent_evidence
+            and not item.hint_used
+            and item.retrieval_type in {"RECALL", "TRANSFER"}
+        }
         if (
             expression.successful_recall >= self.rules.recall_successes_required
             and expression.transfer_success >= self.rules.transfer_successes_required
+            and len(qualifying_sessions) >= self.rules.sessions_required
         ):
             return "MASTERED"
         if expression.transfer_success:
