@@ -29,6 +29,8 @@ class UserRow(Base):
     timezone: Mapped[str] = mapped_column(String(64), default="UTC")
     target_role: Mapped[str | None] = mapped_column(String(160))
     primary_goal: Mapped[str] = mapped_column(String(32), default="english_interview")
+    current_day: Mapped[int] = mapped_column(SmallInteger, default=1)
+    current_phase: Mapped[str] = mapped_column(String(16), default="BUILD")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
@@ -89,6 +91,12 @@ class SessionRow(Base):
     session_type: Mapped[str] = mapped_column(String(32))
     status: Mapped[str] = mapped_column(String(24), default="IN_PROGRESS")
     questions: Mapped[list[dict[str, str]]] = mapped_column(JSONB, default=list)
+    day: Mapped[int | None] = mapped_column(SmallInteger)
+    phase: Mapped[str | None] = mapped_column(String(16))
+    duration_plan: Mapped[int | None] = mapped_column(SmallInteger)
+    topic_family: Mapped[str | None] = mapped_column(String(64))
+    scaffolding_level: Mapped[str | None] = mapped_column(String(24))
+    session_plan: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 

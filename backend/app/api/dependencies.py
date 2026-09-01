@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.ai.fakes import (
     FakeAnswerAnalyzer,
     FakeCalibrationQuestionGenerator,
+    FakeLLMService,
     FakeProfileExtractor,
     FakeSpeechToTextService,
     FakeTextToSpeechService,
@@ -15,6 +16,7 @@ from app.ai.fakes import (
 from app.ai.interfaces import (
     AnswerAnalyzer,
     CalibrationQuestionGenerator,
+    LLMService,
     ProfileExtractor,
     SpeechToTextService,
     TextToSpeechService,
@@ -30,6 +32,7 @@ from app.core.config import get_settings
 from app.core.security import JWTVerificationError, SupabaseTokenVerifier, TokenVerifier
 from app.db.session import get_database_session
 from app.repositories.calibration import CalibrationRepository, SQLCalibrationRepository
+from app.repositories.daily_sessions import DailySessionRepository, SQLDailySessionRepository
 from app.repositories.profiles import ProfileRepository, SQLProfileRepository
 from app.repositories.users import SQLUserRepository, UserRepository
 from app.schemas import AuthenticatedUser
@@ -81,6 +84,12 @@ async def get_calibration_repository(
     yield SQLCalibrationRepository(session)
 
 
+async def get_daily_session_repository(
+    session: AsyncSession = Depends(get_database_session),
+) -> AsyncIterator[DailySessionRepository]:
+    yield SQLDailySessionRepository(session)
+
+
 @lru_cache
 def get_question_generator() -> CalibrationQuestionGenerator:
     settings = get_settings()
@@ -91,6 +100,20 @@ def get_question_generator() -> CalibrationQuestionGenerator:
             api_key=settings.openai_api_key, model=settings.openai_calibration_model
         )
     return FakeCalibrationQuestionGenerator()
+
+
+@lru_cache
+def get_llm_service() -> LLMService:
+    return FakeLLMService(
+        {
+            "question_prompt": "Tell me about your transition.",
+            "reference_answer": "I am building on my transferable experience.",
+            "language_explanations": [],
+            "imitation_variants": [],
+            "transfer_prompts": [],
+            "follow_up_questions": [],
+        }
+    )
 
 
 @lru_cache
