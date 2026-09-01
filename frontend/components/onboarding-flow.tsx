@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { VoiceCalibration } from "@/components/voice-calibration";
 import { signIn, signUp } from "@/lib/auth";
 import {
   CandidateProfile,
@@ -61,6 +62,7 @@ export function OnboardingFlow() {
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const messages = getMessages(locale).onboarding;
+  const calibrationMessages = getMessages(locale).calibration;
 
   async function run(action: () => Promise<void>) {
     setBusy(true);
@@ -198,7 +200,7 @@ export function OnboardingFlow() {
             </form>
           )}
 
-          {step === "complete" && <div className="completion"><span className="completion-mark">✓</span><h2>{messages.completeTitle}</h2><p>{messages.completeCopy}</p></div>}
+          {step === "complete" && <VoiceCalibration token={token} copy={calibrationMessages} />}
           {notice && <p className="notice" role="status">{notice}</p>}
           {error && <p className="error" role="alert"><strong>{messages.error}:</strong> {error}</p>}
         </Card>

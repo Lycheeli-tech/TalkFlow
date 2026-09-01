@@ -9,6 +9,9 @@
     "statusOnline": "FluentLoop API is online.",
     "statusOffline": "API is offline. Start the backend to connect this screen."
   },
+  "calibration": {
+    "readyTitle": "Your profile is ready.", "readyCopy": "Next, answer three short questions so FluentLoop can establish a provisional speaking baseline.", "begin": "Begin voice calibration", "working": "Working…", "question": "Question", "listen": "Listen", "record": "Start recording", "stop": "Stop and submit", "processing": "Saving your recording, then transcribing and analyzing it…", "transcript": "Transcript", "readOnly": "Calibration transcripts are read-only so the baseline reflects your original spoken answer.", "retry": "Retry processing", "next": "Next question", "results": "View my baseline", "noCorrection": "Answer naturally. FluentLoop will not interrupt or correct you mid-answer.", "provisional": "Provisional baseline", "assessmentTitle": "Your starting speaking profile", "fluency": "Fluency", "naturalness": "Naturalness", "grammar": "Grammar", "retrieval": "Retrieval", "structure": "Structure", "primaryFocus": "Primary focus", "evolves": "This profile is an initial observation, not a permanent score. It will evolve with evidence from later training.", "ttsFallback": "Audio is unavailable; read the visible question and continue.", "micError": "Microphone access is required to record an answer.", "error": "Something went wrong"
+  },
   "onboarding": {
     "brand": "FluentLoop",
     "promise": "Turn what you know into what you can say.",
