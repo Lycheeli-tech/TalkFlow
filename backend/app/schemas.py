@@ -302,6 +302,13 @@ class Story(BaseModel):
     updated_at: datetime
 
 
+class RetrievalOpportunity(BaseModel):
+    expression_id: UUID
+    prompt_context: str = Field(min_length=1, max_length=2000)
+    retrieval_type: Literal["RECALL", "TRANSFER"] = "TRANSFER"
+    due_at: datetime
+
+
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: Literal["fluentloop-api"] = "fluentloop-api"
