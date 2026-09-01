@@ -102,6 +102,10 @@ class CalibrationQuestion(BaseModel):
     text: str = Field(min_length=1, max_length=1000)
 
 
+class CalibrationQuestionSet(BaseModel):
+    questions: list[CalibrationQuestion]
+
+
 class CalibrationSession(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -164,6 +168,12 @@ class LearnerAssessment(BaseModel):
     observed_patterns: list[str] = Field(default_factory=list)
     assessment_version: str
     created_at: datetime
+
+
+class CalibrationResult(BaseModel):
+    session: CalibrationSession
+    attempts: list[VoiceAttempt]
+    assessment: LearnerAssessment | None = None
 
 
 class HealthResponse(BaseModel):
