@@ -1,18 +1,30 @@
-from app.schemas import Expression, ExpressionAttempt, HiddenTransferOpportunity
-from app.services.hidden_transfer import HiddenTransferService
-from app.services.memory import MemoryApplicationService
+from uuid import UUID
+
+from app.schemas import Expression, TrustedTransferAnalysis
+from app.services.verification import VerificationService
 
 
 class DailyAttemptService:
-    """Bridges a verified Daily transfer result into the gated memory path."""
+    """Accepts attempt identity and trusted analysis, never caller-authored mastery flags."""
 
-    def __init__(self, memory: MemoryApplicationService) -> None:
-        self.memory = memory
+    def __init__(self, verifier: VerificationService) -> None:
+        self.verifier = verifier
 
     async def record_hidden_transfer(
-        self, *, opportunity: HiddenTransferOpportunity, evidence: ExpressionAttempt
+        self,
+        *,
+        user_id: UUID,
+        opportunity_id: UUID,
+        attempt_id: UUID,
+        session_id: UUID,
+        context: str,
+        analysis: TrustedTransferAnalysis,
     ) -> Expression:
-        verified = HiddenTransferService.verify_transfer_evidence(
-            opportunity=opportunity, evidence=evidence
+        return await self.verifier.verify_and_record(
+            user_id=user_id,
+            opportunity_id=opportunity_id,
+            attempt_id=attempt_id,
+            session_id=session_id,
+            context=context,
+            analysis=analysis,
         )
-        return await self.memory.record_expression_evidence(verified)

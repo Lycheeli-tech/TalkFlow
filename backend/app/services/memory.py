@@ -7,6 +7,9 @@ from app.services.memory_gate import MemoryGate
 
 
 class MemoryApplicationService:
+    async def create_expression(self, expression: Expression) -> Expression:
+        return await self.repository.save_expression(expression)
+
     def __init__(self, repository: MemoryRepository) -> None:
         self.repository = repository
         self.gate = MemoryGate()

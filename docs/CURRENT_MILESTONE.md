@@ -137,7 +137,7 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - M5 hidden retrieval injection, cross-session aha orchestration, and full Daily attempt integration are not implemented.
 - The known Starlette/httpx deprecation warning remains.
 
-## Milestone 5 — Cross-Session Loop
+## Milestone 5 — Cross-Session Retrieval Loop
 
 **Status:** COMPLETE
 
@@ -147,24 +147,26 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 
 ### Implemented
 
-- Deterministic due-expression retrieval with user isolation and stable ordering.
-- Hidden transfer opportunities that keep target expressions out of interviewer-facing prompts.
-- Explicit evidence verification and Daily attempt → MemoryApplicationService integration.
-- Service-level Day 1 → Day 2 cross-session retrieval / transfer / evidence fixture.
-- Minimal authenticated due-retrieval API.
+- Durable, user/session-scoped RetrievalOpportunity records with conditional single consumption.
+- Natural cross-context interview questions with deterministic target/meta-hint leakage guards.
+- Trusted VerificationService creates authoritative evidence from structured analyzer output; public callers cannot submit mastery flags.
+- Daily attempt → VerificationService → MemoryApplicationService integration with auditable opportunity linkage.
+- Production-compatible Day 1 → Day 2 fixture using registered Sessions, Attempts, scheduled due state, durable opportunity, and verified evidence.
+- Minimal authenticated opportunity-creation API.
 
 ### Verified checks
 
-- Backend: 54 tests passed; Ruff format and lint passed.
-- Five versioned migrations validated.
+- Backend: 55 tests passed; Ruff format and lint passed.
+- Six versioned migrations validated.
 - Day 1 → Day 2 and hidden-target leakage regressions passed.
 
 ### Known limitations
 
 - Live Supabase/provider integration has not been validated.
-- Daily attempt integration remains service-level; full production recording/orchestration is not implemented.
-- Only the minimal due-retrieval API exists; M6 practice/progress features remain out of scope.
+- Structured transfer analysis uses the trusted verifier boundary, but live analyzer/provider behavior is not validated.
+- Only the minimal retrieval orchestration API/service exists; M6 practice/progress features remain out of scope.
 - The known Starlette/httpx deprecation warning remains.
+
 
 ## Milestone 6 — Practice & Progress
 

@@ -9,10 +9,13 @@ class HiddenTransferService:
     def create_opportunity(
         self, *, opportunity: RetrievalOpportunity, session_id: UUID
     ) -> HiddenTransferOpportunity:
+        if opportunity.session_id != session_id or opportunity.status != "CREATED":
+            raise ValueError("Opportunity is not active for this session.")
         return HiddenTransferOpportunity(
+            opportunity_id=opportunity.id,
             expression_id=opportunity.expression_id,
             session_id=session_id,
-            interviewer_prompt=opportunity.prompt_context,
+            interviewer_prompt=opportunity.question_text,
         )
 
     @staticmethod

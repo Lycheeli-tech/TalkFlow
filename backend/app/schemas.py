@@ -262,6 +262,7 @@ class ExpressionAttempt(BaseModel):
     expression_id: UUID
     attempt_id: UUID
     session_id: UUID
+    retrieval_opportunity_id: UUID | None = None
     user_id: UUID
     context: str = Field(min_length=1, max_length=2000)
     retrieval_type: RetrievalType
@@ -303,17 +304,33 @@ class Story(BaseModel):
 
 
 class RetrievalOpportunity(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    user_id: UUID
     expression_id: UUID
-    prompt_context: str = Field(min_length=1, max_length=2000)
+    session_id: UUID
+    question_family: str
+    question_text: str = Field(min_length=1, max_length=2000)
     retrieval_type: Literal["RECALL", "TRANSFER"] = "TRANSFER"
-    due_at: datetime
+    status: Literal["CREATED", "CONSUMED", "EXPIRED"] = "CREATED"
+    created_at: datetime
+    consumed_at: datetime | None = None
 
 
 class HiddenTransferOpportunity(BaseModel):
+    opportunity_id: UUID
     expression_id: UUID
     session_id: UUID
     interviewer_prompt: str = Field(min_length=1, max_length=2000)
     retrieval_type: Literal["TRANSFER"] = "TRANSFER"
+
+
+class TrustedTransferAnalysis(BaseModel):
+    target_used: bool
+    usage_correct: bool
+    direct_hint_used: bool
+    verifier_version: str
 
 
 class HealthResponse(BaseModel):

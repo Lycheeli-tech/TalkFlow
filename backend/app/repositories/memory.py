@@ -29,11 +29,20 @@ class MemoryRepository(Protocol):
 
 
 class InMemoryMemoryRepository:
-    def __init__(self) -> None:
+    def __init__(self, *, strict_provenance: bool = False) -> None:
+        self.strict_provenance = strict_provenance
         self.expressions: dict[UUID, Expression] = {}
         self.evidence: dict[UUID, ExpressionAttempt] = {}
         self.error_patterns: dict[UUID, ErrorPattern] = {}
         self.stories: dict[UUID, Story] = {}
+        self.sessions: dict[UUID, UUID] = {}
+        self.attempts: dict[UUID, tuple[UUID, UUID]] = {}
+
+    def register_session(self, session_id: UUID, user_id: UUID) -> None:
+        self.sessions[session_id] = user_id
+
+    def register_attempt(self, attempt_id: UUID, session_id: UUID, user_id: UUID) -> None:
+        self.attempts[attempt_id] = (session_id, user_id)
 
     async def save_expression(self, expression: Expression) -> Expression:
         self.expressions[expression.id] = expression
@@ -57,6 +66,11 @@ class InMemoryMemoryRepository:
         expression = self.expressions.get(evidence.expression_id)
         if expression is None or expression.user_id != evidence.user_id:
             raise PermissionError("Evidence must reference the user's expression.")
+        if self.strict_provenance and (
+            self.sessions.get(evidence.session_id) != evidence.user_id
+            or self.attempts.get(evidence.attempt_id) != (evidence.session_id, evidence.user_id)
+        ):
+            raise PermissionError("Evidence requires an existing user-owned Attempt and Session.")
         self.evidence[evidence.id] = evidence
         return evidence
 

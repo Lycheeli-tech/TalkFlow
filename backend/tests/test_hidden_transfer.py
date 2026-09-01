@@ -10,6 +10,7 @@ from app.services.hidden_transfer import HiddenTransferService
 def test_interviewer_payload_does_not_include_target_expression() -> None:
     target = "naturally curious"
     opportunity = HiddenTransferOpportunity(
+        opportunity_id=uuid4(),
         expression_id=uuid4(),
         session_id=uuid4(),
         interviewer_prompt=(
@@ -21,7 +22,10 @@ def test_interviewer_payload_does_not_include_target_expression() -> None:
 
 def test_transfer_verification_consumes_explicit_flags() -> None:
     opportunity = HiddenTransferOpportunity(
-        expression_id=uuid4(), session_id=uuid4(), interviewer_prompt="New context"
+        opportunity_id=uuid4(),
+        expression_id=uuid4(),
+        session_id=uuid4(),
+        interviewer_prompt="New context",
     )
     evidence = ExpressionAttempt(
         id=uuid4(),
@@ -45,7 +49,10 @@ def test_transfer_verification_consumes_explicit_flags() -> None:
 
 def test_wrong_session_is_rejected() -> None:
     opportunity = HiddenTransferOpportunity(
-        expression_id=uuid4(), session_id=uuid4(), interviewer_prompt="New context"
+        opportunity_id=uuid4(),
+        expression_id=uuid4(),
+        session_id=uuid4(),
+        interviewer_prompt="New context",
     )
     evidence = ExpressionAttempt(
         id=uuid4(),

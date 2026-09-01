@@ -1,40 +1,55 @@
 from datetime import UTC, datetime
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from app.repositories.memory import MemoryRepository
+from app.repositories.retrieval import RetrievalOpportunityRepository
 from app.schemas import RetrievalOpportunity
 
 
 class RetrievalService:
-    """Deterministically selects due expressions without exposing target text."""
+    def __init__(
+        self, memory: MemoryRepository, opportunities: RetrievalOpportunityRepository
+    ) -> None:
+        self.memory, self.opportunities = memory, opportunities
 
-    def __init__(self, repository: MemoryRepository) -> None:
-        self.repository = repository
-
-    async def due_opportunities(
-        self, *, user_id: UUID, now: datetime | None = None, limit: int = 3
-    ) -> list[RetrievalOpportunity]:
+    async def create_due_opportunity(
+        self,
+        *,
+        user_id: UUID,
+        session_id: UUID,
+        question_family: str,
+        question_text: str,
+        now: datetime | None = None,
+    ) -> RetrievalOpportunity | None:
         anchor = now or datetime.now(UTC)
-        expressions = await self.repository.list_expressions(user_id)
         due = sorted(
             (
-                expression
-                for expression in expressions
-                if expression.user_id == user_id
-                and expression.status != "MASTERED"
-                and expression.next_review_at is not None
-                and expression.next_review_at <= anchor
+                item
+                for item in await self.memory.list_expressions(user_id)
+                if item.status != "MASTERED"
+                and item.next_review_at
+                and item.next_review_at <= anchor
             ),
-            key=lambda expression: (expression.next_review_at, str(expression.id)),
+            key=lambda item: (item.next_review_at, str(item.id)),
         )
-        return [
+        if not due:
+            return None
+        target = due[0]
+        normalized_question = question_text.casefold()
+        if (
+            target.text.casefold() in normalized_question
+            or "earlier practice" in normalized_question
+            or "previously learned" in normalized_question
+        ):
+            raise ValueError("Interviewer question leaks or meta-hints the hidden target.")
+        return await self.opportunities.create(
             RetrievalOpportunity(
-                expression_id=expression.id,
-                prompt_context=(
-                    "Answer a new interview question using a useful phrase from earlier practice."
-                ),
-                retrieval_type="TRANSFER",
-                due_at=expression.next_review_at,
+                id=uuid4(),
+                user_id=user_id,
+                expression_id=target.id,
+                session_id=session_id,
+                question_family=question_family,
+                question_text=question_text,
+                created_at=anchor,
             )
-            for expression in due[: max(0, limit)]
-        ]
+        )
