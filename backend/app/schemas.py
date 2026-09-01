@@ -214,6 +214,11 @@ class DailyLessonContent(BaseModel):
     follow_up_questions: list[str] = Field(default_factory=list)
 
 
+class DailySessionResponse(BaseModel):
+    plan: DailySessionPlan
+    content: DailyLessonContent
+
+
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: Literal["fluentloop-api"] = "fluentloop-api"

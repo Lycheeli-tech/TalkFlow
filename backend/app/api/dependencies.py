@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.ai.fakes import (
     FakeAnswerAnalyzer,
     FakeCalibrationQuestionGenerator,
+    FakeLLMService,
     FakeProfileExtractor,
     FakeSpeechToTextService,
     FakeTextToSpeechService,
@@ -15,6 +16,7 @@ from app.ai.fakes import (
 from app.ai.interfaces import (
     AnswerAnalyzer,
     CalibrationQuestionGenerator,
+    LLMService,
     ProfileExtractor,
     SpeechToTextService,
     TextToSpeechService,
@@ -91,6 +93,20 @@ def get_question_generator() -> CalibrationQuestionGenerator:
             api_key=settings.openai_api_key, model=settings.openai_calibration_model
         )
     return FakeCalibrationQuestionGenerator()
+
+
+@lru_cache
+def get_llm_service() -> LLMService:
+    return FakeLLMService(
+        {
+            "question_prompt": "Tell me about your transition.",
+            "reference_answer": "I am building on my transferable experience.",
+            "language_explanations": [],
+            "imitation_variants": [],
+            "transfer_prompts": [],
+            "follow_up_questions": [],
+        }
+    )
 
 
 @lru_cache
