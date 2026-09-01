@@ -50,6 +50,7 @@ class SourceDocument(BaseModel):
     user_id: UUID
     source_type: Literal["resume_pdf", "background_text"]
     filename: str | None = None
+    storage_path: str | None = None
     raw_text: str
     parse_status: Literal["ready", "extracted", "failed"] = "ready"
     candidate_profile: dict[str, object] | None = None

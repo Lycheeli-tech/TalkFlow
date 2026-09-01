@@ -7,6 +7,7 @@ create table public.source_documents (
   user_id uuid not null references public.users (id) on delete cascade,
   source_type text not null check (source_type in ('resume_pdf', 'background_text')),
   filename text,
+  storage_path text,
   raw_text text not null,
   parse_status text not null default 'ready'
     check (parse_status in ('ready', 'extracted', 'failed')),
@@ -46,3 +47,28 @@ with check ((select auth.uid()) = user_id);
 
 grant select, insert, update, delete on public.source_documents to authenticated;
 grant select, insert, update, delete on public.profiles to authenticated;
+
+insert into storage.buckets (id, name, public)
+values ('resumes', 'resumes', false)
+on conflict (id) do nothing;
+
+create policy "users read their own resume objects"
+on storage.objects for select
+using (
+  bucket_id = 'resumes'
+  and split_part(name, '/', 1)::uuid = (select auth.uid())
+);
+
+create policy "users insert their own resume objects"
+on storage.objects for insert
+with check (
+  bucket_id = 'resumes'
+  and split_part(name, '/', 1)::uuid = (select auth.uid())
+);
+
+create policy "users delete their own resume objects"
+on storage.objects for delete
+using (
+  bucket_id = 'resumes'
+  and split_part(name, '/', 1)::uuid = (select auth.uid())
+);

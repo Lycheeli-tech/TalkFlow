@@ -73,6 +73,22 @@ async def test_source_and_confirmation_are_user_scoped(candidate: CandidateProfi
     assert await service.get_confirmed(OTHER_USER_ID) is None
 
 
+async def test_pdf_source_keeps_private_storage_provenance(candidate: CandidateProfile) -> None:
+    repository = InMemoryProfileRepository()
+    service = ProfileService(repository, FakeProfileExtractor(candidate))
+
+    source, _ = await service.create_pdf_candidate(
+        user_id=USER_ID,
+        target_role="Product Manager",
+        filename="resume.pdf",
+        raw_text="Extracted resume text.",
+        content=b"%PDF fixture",
+    )
+
+    assert source.source_type == "resume_pdf"
+    assert source.storage_path == f"{USER_ID}/{source.id}/resume.pdf"
+
+
 async def test_extraction_failure_preserves_source_document() -> None:
     class FailingExtractor:
         version = "failing_fixture_v1"

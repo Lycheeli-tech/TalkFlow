@@ -175,12 +175,14 @@ def new_source_document(
     source_type: str,
     filename: str | None,
     raw_text: str,
+    storage_path: str | None = None,
 ) -> SourceDocument:
     return SourceDocument(
         id=source_id,
         user_id=user_id,
         source_type=source_type,
         filename=filename,
+        storage_path=storage_path,
         raw_text=raw_text,
         created_at=datetime.now(UTC),
     )

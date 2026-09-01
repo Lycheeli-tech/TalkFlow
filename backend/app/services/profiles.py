@@ -4,12 +4,19 @@ from uuid import UUID, uuid4
 from app.ai.interfaces import ProfileExtractor
 from app.repositories.profiles import ProfileRepository, new_source_document
 from app.schemas import CandidateProfile, ConfirmedProfile, SourceDocument
+from app.storage.documents import DocumentStorage, FakeDocumentStorage
 
 
 class ProfileService:
-    def __init__(self, repository: ProfileRepository, extractor: ProfileExtractor) -> None:
+    def __init__(
+        self,
+        repository: ProfileRepository,
+        extractor: ProfileExtractor,
+        storage: DocumentStorage | None = None,
+    ) -> None:
         self._repository = repository
         self._extractor = extractor
+        self._storage = storage or FakeDocumentStorage()
 
     async def create_text_candidate(
         self,
@@ -36,13 +43,23 @@ class ProfileService:
         target_role: str,
         filename: str,
         raw_text: str,
+        content: bytes,
     ) -> tuple[SourceDocument, CandidateProfile]:
+        source_id = uuid4()
+        storage_path = await self._storage.store_resume(
+            user_id=user_id,
+            document_id=source_id,
+            filename=filename,
+            content=content,
+        )
         return await self._create_candidate(
             user_id=user_id,
             target_role=target_role,
             raw_text=raw_text,
             source_type="resume_pdf",
             filename=filename,
+            source_id=source_id,
+            storage_path=storage_path,
         )
 
     async def confirm_candidate(
@@ -73,13 +90,16 @@ class ProfileService:
         raw_text: str,
         source_type: str,
         filename: str | None,
+        source_id: UUID | None = None,
+        storage_path: str | None = None,
     ) -> tuple[SourceDocument, CandidateProfile]:
         source = new_source_document(
-            source_id=uuid4(),
+            source_id=source_id or uuid4(),
             user_id=user_id,
             source_type=source_type,
             filename=filename,
             raw_text=raw_text,
+            storage_path=storage_path,
         )
         await self._repository.create_source(source)
         candidate = await self._extractor.extract(raw_text=raw_text, target_role=target_role)

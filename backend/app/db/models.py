@@ -36,6 +36,7 @@ class SourceDocumentRow(Base):
     )
     source_type: Mapped[str] = mapped_column(String(32))
     filename: Mapped[str | None] = mapped_column(String(255))
+    storage_path: Mapped[str | None] = mapped_column(String(512))
     raw_text: Mapped[str] = mapped_column(Text)
     parse_status: Mapped[str] = mapped_column(String(16), default="ready")
     candidate_profile: Mapped[dict[str, object] | None] = mapped_column(JSONB)

@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, s
 from app.ai.interfaces import ProfileExtractor
 from app.api.dependencies import (
     get_current_user,
+    get_document_storage,
     get_profile_extractor,
     get_profile_repository,
 )
@@ -19,6 +20,7 @@ from app.schemas import (
 )
 from app.services.documents import PdfResumeParser, ResumeValidationError
 from app.services.profiles import ProfileService
+from app.storage.documents import DocumentStorage
 
 router = APIRouter()
 
@@ -26,8 +28,9 @@ router = APIRouter()
 def profile_service(
     repository: ProfileRepository = Depends(get_profile_repository),
     extractor: ProfileExtractor = Depends(get_profile_extractor),
+    storage: DocumentStorage = Depends(get_document_storage),
 ) -> ProfileService:
-    return ProfileService(repository, extractor)
+    return ProfileService(repository, extractor, storage)
 
 
 @router.post("/sources/text", response_model=CandidateExtractionResponse, status_code=201)
@@ -72,6 +75,7 @@ async def import_resume_pdf(
         target_role=target_role,
         filename=resume.filename or "resume.pdf",
         raw_text=raw_text,
+        content=content,
     )
     return CandidateExtractionResponse(
         source_id=source.id,

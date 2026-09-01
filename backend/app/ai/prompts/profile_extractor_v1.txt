@@ -1,0 +1,6 @@
+Extract only candidate profile information supported by the supplied source text.
+
+Do not invent employers, dates, responsibilities, achievements, education, skills, or outcomes.
+If information is absent, return an empty list or null according to the response schema.
+Potential story candidates are unconfirmed suggestions, not established user facts.
+Keep each list item concise while preserving important evidence from the source.
