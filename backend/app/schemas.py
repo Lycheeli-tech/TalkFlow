@@ -97,6 +97,10 @@ AttemptStatus = Literal["AUDIO_SAVED", "STT_FAILED", "TRANSCRIBED", "ANALYSIS_FA
 AssessmentLevel = Literal["NEEDS_WORK", "DEVELOPING", "FUNCTIONAL", "STRONG"]
 LearningPhase = Literal["BUILD", "TRANSFER", "PERFORM"]
 DailyStep = Literal["RECALL", "LEARN", "IMITATE", "RETRIEVE", "TRANSFER", "INTERVIEW", "RECAP"]
+ExpressionStatus = Literal["NEW", "LEARNING", "RECALLED", "TRANSFERRED", "MASTERED"]
+RetrievalType = Literal["LEARNING", "RECALL", "TRANSFER"]
+EvidenceResult = Literal["SUCCESS", "FAILURE"]
+ErrorPatternStatus = Literal["CANDIDATE", "ACTIVE", "IMPROVING", "RESOLVED"]
 
 
 class CalibrationQuestion(BaseModel):
@@ -217,6 +221,77 @@ class DailyLessonContent(BaseModel):
 class DailySessionResponse(BaseModel):
     plan: DailySessionPlan
     content: DailyLessonContent
+
+
+class MasteryRules(BaseModel):
+    version: Literal["mastery_rules_v1"] = "mastery_rules_v1"
+    recall_successes_required: int = Field(default=3, ge=1)
+    transfer_successes_required: int = Field(default=2, ge=1)
+    sessions_required: int = Field(default=3, ge=1)
+    review_intervals_days: list[int] = Field(default_factory=lambda: [1, 3, 7, 14])
+
+
+class Expression(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    user_id: UUID
+    text: str = Field(min_length=1, max_length=500)
+    meaning: str = Field(min_length=1, max_length=1000)
+    source_type: Literal["CURRICULUM", "ATTEMPT", "USER"]
+    source_id: UUID | None = None
+    status: ExpressionStatus = "NEW"
+    successful_recall: int = Field(default=0, ge=0)
+    failed_recall: int = Field(default=0, ge=0)
+    transfer_success: int = Field(default=0, ge=0)
+    next_review_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
+
+
+class ExpressionAttempt(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    expression_id: UUID
+    attempt_id: UUID
+    session_id: UUID
+    user_id: UUID
+    context: str = Field(min_length=1, max_length=2000)
+    retrieval_type: RetrievalType
+    hint_used: bool = False
+    independent_evidence: bool = False
+    usage_correct: bool = False
+    result: EvidenceResult
+    created_at: datetime
+
+
+class ErrorPattern(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    user_id: UUID
+    pattern_type: str
+    original_example: str
+    preferred_expression: str | None = None
+    occurrence_count: int = Field(default=1, ge=1)
+    successful_correction_count: int = Field(default=0, ge=0)
+    status: ErrorPatternStatus = "CANDIDATE"
+    first_seen: datetime
+    last_seen: datetime
+
+
+class Story(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    user_id: UUID
+    title: str
+    content: str
+    source_document_id: UUID | None = None
+    confirmed_by_user: Literal[True]
+    created_at: datetime
+    updated_at: datetime
 
 
 class HealthResponse(BaseModel):
