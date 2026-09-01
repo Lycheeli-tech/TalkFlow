@@ -97,7 +97,7 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 
 ### Known limitations
 
-- Daily session API currently returns the minimal Day 1 shell and does not yet persist completed daily sessions or learner progress.
+- Daily sessions persist and are idempotently resumed while in progress; completion progression and learner progress remain later work.
 - Today UI is a polished low-fidelity MVP entry surface; recording, real TTS/STT, and full seven-step interaction remain later work.
 - Fake providers remain the default; live provider and Supabase integration gates are still open.
 - Formal Memory/Mastery, Story Bank, Review Scheduler, Mock Interview, and Quick Review remain out of scope.

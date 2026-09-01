@@ -32,6 +32,7 @@ from app.core.config import get_settings
 from app.core.security import JWTVerificationError, SupabaseTokenVerifier, TokenVerifier
 from app.db.session import get_database_session
 from app.repositories.calibration import CalibrationRepository, SQLCalibrationRepository
+from app.repositories.daily_sessions import DailySessionRepository, SQLDailySessionRepository
 from app.repositories.profiles import ProfileRepository, SQLProfileRepository
 from app.repositories.users import SQLUserRepository, UserRepository
 from app.schemas import AuthenticatedUser
@@ -81,6 +82,12 @@ async def get_calibration_repository(
     session: AsyncSession = Depends(get_database_session),
 ) -> AsyncIterator[CalibrationRepository]:
     yield SQLCalibrationRepository(session)
+
+
+async def get_daily_session_repository(
+    session: AsyncSession = Depends(get_database_session),
+) -> AsyncIterator[DailySessionRepository]:
+    yield SQLDailySessionRepository(session)
 
 
 @lru_cache

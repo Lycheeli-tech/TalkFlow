@@ -1,7 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.ai.interfaces import LLMService
-from app.api.dependencies import get_current_user, get_llm_service, get_profile_repository
+from app.api.dependencies import (
+    get_current_user,
+    get_daily_session_repository,
+    get_llm_service,
+    get_profile_repository,
+)
+from app.repositories.daily_sessions import DailySessionRepository
 from app.repositories.profiles import ProfileRepository
 from app.schemas import AuthenticatedUser, DailySessionResponse
 from app.services.daily_lesson_content import DailyLessonContentService
@@ -14,6 +20,7 @@ router = APIRouter()
 async def create_daily_session(
     current_user: AuthenticatedUser = Depends(get_current_user),
     profiles: ProfileRepository = Depends(get_profile_repository),
+    repository: DailySessionRepository = Depends(get_daily_session_repository),
     llm: LLMService = Depends(get_llm_service),
 ) -> DailySessionResponse:
     profile = await profiles.get_confirmed(current_user.id)
@@ -28,4 +35,4 @@ async def create_daily_session(
         )
     )
     content = await DailyLessonContentService(llm=llm).generate(plan=plan, profile=profile)
-    return DailySessionResponse(plan=plan, content=content)
+    return await repository.get_or_create(user_id=current_user.id, plan=plan, content=content)
