@@ -72,10 +72,32 @@
 
 ## Milestone 3 — Core Daily Session
 
-**Status:** IN PROGRESS
+**Status:** COMPLETE
 
 **Branch:** `feat/daily-session`
 
 **Base:** `m2-voice-calibration` (`c910377`)
 
 Scope: bounded inventories, deterministic Daily Planner, minimum daily-session persistence, the canonical session shell, and Today. The fixed backbone is BUILD → TRANSFER → PERFORM, not a hard-coded Day 2–30 topic calendar. Formal Memory/Mastery, Story Bank, Review Scheduler, Mock Interview, and Quick Review remain later-milestone scope.
+
+**Verified HEAD:** `43ece44`
+
+### Implemented
+
+- Bounded interview, language, strategy, and story inventories.
+- Deterministic Daily Planner with stage boundaries, scaffolding, duration-specific canonical steps, and cross-day retrieval selection.
+- Provider-backed, versioned structured lesson content generation with confirmed-profile constraints.
+- Minimal authenticated Daily Session API shell and reusable responsive Today UI.
+
+### Verified checks
+
+- Backend: 32 tests passed; Ruff format and lint passed.
+- Four versioned migrations validated.
+- Frontend ESLint, TypeScript (`--incremental false`), and production build passed.
+
+### Known limitations
+
+- Daily session API currently returns the minimal Day 1 shell and does not yet persist completed daily sessions or learner progress.
+- Today UI is a polished low-fidelity MVP entry surface; recording, real TTS/STT, and full seven-step interaction remain later work.
+- Fake providers remain the default; live provider and Supabase integration gates are still open.
+- Formal Memory/Mastery, Story Bank, Review Scheduler, Mock Interview, and Quick Review remain out of scope.
