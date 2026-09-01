@@ -204,6 +204,16 @@ class DailySessionPlan(BaseModel):
     scaffolding_level: Literal["HIGH", "MEDIUM", "LOW"]
 
 
+class DailyLessonContent(BaseModel):
+    version: Literal["daily_lesson_content_v1"] = "daily_lesson_content_v1"
+    question_prompt: str = Field(min_length=1, max_length=1000)
+    reference_answer: str = Field(min_length=1, max_length=4000)
+    language_explanations: list[str] = Field(default_factory=list)
+    imitation_variants: list[str] = Field(default_factory=list)
+    transfer_prompts: list[str] = Field(default_factory=list)
+    follow_up_questions: list[str] = Field(default_factory=list)
+
+
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: Literal["fluentloop-api"] = "fluentloop-api"
