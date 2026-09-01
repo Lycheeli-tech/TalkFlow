@@ -437,6 +437,14 @@ h1 {
 }
 
 .calibration, .assessment { display: grid; gap: 1.25rem; }
+.today-card { display: grid; gap: 1.25rem; max-width: 720px; }
+.today-heading { display: flex; gap: 1rem; justify-content: space-between; align-items: flex-start; }
+.today-duration { color: var(--muted, #667085); white-space: nowrap; }
+.today-progress { display: grid; grid-template-columns: repeat(7, 1fr); gap: .4rem; }
+.today-progress span { height: .35rem; border-radius: 999px; background: #e5e7eb; }
+.today-progress span[data-active="true"], .today-progress span[data-complete="true"] { background: #4f46e5; }
+.today-step { margin: 0; }
+@media (max-width: 560px) { .today-heading { display: grid; } .today-progress { gap: .25rem; } }
 .calibration h2 { font-size: clamp(1.35rem, 3vw, 2rem); line-height: 1.25; }
 .transcript { display: grid; gap: .75rem; padding: 1rem; border-radius: var(--radius-md); background: var(--surface-muted); }
 .transcript small { color: var(--text-muted); }

@@ -105,3 +105,30 @@ export function retryCalibrationAttempt(token: string, attemptId: string) {
 export function getCalibration(token: string, sessionId: string) {
   return apiFetch<{ session: CalibrationSession; attempts: VoiceAttempt[]; assessment: LearnerAssessment | null }>(`/api/v1/calibration/sessions/${sessionId}`, token);
 }
+
+export type DailySessionPlan = {
+  day: number;
+  phase: "BUILD" | "TRANSFER" | "PERFORM";
+  duration_minutes: 10 | 20 | 30 | 60;
+  topic_family: string;
+  question_family: string;
+  strategy_id: string;
+  steps: string[];
+  scaffolding_level: "HIGH" | "MEDIUM" | "LOW";
+};
+
+export type DailySessionResponse = {
+  plan: DailySessionPlan;
+  content: {
+    question_prompt: string;
+    reference_answer: string;
+    language_explanations: string[];
+    imitation_variants: string[];
+    transfer_prompts: string[];
+    follow_up_questions: string[];
+  };
+};
+
+export function createDailySession(token: string) {
+  return apiFetch<DailySessionResponse>("/api/v1/daily/sessions", token, { method: "POST" });
+}
