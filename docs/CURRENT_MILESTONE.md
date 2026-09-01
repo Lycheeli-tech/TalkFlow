@@ -101,3 +101,31 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - Today UI is a polished low-fidelity MVP entry surface; recording, real TTS/STT, and full seven-step interaction remain later work.
 - Fake providers remain the default; live provider and Supabase integration gates are still open.
 - Formal Memory/Mastery, Story Bank, Review Scheduler, Mock Interview, and Quick Review remain out of scope.
+
+## Milestone 4 — Memory & Mastery
+
+**Status:** COMPLETE
+
+**Branch:** `feat/memory-mastery`
+
+**Verified HEAD:** `aa80e68`
+
+### Implemented
+
+- Versioned mastery and review rules with deterministic evidence-based transitions.
+- Explicit ExpressionAttempt evidence fields for recall/transfer, hint usage, independence, correctness, linked attempt/session, context, and timestamp.
+- Conservative ErrorPattern lifecycle and confirmation-gated durable Story contract.
+- User-scoped memory repository boundary with an in-memory MVP adapter.
+- Versioned PostgreSQL migration for expressions, evidence, error patterns, and confirmed stories.
+
+### Verified checks
+
+- Backend: 43 tests passed; Ruff format and lint passed.
+- Five versioned migrations validated.
+- Frontend lint, TypeScript, and production build checks passed.
+
+### Known limitations
+
+- The current repository adapter is in-memory; wiring the M4 tables to a live SQL repository remains a hardening step before production use.
+- M5 hidden retrieval injection, cross-session aha orchestration, and full Daily attempt integration remain out of scope.
+- Fake providers remain the default and live Supabase/provider integration is not yet verified.
