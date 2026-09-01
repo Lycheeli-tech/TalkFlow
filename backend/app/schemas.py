@@ -309,6 +309,13 @@ class RetrievalOpportunity(BaseModel):
     due_at: datetime
 
 
+class HiddenTransferOpportunity(BaseModel):
+    expression_id: UUID
+    session_id: UUID
+    interviewer_prompt: str = Field(min_length=1, max_length=2000)
+    retrieval_type: Literal["TRANSFER"] = "TRANSFER"
+
+
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: Literal["fluentloop-api"] = "fluentloop-api"
