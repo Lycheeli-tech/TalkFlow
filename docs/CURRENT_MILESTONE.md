@@ -139,7 +139,7 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 
 ## Milestone 5 — Cross-Session Retrieval Loop
 
-**Status:** COMPLETE
+**Status:** IN PROGRESS
 
 **Branch:** `feat/cross-session-loop`
 
@@ -166,6 +166,11 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - Structured transfer analysis uses the trusted verifier boundary, but live analyzer/provider behavior is not validated.
 - Only the minimal retrieval orchestration API/service exists; M6 practice/progress features remain out of scope.
 - The known Starlette/httpx deprecation warning remains.
+
+### Remaining completion gaps
+
+- SQL evidence persistence and opportunity consumption still need one transaction/unit-of-work boundary for crash-safe atomicity.
+- The authenticated API creates an opportunity, but the real Daily Attempt submission and server-side verification result endpoint are not yet wired end to end.
 
 
 ## Milestone 6 — Practice & Progress
