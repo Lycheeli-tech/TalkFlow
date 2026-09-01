@@ -190,6 +190,9 @@ class ExpressionAttemptRow(Base):
     )
     attempt_id: Mapped[UUID] = mapped_column(ForeignKey("public.attempts.id", ondelete="CASCADE"))
     session_id: Mapped[UUID] = mapped_column(ForeignKey("public.sessions.id", ondelete="CASCADE"))
+    retrieval_opportunity_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("public.retrieval_opportunities.id", ondelete="RESTRICT"), unique=True
+    )
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("public.users.id", ondelete="CASCADE"), index=True
     )
@@ -256,7 +259,6 @@ class RetrievalOpportunityRow(Base):
         ForeignKey("public.expressions.id", ondelete="CASCADE")
     )
     session_id: Mapped[UUID] = mapped_column(ForeignKey("public.sessions.id", ondelete="CASCADE"))
-    retrieval_opportunity_id: Mapped[UUID | None]
     question_family: Mapped[str] = mapped_column(String(64))
     question_text: Mapped[str] = mapped_column(Text)
     retrieval_type: Mapped[str] = mapped_column(String(24), default="TRANSFER")

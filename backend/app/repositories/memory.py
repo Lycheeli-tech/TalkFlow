@@ -13,7 +13,7 @@ from app.db.models import (
     SourceDocumentRow,
     StoryRow,
 )
-from app.schemas import ErrorPattern, Expression, ExpressionAttempt, Story
+from app.schemas import ErrorPattern, Expression, ExpressionAttempt, Story, TrustedTransferAnalysis
 
 
 class MemoryRepository(Protocol):
@@ -36,13 +36,35 @@ class InMemoryMemoryRepository:
         self.error_patterns: dict[UUID, ErrorPattern] = {}
         self.stories: dict[UUID, Story] = {}
         self.sessions: dict[UUID, UUID] = {}
+        self.session_states: dict[UUID, tuple[str, str]] = {}
         self.attempts: dict[UUID, tuple[UUID, UUID]] = {}
+        self.attempt_analyses: dict[UUID, TrustedTransferAnalysis] = {}
+        self.attempt_questions: dict[UUID, str] = {}
 
-    def register_session(self, session_id: UUID, user_id: UUID) -> None:
+    def register_session(
+        self,
+        session_id: UUID,
+        user_id: UUID,
+        *,
+        session_type: str = "DAILY",
+        status: str = "IN_PROGRESS",
+    ) -> None:
         self.sessions[session_id] = user_id
+        self.session_states[session_id] = (session_type, status)
 
-    def register_attempt(self, attempt_id: UUID, session_id: UUID, user_id: UUID) -> None:
+    def register_attempt(
+        self,
+        attempt_id: UUID,
+        session_id: UUID,
+        user_id: UUID,
+        analysis: TrustedTransferAnalysis | None = None,
+        question: str | None = None,
+    ) -> None:
         self.attempts[attempt_id] = (session_id, user_id)
+        if analysis is not None:
+            self.attempt_analyses[attempt_id] = analysis
+        if question is not None:
+            self.attempt_questions[attempt_id] = question
 
     async def save_expression(self, expression: Expression) -> Expression:
         self.expressions[expression.id] = expression

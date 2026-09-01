@@ -1,11 +1,11 @@
 from uuid import UUID
 
-from app.schemas import Expression, TrustedTransferAnalysis
+from app.schemas import RetrievalResult
 from app.services.verification import VerificationService
 
 
 class DailyAttemptService:
-    """Accepts attempt identity and trusted analysis, never caller-authored mastery flags."""
+    """Resolves a persisted, server-analyzed Daily Attempt by identity only."""
 
     def __init__(self, verifier: VerificationService) -> None:
         self.verifier = verifier
@@ -16,15 +16,9 @@ class DailyAttemptService:
         user_id: UUID,
         opportunity_id: UUID,
         attempt_id: UUID,
-        session_id: UUID,
-        context: str,
-        analysis: TrustedTransferAnalysis,
-    ) -> Expression:
+    ) -> RetrievalResult:
         return await self.verifier.verify_and_record(
             user_id=user_id,
             opportunity_id=opportunity_id,
             attempt_id=attempt_id,
-            session_id=session_id,
-            context=context,
-            analysis=analysis,
         )

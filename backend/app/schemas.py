@@ -318,6 +318,16 @@ class RetrievalOpportunity(BaseModel):
     consumed_at: datetime | None = None
 
 
+class RetrievalOpportunityResponse(BaseModel):
+    """Interviewer-safe data; the hidden expression is deliberately omitted."""
+
+    opportunity_id: UUID
+    session_id: UUID
+    question_family: str
+    question_text: str
+    status: Literal["CREATED", "CONSUMED", "EXPIRED"]
+
+
 class HiddenTransferOpportunity(BaseModel):
     opportunity_id: UUID
     expression_id: UUID
@@ -331,6 +341,20 @@ class TrustedTransferAnalysis(BaseModel):
     usage_correct: bool
     direct_hint_used: bool
     verifier_version: str
+
+
+class ResolveRetrievalRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    attempt_id: UUID
+
+
+class RetrievalResult(BaseModel):
+    opportunity_id: UUID
+    opportunity_status: Literal["CONSUMED"] = "CONSUMED"
+    recorded: bool
+    expression_status: ExpressionStatus
+    next_review_at: datetime | None = None
 
 
 class HealthResponse(BaseModel):

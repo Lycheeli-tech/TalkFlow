@@ -6,8 +6,8 @@ import pytest
 from app.repositories.memory import InMemoryMemoryRepository
 from app.repositories.retrieval import InMemoryRetrievalOpportunityRepository
 from app.schemas import Expression, RetrievalOpportunity, TrustedTransferAnalysis
+from app.services.cross_session_uow import InMemoryCrossSessionUnitOfWork
 from app.services.daily_attempts import DailyAttemptService
-from app.services.memory import MemoryApplicationService
 from app.services.verification import VerificationService
 
 
@@ -27,7 +27,18 @@ async def test_daily_transfer_flows_through_verified_memory_path() -> None:
     await repository.save_expression(expression)
     session_id, attempt_id = uuid4(), uuid4()
     repository.register_session(session_id, expression.user_id)
-    repository.register_attempt(attempt_id, session_id, expression.user_id)
+    repository.register_attempt(
+        attempt_id,
+        session_id,
+        expression.user_id,
+        TrustedTransferAnalysis(
+            target_used=True,
+            usage_correct=True,
+            direct_hint_used=False,
+            verifier_version="fixture_v1",
+        ),
+        question="New context",
+    )
     opportunities = InMemoryRetrievalOpportunityRepository()
     opportunity = await opportunities.create(
         RetrievalOpportunity(
@@ -41,37 +52,23 @@ async def test_daily_transfer_flows_through_verified_memory_path() -> None:
         )
     )
 
-    verifier = VerificationService(
-        opportunities=opportunities, memory=MemoryApplicationService(repository)
-    )
-    updated = await DailyAttemptService(verifier).record_hidden_transfer(
+    verifier = VerificationService(InMemoryCrossSessionUnitOfWork(repository, opportunities))
+    result = await DailyAttemptService(verifier).record_hidden_transfer(
         user_id=expression.user_id,
         opportunity_id=opportunity.id,
         attempt_id=attempt_id,
-        session_id=session_id,
-        context="new interview answer",
-        analysis=TrustedTransferAnalysis(
-            target_used=True,
-            usage_correct=True,
-            direct_hint_used=False,
-            verifier_version="fixture_v1",
-        ),
     )
 
-    assert updated.transfer_success == 1
+    assert result.recorded is True
+    assert (
+        await repository.get_expression(expression.id, expression.user_id)
+    ).transfer_success == 1
     assert len(repository.evidence) == 1
     assert (await opportunities.get(opportunity.id, expression.user_id)).status == "CONSUMED"
-    with pytest.raises(ValueError):
-        await DailyAttemptService(verifier).record_hidden_transfer(
-            user_id=expression.user_id,
-            opportunity_id=opportunity.id,
-            attempt_id=attempt_id,
-            session_id=session_id,
-            context="retry",
-            analysis=TrustedTransferAnalysis(
-                target_used=True,
-                usage_correct=True,
-                direct_hint_used=False,
-                verifier_version="fixture_v1",
-            ),
-        )
+    replay = await DailyAttemptService(verifier).record_hidden_transfer(
+        user_id=expression.user_id,
+        opportunity_id=opportunity.id,
+        attempt_id=attempt_id,
+    )
+    assert replay.recorded is False
+    assert len(repository.evidence) == 1

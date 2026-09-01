@@ -54,6 +54,7 @@ class SQLRetrievalOpportunityRepository:
                 SessionRow.id == opportunity.session_id,
                 SessionRow.user_id == opportunity.user_id,
                 SessionRow.session_type == "DAILY",
+                SessionRow.status == "IN_PROGRESS",
             )
         )
         if expression is None or daily_session is None:

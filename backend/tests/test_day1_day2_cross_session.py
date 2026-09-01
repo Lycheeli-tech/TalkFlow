@@ -6,6 +6,7 @@ import pytest
 from app.repositories.memory import InMemoryMemoryRepository
 from app.repositories.retrieval import InMemoryRetrievalOpportunityRepository
 from app.schemas import Expression, ExpressionAttempt, TrustedTransferAnalysis
+from app.services.cross_session_uow import InMemoryCrossSessionUnitOfWork
 from app.services.daily_attempts import DailyAttemptService
 from app.services.memory import MemoryApplicationService
 from app.services.retrieval import RetrievalService
@@ -52,7 +53,18 @@ async def test_day_one_learning_reappears_as_day_two_hidden_transfer() -> None:
 
     day2_session, day2_attempt = uuid4(), uuid4()
     repository.register_session(day2_session, user_id)
-    repository.register_attempt(day2_attempt, day2_session, user_id)
+    repository.register_attempt(
+        day2_attempt,
+        day2_session,
+        user_id,
+        TrustedTransferAnalysis(
+            target_used=True,
+            usage_correct=True,
+            direct_hint_used=False,
+            verifier_version="fixture_v1",
+        ),
+        question="How does your previous experience prepare you for this role?",
+    )
     opportunities = InMemoryRetrievalOpportunityRepository()
     opportunity = await RetrievalService(repository, opportunities).create_due_opportunity(
         user_id=user_id,
@@ -63,21 +75,16 @@ async def test_day_one_learning_reappears_as_day_two_hidden_transfer() -> None:
     )
     assert opportunity is not None
     assert expression.text not in opportunity.question_text
-    verifier = VerificationService(opportunities=opportunities, memory=memory)
-    updated = await DailyAttemptService(verifier).record_hidden_transfer(
+    verifier = VerificationService(InMemoryCrossSessionUnitOfWork(repository, opportunities))
+    result = await DailyAttemptService(verifier).record_hidden_transfer(
         user_id=user_id,
         opportunity_id=opportunity.id,
         attempt_id=day2_attempt,
-        session_id=day2_session,
-        context=opportunity.question_text,
-        analysis=TrustedTransferAnalysis(
-            target_used=True,
-            usage_correct=True,
-            direct_hint_used=False,
-            verifier_version="fixture_v1",
-        ),
     )
 
+    updated = await repository.get_expression(expression.id, user_id)
+    assert updated is not None
+    assert result.recorded is True
     assert updated.transfer_success == 1
     assert updated.status == "TRANSFERRED"
     assert len(repository.evidence) == 4
