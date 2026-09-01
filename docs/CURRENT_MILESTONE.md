@@ -6,6 +6,10 @@
 **Branch:** `feat/onboarding-profile`  
 **Verified HEAD:** `2ce8dd2`
 
+**Merged to main:** `2c2943c`
+
+**Stable tag:** `m1-profile`
+
 ### Verified checks
 
 - Backend tests: 18 passed.
@@ -28,6 +32,10 @@
 
 ## Milestone 2 — Voice Calibration
 
-**Status:** NOT STARTED
+**Status:** IN PROGRESS
 
-Do not begin Milestone 2 until the repository-memory documents have been reviewed and implementation is explicitly resumed.
+**Branch:** `feat/voice-calibration`
+
+**Base:** `m1-profile` (`2c2943c`)
+
+Scope is limited to turn-based Voice Calibration: three confirmed-profile-grounded questions, learner audio preservation, STT, attempts, structured per-attempt analysis, and a provisional versioned learner assessment. Milestone 3 Daily Session behavior is not authorized.
