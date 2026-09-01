@@ -95,6 +95,10 @@ class ConfirmedProfile(BaseModel):
 CalibrationQuestionType = Literal["EXPERIENCE", "MOTIVATION", "PROJECT"]
 AttemptStatus = Literal["AUDIO_SAVED", "STT_FAILED", "TRANSCRIBED", "ANALYSIS_FAILED", "ANALYZED"]
 AssessmentLevel = Literal["NEEDS_WORK", "DEVELOPING", "FUNCTIONAL", "STRONG"]
+LearningPhase = Literal["BUILD", "TRANSFER", "PERFORM"]
+DailyStep = Literal["RECALL", "LEARN", "IMITATE", "RETRIEVE", "TRANSFER", "INTERVIEW", "RECAP"]
+LearningPhase = Literal["BUILD", "TRANSFER", "PERFORM"]
+DailyStep = Literal["RECALL", "LEARN", "IMITATE", "RETRIEVE", "TRANSFER", "INTERVIEW", "RECAP"]
 
 
 class CalibrationQuestion(BaseModel):
@@ -174,6 +178,32 @@ class CalibrationResult(BaseModel):
     session: CalibrationSession
     attempts: list[VoiceAttempt]
     assessment: LearnerAssessment | None = None
+
+
+class InventoryItem(BaseModel):
+    id: str
+    item_type: Literal["QUESTION", "LANGUAGE", "STRATEGY"]
+    family: str
+    content: str
+    tags: list[str] = Field(default_factory=list)
+    eligible_phases: list[LearningPhase] = Field(
+        default_factory=lambda: ["BUILD", "TRANSFER", "PERFORM"]
+    )
+
+
+class DailySessionPlan(BaseModel):
+    version: Literal["daily_session_plan_v1"] = "daily_session_plan_v1"
+    day: int = Field(ge=1, le=30)
+    phase: LearningPhase
+    duration_minutes: Literal[10, 20, 30, 60]
+    topic_family: str
+    question_family: str
+    strategy_id: str
+    story_category: str
+    new_language_target_ids: list[str] = Field(default_factory=list)
+    retrieval_target_ids: list[str] = Field(default_factory=list)
+    steps: list[DailyStep]
+    scaffolding_level: Literal["HIGH", "MEDIUM", "LOW"]
 
 
 class HealthResponse(BaseModel):
