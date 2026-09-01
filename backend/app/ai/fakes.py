@@ -1,6 +1,11 @@
 from typing import Any
 
-from app.schemas import CandidateProfile
+from app.schemas import (
+    AttemptAnalysis,
+    CalibrationQuestion,
+    CandidateProfile,
+    ConfirmedProfile,
+)
 
 
 class FakeLLMService:
@@ -23,6 +28,8 @@ class FakeLLMService:
 
 
 class FakeSpeechToTextService:
+    provider_name = "fake"
+
     def __init__(self, transcript: str = "Fixture transcript") -> None:
         self._transcript = transcript
 
@@ -34,6 +41,51 @@ class FakeSpeechToTextService:
 class FakeTextToSpeechService:
     async def synthesize(self, *, text: str, voice: str) -> bytes:
         return f"fake-audio:{voice}:{text}".encode()
+
+
+class FakeCalibrationQuestionGenerator:
+    version = "calibration_questions_fixture_v1"
+
+    async def generate(self, *, profile: ConfirmedProfile) -> list[CalibrationQuestion]:
+        experience = profile.work_experience[0] if profile.work_experience else profile.target_role
+        motivation = profile.career_transition or profile.target_role
+        project = (
+            profile.projects[0]
+            if profile.projects
+            else profile.skills[0]
+            if profile.skills
+            else profile.target_role
+        )
+        return [
+            CalibrationQuestion(
+                category="EXPERIENCE", text=f"Tell me about your experience with {experience}."
+            ),
+            CalibrationQuestion(
+                category="MOTIVATION", text=f"Why are you moving toward {motivation}?"
+            ),
+            CalibrationQuestion(
+                category="PROJECT", text=f"Walk me through a project involving {project}."
+            ),
+        ]
+
+
+class FakeAnswerAnalyzer:
+    version = "answer_analyzer_fixture_v1"
+
+    async def analyze(self, *, question: str, transcript: str) -> AttemptAnalysis:
+        del question
+        level = "FUNCTIONAL" if len(transcript.split()) >= 5 else "DEVELOPING"
+        return AttemptAnalysis(
+            fluency=level,
+            naturalness=level,
+            grammar=level,
+            retrieval=level,
+            structure=level,
+            strengths=["Completed a relevant spoken response."],
+            focus_areas=["Use specific examples and clearer transitions."],
+            observed_patterns=["Baseline response captured."],
+            evidence=[transcript[:160]],
+        )
 
 
 class FakeProfileExtractor:
