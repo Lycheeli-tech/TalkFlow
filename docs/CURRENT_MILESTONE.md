@@ -139,4 +139,33 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 
 ## Milestone 5 — Cross-Session Loop
 
+**Status:** COMPLETE
+
+**Branch:** `feat/cross-session-loop`
+
+**Verified implementation HEAD:** `20da2bf`
+
+### Implemented
+
+- Deterministic due-expression retrieval with user isolation and stable ordering.
+- Hidden transfer opportunities that keep target expressions out of interviewer-facing prompts.
+- Explicit evidence verification and Daily attempt → MemoryApplicationService integration.
+- Service-level Day 1 → Day 2 cross-session retrieval / transfer / evidence fixture.
+- Minimal authenticated due-retrieval API.
+
+### Verified checks
+
+- Backend: 54 tests passed; Ruff format and lint passed.
+- Five versioned migrations validated.
+- Day 1 → Day 2 and hidden-target leakage regressions passed.
+
+### Known limitations
+
+- Live Supabase/provider integration has not been validated.
+- Daily attempt integration remains service-level; full production recording/orchestration is not implemented.
+- Only the minimal due-retrieval API exists; M6 practice/progress features remain out of scope.
+- The known Starlette/httpx deprecation warning remains.
+
+## Milestone 6 — Practice & Progress
+
 **Status:** NOT STARTED
