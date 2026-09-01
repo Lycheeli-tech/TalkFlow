@@ -1,0 +1,18 @@
+{
+  "user_id": "10000000-0000-0000-0000-000000000001",
+  "expression_id": "20000000-0000-0000-0000-000000000001",
+  "day1": {
+    "session_id": "30000000-0000-0000-0000-000000000001",
+    "evidence_id": "40000000-0000-0000-0000-000000000001",
+    "occurred_at": "2026-09-01T09:00:00+00:00",
+    "expression": "highly transferable",
+    "context": "Describe the skills you can bring from your previous role."
+  },
+  "day2": {
+    "session_id": "30000000-0000-0000-0000-000000000002",
+    "evidence_id": "40000000-0000-0000-0000-000000000002",
+    "occurred_at": "2026-09-02T09:00:00+00:00",
+    "question": "How would your previous experience help you succeed in this position?",
+    "answer": "The communication skills I developed are highly transferable to this position."
+  }
+}
