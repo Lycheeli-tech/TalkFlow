@@ -35,8 +35,14 @@ from app.repositories.calibration import CalibrationRepository, SQLCalibrationRe
 from app.repositories.daily_sessions import DailySessionRepository, SQLDailySessionRepository
 from app.repositories.memory import MemoryRepository, SQLMemoryRepository
 from app.repositories.profiles import ProfileRepository, SQLProfileRepository
+from app.repositories.retrieval import (
+    RetrievalOpportunityRepository,
+    SQLRetrievalOpportunityRepository,
+)
 from app.repositories.users import SQLUserRepository, UserRepository
 from app.schemas import AuthenticatedUser
+from app.services.cross_session_uow import SQLCrossSessionUnitOfWork
+from app.services.verification import VerificationService
 from app.storage.audio import AudioStorage, FakeAudioStorage, SupabaseAudioStorage
 from app.storage.documents import DocumentStorage, FakeDocumentStorage, SupabaseDocumentStorage
 
@@ -95,6 +101,18 @@ async def get_memory_repository(
     session: AsyncSession = Depends(get_database_session),
 ) -> AsyncIterator[MemoryRepository]:
     yield SQLMemoryRepository(session)
+
+
+async def get_retrieval_opportunity_repository(
+    session: AsyncSession = Depends(get_database_session),
+) -> AsyncIterator[RetrievalOpportunityRepository]:
+    yield SQLRetrievalOpportunityRepository(session)
+
+
+def get_verification_service(
+    session: AsyncSession = Depends(get_database_session),
+) -> VerificationService:
+    return VerificationService(SQLCrossSessionUnitOfWork(session))
 
 
 @lru_cache

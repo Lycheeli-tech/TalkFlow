@@ -75,3 +75,9 @@ The 30-Day Interview Bootcamp has a fixed BUILD → TRANSFER → PERFORM stage b
 ### ADR-018 — Gated Durable Memory Writes
 
 Production memory uses the PostgreSQL repository. Normal durable writes pass through the memory application service and Memory Gate; repositories remain low-level persistence boundaries. In-memory storage is limited to deterministic tests and fixtures.
+
+### ADR-019 — Atomic Cross-Session Resolution
+
+Resolving a persisted Daily Attempt uses a small cross-session unit of work. Verified evidence,
+deterministic Expression mastery/review updates, and RetrievalOpportunity consumption commit in one
+PostgreSQL transaction; fixtures emulate the same rollback and idempotency semantics in memory.

@@ -137,6 +137,48 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - M5 hidden retrieval injection, cross-session aha orchestration, and full Daily attempt integration are not implemented.
 - The known Starlette/httpx deprecation warning remains.
 
-## Milestone 5 — Cross-Session Loop
+## Milestone 5 — Cross-Session Retrieval Loop
+
+**Status:** COMPLETE
+
+**Branch:** `feat/cross-session-loop`
+
+**Verified implementation HEAD:** `bab7598`
+
+### Implemented
+
+- Durable, user/session-scoped RetrievalOpportunity records with conditional single consumption.
+- Natural cross-context interview questions with deterministic target/meta-hint leakage guards.
+- Trusted VerificationService creates authoritative evidence from structured analyzer output; public callers cannot submit mastery flags.
+- Daily attempt → VerificationService → MemoryApplicationService integration with auditable opportunity linkage.
+- Production-compatible Day 1 → Day 2 fixture using registered Sessions, Attempts, scheduled due state, durable opportunity, and verified evidence.
+- Minimal authenticated opportunity-creation API.
+- Interviewer-safe opportunity responses that omit the hidden Expression identifier and text.
+- Authenticated retrieval-resolution API accepting only a persisted `attempt_id`; request-authored
+  mastery/evidence flags are forbidden.
+- `VerificationService` loads the user-owned, same-session, analyzed Daily Attempt and delegates to
+  a cross-session unit of work.
+- One SQL transaction atomically persists verified ExpressionAttempt evidence, applies the shared
+  deterministic MemoryApplicationService mastery/review policy, and consumes the opportunity.
+- In-memory fixtures emulate rollback and idempotency for deterministic tests.
+
+### Verified checks
+
+- Backend: 62 tests passed; Ruff format and lint passed.
+- Six versioned migrations validated.
+- Atomic rollback/retry/replay, API anti-forgery, SQL transaction, ownership/provenance,
+  Day 1 → Day 2, and hidden-target leakage regressions passed.
+
+### Known limitations
+
+- Live Supabase/provider integration has not been validated.
+- The resolve API consumes an already persisted, transcript-bearing, analyzed Daily Attempt; live
+  Daily recording/STT/transfer-analyzer provider behavior remains a Live Integration Gate item.
+- Only the minimal retrieval orchestration API/service exists; M6 practice/progress features remain
+  out of scope.
+- The known Starlette/httpx deprecation warning remains.
+
+
+## Milestone 6 — Practice & Progress
 
 **Status:** NOT STARTED

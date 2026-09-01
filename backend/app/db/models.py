@@ -190,6 +190,9 @@ class ExpressionAttemptRow(Base):
     )
     attempt_id: Mapped[UUID] = mapped_column(ForeignKey("public.attempts.id", ondelete="CASCADE"))
     session_id: Mapped[UUID] = mapped_column(ForeignKey("public.sessions.id", ondelete="CASCADE"))
+    retrieval_opportunity_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("public.retrieval_opportunities.id", ondelete="RESTRICT"), unique=True
+    )
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("public.users.id", ondelete="CASCADE"), index=True
     )
@@ -242,3 +245,23 @@ class StoryRow(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
+
+
+class RetrievalOpportunityRow(Base):
+    __tablename__ = "retrieval_opportunities"
+    __table_args__ = {"schema": "public"}
+
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("public.users.id", ondelete="CASCADE"), index=True
+    )
+    expression_id: Mapped[UUID] = mapped_column(
+        ForeignKey("public.expressions.id", ondelete="CASCADE")
+    )
+    session_id: Mapped[UUID] = mapped_column(ForeignKey("public.sessions.id", ondelete="CASCADE"))
+    question_family: Mapped[str] = mapped_column(String(64))
+    question_text: Mapped[str] = mapped_column(Text)
+    retrieval_type: Mapped[str] = mapped_column(String(24), default="TRANSFER")
+    status: Mapped[str] = mapped_column(String(24), default="CREATED")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    consumed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
