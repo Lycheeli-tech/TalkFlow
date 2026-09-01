@@ -97,8 +97,6 @@ AttemptStatus = Literal["AUDIO_SAVED", "STT_FAILED", "TRANSCRIBED", "ANALYSIS_FA
 AssessmentLevel = Literal["NEEDS_WORK", "DEVELOPING", "FUNCTIONAL", "STRONG"]
 LearningPhase = Literal["BUILD", "TRANSFER", "PERFORM"]
 DailyStep = Literal["RECALL", "LEARN", "IMITATE", "RETRIEVE", "TRANSFER", "INTERVIEW", "RECAP"]
-LearningPhase = Literal["BUILD", "TRANSFER", "PERFORM"]
-DailyStep = Literal["RECALL", "LEARN", "IMITATE", "RETRIEVE", "TRANSFER", "INTERVIEW", "RECAP"]
 
 
 class CalibrationQuestion(BaseModel):
