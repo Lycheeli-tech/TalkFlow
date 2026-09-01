@@ -71,3 +71,7 @@ Persist learner audio and link the attempt before STT; persist the transcript be
 ### ADR-017 — Bounded Adaptive Daily Planning
 
 The 30-Day Interview Bootcamp has a fixed BUILD → TRANSFER → PERFORM stage backbone, bounded MVP inventories, deterministic target selection, and LLM-generated personalized lesson content. Day 1 is Career Transition; Day 2–30 topics are selected by the planner, not hard-coded as a calendar.
+
+### ADR-018 — Gated Durable Memory Writes
+
+Production memory uses the PostgreSQL repository. Normal durable writes pass through the memory application service and Memory Gate; repositories remain low-level persistence boundaries. In-memory storage is limited to deterministic tests and fixtures.

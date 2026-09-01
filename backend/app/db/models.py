@@ -2,6 +2,7 @@ from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     ForeignKey,
     Integer,
@@ -154,3 +155,90 @@ class LearnerAssessmentRow(Base):
     observed_patterns: Mapped[list[str]] = mapped_column(JSONB, default=list)
     assessment_version: Mapped[str] = mapped_column(String(64))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ExpressionRow(Base):
+    __tablename__ = "expressions"
+    __table_args__ = {"schema": "public"}
+
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("public.users.id", ondelete="CASCADE"), index=True
+    )
+    text: Mapped[str] = mapped_column(Text)
+    meaning: Mapped[str] = mapped_column(Text)
+    source_type: Mapped[str] = mapped_column(String(24))
+    source_id: Mapped[UUID | None]
+    status: Mapped[str] = mapped_column(String(24), default="NEW")
+    successful_recall: Mapped[int] = mapped_column(Integer, default=0)
+    failed_recall: Mapped[int] = mapped_column(Integer, default=0)
+    transfer_success: Mapped[int] = mapped_column(Integer, default=0)
+    next_review_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+
+class ExpressionAttemptRow(Base):
+    __tablename__ = "expression_attempts"
+    __table_args__ = {"schema": "public"}
+
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    expression_id: Mapped[UUID] = mapped_column(
+        ForeignKey("public.expressions.id", ondelete="CASCADE"), index=True
+    )
+    attempt_id: Mapped[UUID] = mapped_column(ForeignKey("public.attempts.id", ondelete="CASCADE"))
+    session_id: Mapped[UUID] = mapped_column(ForeignKey("public.sessions.id", ondelete="CASCADE"))
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("public.users.id", ondelete="CASCADE"), index=True
+    )
+    context: Mapped[str] = mapped_column(Text)
+    retrieval_type: Mapped[str] = mapped_column(String(24))
+    hint_used: Mapped[bool] = mapped_column(Boolean, default=False)
+    independent_evidence: Mapped[bool] = mapped_column(Boolean, default=False)
+    usage_correct: Mapped[bool] = mapped_column(Boolean, default=False)
+    result: Mapped[str] = mapped_column(String(16))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ErrorPatternRow(Base):
+    __tablename__ = "error_patterns"
+    __table_args__ = {"schema": "public"}
+
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("public.users.id", ondelete="CASCADE"), index=True
+    )
+    pattern_type: Mapped[str] = mapped_column(String(64))
+    original_example: Mapped[str] = mapped_column(Text)
+    preferred_expression: Mapped[str | None] = mapped_column(Text)
+    occurrence_count: Mapped[int] = mapped_column(Integer, default=1)
+    successful_correction_count: Mapped[int] = mapped_column(Integer, default=0)
+    status: Mapped[str] = mapped_column(String(24), default="CANDIDATE")
+    first_seen: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    last_seen: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class StoryRow(Base):
+    __tablename__ = "stories"
+    __table_args__ = {"schema": "public"}
+
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("public.users.id", ondelete="CASCADE"), index=True
+    )
+    title: Mapped[str] = mapped_column(Text)
+    content: Mapped[str] = mapped_column(Text)
+    source_type: Mapped[str] = mapped_column(String(24))
+    source_document_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("public.source_documents.id", ondelete="RESTRICT")
+    )
+    source_attempt_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("public.attempts.id", ondelete="RESTRICT")
+    )
+    confirmed_by_user: Mapped[bool] = mapped_column(Boolean)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )

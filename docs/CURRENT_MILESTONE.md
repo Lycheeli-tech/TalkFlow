@@ -101,3 +101,42 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - Today UI is a polished low-fidelity MVP entry surface; recording, real TTS/STT, and full seven-step interaction remain later work.
 - Fake providers remain the default; live provider and Supabase integration gates are still open.
 - Formal Memory/Mastery, Story Bank, Review Scheduler, Mock Interview, and Quick Review remain out of scope.
+
+## Milestone 4 — Memory & Mastery
+
+**Status:** COMPLETE
+
+**Branch:** `feat/memory-mastery`
+
+**Verified implementation HEAD:** `fcb3467`
+
+### Implemented
+
+- Versioned mastery and review rules with deterministic evidence-based transitions.
+- Mastery requires recall >= 3, transfer >= 2, and qualifying evidence across >= 3 distinct sessions.
+- Direct/full-hint and non-independent evidence do not qualify for recall or transfer mastery counts.
+- Review scheduling is deterministic and versioned using the 1 / 3 / 7 / 14 day intervals.
+- Explicit ExpressionAttempt evidence fields for recall/transfer, hint usage, independence, correctness, linked attempt/session, context, and timestamp.
+- Conservative ErrorPattern lifecycle with versioned, centralized transition rules.
+- Confirmation-gated Story records with DOCUMENT / ATTEMPT / USER provenance.
+- User-scoped memory repository boundary with PostgreSQL runtime and in-memory fixture adapters.
+- `MemoryApplicationService` is the official gated durable write path enforcing Memory Gate, ownership, evidence provenance, and deterministic mastery rules.
+- Minimal authenticated expression read API for future M5 consumption.
+- Versioned PostgreSQL migration for expressions, evidence, error patterns, and confirmed stories.
+
+### Verified checks
+
+- Backend: 47 tests passed; Ruff format and lint passed.
+- Five versioned migrations validated.
+- Frontend lint, TypeScript, and production build checks passed.
+
+### Known limitations
+
+- The SQL adapter and migration are implemented but have not been exercised against a live Supabase project.
+- Only a minimal expression read API exists; Story Bank and memory-management UI are not implemented.
+- M5 hidden retrieval injection, cross-session aha orchestration, and full Daily attempt integration are not implemented.
+- The known Starlette/httpx deprecation warning remains.
+
+## Milestone 5 — Cross-Session Loop
+
+**Status:** NOT STARTED

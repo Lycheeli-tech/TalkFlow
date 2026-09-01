@@ -33,6 +33,7 @@ from app.core.security import JWTVerificationError, SupabaseTokenVerifier, Token
 from app.db.session import get_database_session
 from app.repositories.calibration import CalibrationRepository, SQLCalibrationRepository
 from app.repositories.daily_sessions import DailySessionRepository, SQLDailySessionRepository
+from app.repositories.memory import MemoryRepository, SQLMemoryRepository
 from app.repositories.profiles import ProfileRepository, SQLProfileRepository
 from app.repositories.users import SQLUserRepository, UserRepository
 from app.schemas import AuthenticatedUser
@@ -88,6 +89,12 @@ async def get_daily_session_repository(
     session: AsyncSession = Depends(get_database_session),
 ) -> AsyncIterator[DailySessionRepository]:
     yield SQLDailySessionRepository(session)
+
+
+async def get_memory_repository(
+    session: AsyncSession = Depends(get_database_session),
+) -> AsyncIterator[MemoryRepository]:
+    yield SQLMemoryRepository(session)
 
 
 @lru_cache
