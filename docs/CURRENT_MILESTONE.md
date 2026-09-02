@@ -230,3 +230,15 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
   system was introduced.
 - The known Starlette/httpx deprecation warning remains.
 - Milestone 7, V1.5, and V2 have not been started.
+
+## Milestone 7 — Hardening
+
+**Status:** IN PROGRESS
+
+**Branch:** `feat/hardening`
+
+**Base:** `m6-practice-progress` (`669b7d9`)
+
+M7 scope is limited to regression coverage, failure recovery, i18n completeness, logging,
+security/data-isolation checks, responsive UX validation, and README/setup documentation. No V1.5,
+V2, or new product behavior is authorized in this milestone.
