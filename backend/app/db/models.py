@@ -1,8 +1,9 @@
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
 from sqlalchemy import (
     Boolean,
+    Date,
     DateTime,
     ForeignKey,
     Integer,
@@ -32,6 +33,9 @@ class UserRow(Base):
     primary_goal: Mapped[str] = mapped_column(String(32), default="english_interview")
     current_day: Mapped[int] = mapped_column(SmallInteger, default=1)
     current_phase: Mapped[str] = mapped_column(String(16), default="BUILD")
+    xp: Mapped[int] = mapped_column(Integer, default=0)
+    current_streak: Mapped[int] = mapped_column(SmallInteger, default=0)
+    last_completed_date: Mapped[date | None] = mapped_column(Date)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

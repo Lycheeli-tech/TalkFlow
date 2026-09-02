@@ -191,15 +191,17 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 
 - Versioned deterministic `RewardEngine` for passive learn, imitation, recall, transfer, and mastery XP.
 - Deterministic daily streak behavior: same-day idempotency, consecutive-day increment, and gap reset.
-- Focused reward-domain tests; no persistence, API, UI, Mock Interview, or Quick Review has been added yet.
+- PostgreSQL user progress fields (`xp`, `current_streak`, `last_completed_date`) with a versioned migration.
+- `ProgressService` application boundary and focused reward/persistence-contract tests.
+- No Practice API/UI, Mock Interview, or Quick Review has been added yet.
 
 ### M6.1 Verified checks
 
-- Reward tests: 3 passed.
+- Reward and progress tests: 4 passed.
 - Ruff format and lint checks passed for the M6.1 files.
 
 ### M6 Known limitations
 
-- XP/streak persistence and authenticated progress API are not implemented yet.
+- Authenticated progress API and Practice UI are not implemented yet.
 - Mock Interview, Quick Review, Journey map, and My English projections remain pending.
 - No M7, V1.5, or V2 scope has been started.

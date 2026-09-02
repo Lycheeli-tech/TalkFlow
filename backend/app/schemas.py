@@ -21,6 +21,9 @@ class UserState(BaseModel):
     timezone: str = "UTC"
     target_role: str | None = None
     primary_goal: Literal["english_interview"] = "english_interview"
+    xp: int = Field(default=0, ge=0)
+    current_streak: int = Field(default=0, ge=0)
+    last_completed_date: date | None = None
 
 
 class UserPreferencesUpdate(BaseModel):
