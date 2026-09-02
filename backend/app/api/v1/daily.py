@@ -1,4 +1,3 @@
-from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -33,6 +32,8 @@ async def create_daily_session(
     if profile is None:
         raise HTTPException(status_code=409, detail="A confirmed profile is required first.")
     user = await users.get_or_create(current_user.id)
+    if user.program_completed_at is not None:
+        raise HTTPException(status_code=409, detail="The 30-day Bootcamp is complete.")
     plan = DailyPlanner().plan(
         DailyPlannerInput(
             profile=profile,
@@ -52,8 +53,20 @@ async def complete_daily_session(
     repository: DailySessionRepository = Depends(get_daily_session_repository),
 ) -> DailySessionCompletion:
     try:
-        return await repository.complete(
-            user_id=current_user.id, session_id=session_id, completed_on=datetime.now(UTC).date()
-        )
+        return await repository.complete(user_id=current_user.id, session_id=session_id)
+    except LookupError as error:
+        raise HTTPException(status_code=404, detail="Daily session not found.") from error
+    except ValueError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+
+
+@router.post("/sessions/{session_id}/advance", response_model=DailySessionResponse)
+async def advance_daily_session(
+    session_id: UUID,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    repository: DailySessionRepository = Depends(get_daily_session_repository),
+) -> DailySessionResponse:
+    try:
+        return await repository.advance(user_id=current_user.id, session_id=session_id)
     except LookupError as error:
         raise HTTPException(status_code=404, detail="Daily session not found.") from error

@@ -44,13 +44,17 @@ function LinesField({
   );
 }
 
-export function OnboardingFlow() {
+export function OnboardingFlow({
+  initialToken = "",
+  initialTargetRole = "",
+  onReady,
+}: { initialToken?: string; initialTargetRole?: string; onReady?: () => void }) {
   const [locale, setLocale] = useState<InterfaceLocale>("en");
-  const [step, setStep] = useState<Step>("auth");
-  const [token, setToken] = useState("");
+  const [step, setStep] = useState<Step>(initialToken ? "goal" : "auth");
+  const [token, setToken] = useState(initialToken);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [targetRole, setTargetRole] = useState("");
+  const [targetRole, setTargetRole] = useState(initialTargetRole);
   const [supportLanguage, setSupportLanguage] = useState<InterfaceLocale>("en");
   const [sessionLength, setSessionLength] = useState<10 | 20 | 30 | 60>(20);
   const [importMode, setImportMode] = useState<"pdf" | "text">("pdf");
@@ -100,6 +104,7 @@ export function OnboardingFlow() {
         default_session_length: sessionLength,
         target_role: targetRole,
       });
+      sessionStorage.setItem("fluentloop_interface_locale", locale);
       setStep("source");
     });
   }
@@ -201,7 +206,7 @@ export function OnboardingFlow() {
             </form>
           )}
 
-          {step === "complete" && <VoiceCalibration token={token} copy={calibrationMessages} />}
+          {step === "complete" && <VoiceCalibration token={token} copy={calibrationMessages} onComplete={onReady} />}
           {notice && <p className="notice" role="status">{notice}</p>}
           {error && <p className="error" role="alert"><strong>{messages.error}:</strong> {error}</p>}
         </Card>

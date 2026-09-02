@@ -5,25 +5,28 @@ import Link from "next/link";
 
 import { getMyEnglish, MyEnglishResponse } from "@/lib/api";
 import { Card } from "@/components/ui/card";
+import { getMessages, getStoredLocale } from "@/lib/i18n";
 
 export function MyEnglish({ token }: { token: string }) {
   const [memory, setMemory] = useState<MyEnglishResponse | null>(null);
   const [error, setError] = useState("");
+  const copy = getMessages(getStoredLocale()).m6.myEnglish;
+  const unavailable = copy.unavailable;
 
   useEffect(() => {
     if (!token) return;
-    void getMyEnglish(token).then(setMemory).catch(() => setError("My English is unavailable right now."));
-  }, [token]);
+    void getMyEnglish(token).then(setMemory).catch(() => setError(unavailable));
+  }, [token, unavailable]);
 
   return <main className="page-shell my-english-shell">
-    <header className="practice-header"><div><p className="eyebrow">FluentLoop · My English</p><h1>Your usable language.</h1><p className="hero-copy">A calm view of what you are building: expressions, patterns, and confirmed stories.</p></div><Link className="button button-secondary" href="/practice">Practice</Link></header>
-    {!token && <p className="notice" role="status">Sign in through Today to see your personal learning memory.</p>}
+    <header className="practice-header"><div><p className="eyebrow">{copy.eyebrow}</p><h1>{copy.title}</h1><p className="hero-copy">{copy.copy}</p></div><Link className="button button-secondary" href="/practice">{copy.practice}</Link></header>
+    {!token && <p className="notice" role="status">{copy.signin}</p>}
     {memory && <section className="my-english-grid">
-      <MemoryCard title="Expressions" empty="Expressions you learn and retrieve will appear here.">{memory.expressions.map((item) => <li key={item.id}><strong>{item.text}</strong><span>{item.meaning} · {item.status}</span></li>)}</MemoryCard>
-      <MemoryCard title="Patterns" empty="Patterns are added only after repeated evidence.">{memory.patterns.map((item) => <li key={item.id}><strong>{item.pattern_type}</strong><span>{item.original_example} · {item.status}</span></li>)}</MemoryCard>
-      <MemoryCard title="Stories" empty="Only stories you confirm are saved here.">{memory.stories.map((item) => <li key={item.id}><strong>{item.title}</strong><span>{item.content}</span></li>)}</MemoryCard>
+      <MemoryCard title={copy.expressions} empty={copy.expressionEmpty}>{memory.expressions.map((item) => <li key={item.id}><strong>{item.text}</strong><span>{item.meaning} · {item.status}</span></li>)}</MemoryCard>
+      <MemoryCard title={copy.patterns} empty={copy.patternEmpty}>{memory.patterns.map((item) => <li key={item.id}><strong>{item.pattern_type}</strong><span>{item.original_example} · {item.status}</span></li>)}</MemoryCard>
+      <MemoryCard title={copy.stories} empty={copy.storyEmpty}>{memory.stories.map((item) => <li key={item.id}><strong>{item.title}</strong><span>{item.content}</span></li>)}</MemoryCard>
     </section>}
-    {!memory && token && !error && <p className="notice" role="status">Loading your learning memory…</p>}
+    {!memory && token && !error && <p className="notice" role="status">{copy.loading}</p>}
     {error && <p className="error" role="alert">{error}</p>}
   </main>;
 }

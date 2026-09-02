@@ -10,6 +10,12 @@ class AuthenticatedUser(BaseModel):
     email: str | None = None
 
 
+class ApplicationEntry(BaseModel):
+    stage: Literal["ONBOARDING", "CALIBRATION", "TODAY"]
+    interface_language: Literal["en", "zh-CN"] = "en"
+    target_role: str | None = None
+
+
 class UserState(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -26,6 +32,7 @@ class UserState(BaseModel):
     last_completed_date: date | None = None
     current_day: int = Field(default=1, ge=1, le=30)
     current_phase: Literal["BUILD", "TRANSFER", "PERFORM"] = "BUILD"
+    program_completed_at: datetime | None = None
 
 
 class UserPreferencesUpdate(BaseModel):
@@ -226,6 +233,8 @@ class DailyLessonContent(BaseModel):
 class DailySessionResponse(BaseModel):
     session_id: UUID
     status: Literal["IN_PROGRESS", "COMPLETED"] = "IN_PROGRESS"
+    current_step: int = Field(default=0, ge=0)
+    completion_ready: bool = False
     plan: DailySessionPlan
     content: DailyLessonContent
 
@@ -235,6 +244,10 @@ class DailySessionCompletion(BaseModel):
     status: Literal["COMPLETED"] = "COMPLETED"
     awarded_xp: int = Field(ge=0)
     progress: UserState
+
+
+class DailySessionAdvance(BaseModel):
+    session: DailySessionResponse
 
 
 class MasteryRules(BaseModel):
@@ -397,6 +410,12 @@ class QuickReviewItem(BaseModel):
     meaning: str
     status: ExpressionStatus
     next_review_at: datetime | None = None
+
+
+class QuickReviewSubmit(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    transcript: str = Field(min_length=1, max_length=20_000)
 
 
 class MyEnglishResponse(BaseModel):

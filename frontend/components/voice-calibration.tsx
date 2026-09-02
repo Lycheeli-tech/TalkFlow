@@ -7,7 +7,7 @@ import { calibrationTts, getCalibration, LearnerAssessment, retryCalibrationAtte
 
 type Copy = Record<string, string>;
 
-export function VoiceCalibration({ token, copy }: { token: string; copy: Copy }) {
+export function VoiceCalibration({ token, copy, onComplete }: { token: string; copy: Copy; onComplete?: () => void }) {
   const [sessionId, setSessionId] = useState("");
   const [questions, setQuestions] = useState<{ category: string; text: string }[]>([]);
   const [index, setIndex] = useState(0);
@@ -77,7 +77,7 @@ export function VoiceCalibration({ token, copy }: { token: string; copy: Copy })
   }
 
   if (!sessionId) return <div className="completion"><span className="completion-mark">✓</span><h2>{copy.readyTitle}</h2><p>{copy.readyCopy}</p><Button disabled={busy} onClick={begin}>{busy ? copy.working : copy.begin}</Button>{error && <p className="error">{error}</p>}</div>;
-  if (assessment) return <div className="assessment"><p className="eyebrow">{copy.provisional}</p><h2>{copy.assessmentTitle}</h2><div className="dimension-grid">{["fluency", "naturalness", "grammar", "retrieval", "structure"].map((key) => <div key={key}><span>{copy[key]}</span><strong>{assessment[key as keyof LearnerAssessment] as string}</strong></div>)}</div><h3>{copy.primaryFocus}</h3><p>{assessment.primary_focus}</p><p className="card-copy">{copy.evolves}</p></div>;
+  if (assessment) return <div className="assessment"><p className="eyebrow">{copy.provisional}</p><h2>{copy.assessmentTitle}</h2><div className="dimension-grid">{["fluency", "naturalness", "grammar", "retrieval", "structure"].map((key) => <div key={key}><span>{copy[key]}</span><strong>{assessment[key as keyof LearnerAssessment] as string}</strong></div>)}</div><h3>{copy.primaryFocus}</h3><p>{assessment.primary_focus}</p><p className="card-copy">{copy.evolves}</p>{onComplete && <Button onClick={onComplete}>{copy.continue ?? "Continue"}</Button>}</div>;
   const question = questions[index];
   return <div className="calibration"><p className="eyebrow">{copy.question} {index + 1} / 3 · {question.category}</p><h2>{question.text}</h2><p className="card-copy">{copy.noCorrection}</p><div className="form-actions"><Button className="button-secondary" onClick={playQuestion}>{copy.listen}</Button>{!recording ? <Button disabled={busy || !!attempt} onClick={startRecording}>{copy.record}</Button> : <Button onClick={stopRecording}>{copy.stop}</Button>}</div>{busy && <p className="notice">{copy.processing}</p>}{attempt && <div className="transcript"><strong>{copy.transcript}</strong><p>{attempt.transcript ?? attempt.provider_error}</p><small>{copy.readOnly}</small>{attempt.status === "ANALYZED" ? <Button onClick={next}>{index < 2 ? copy.next : copy.results}</Button> : <Button disabled={busy} onClick={retry}>{copy.retry}</Button>}</div>}{error && <p className="error">{error}</p>}</div>;
 }

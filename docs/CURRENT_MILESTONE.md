@@ -32,7 +32,7 @@
 
 ## Milestone 2 — Voice Calibration
 
-**Status:** COMPLETE
+**Status:** IN PROGRESS
 
 **Branch:** `feat/voice-calibration`
 
@@ -187,9 +187,9 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 
 **Base:** `m5-cross-session-loop` (`0ab52da`)
 
-**Verified implementation HEAD:** `946925a`
+**Verified implementation HEAD:** `5519bdb` (pre-hardening baseline)
 
-### Implemented
+### Implemented before hardening pass
 
 - Versioned deterministic `RewardEngine` for passive learn, imitation, recall, transfer, and mastery XP.
 - Deterministic daily streak behavior: same-day idempotency, consecutive-day increment, and gap reset.
@@ -206,7 +206,7 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
   passive-learning reward, preserves streak state, and advances the Journey day without duplicate
   XP on replay.
 
-### Verified checks
+### Previously verified checks
 
 - Backend: 74 tests passed.
 - Ruff format and lint checks passed.
@@ -214,12 +214,8 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - Frontend ESLint, TypeScript, and production build checks passed.
 - Git diff check against `main` passed; no M7, V1.5, or V2 scope is included.
 
-### M6 Known limitations
+### M6 hardening pass status
 
-- Live Supabase and provider integration remains unvalidated; fake providers remain the default.
-- Today remains a low-fidelity session shell: its full in-session recording, TTS/STT, and Daily
-  Attempt capture are not implemented.
-- The 30-day Journey remains at Day 30 after its final session; post-program continuation is not
-  specified for the MVP.
-- The known Starlette/httpx deprecation warning remains.
-- Milestone 7, V1.5, and V2 have not been started.
+- Application entry routing, server-side Daily step gating, terminal Day 30 behavior, timezone-aware
+  rewards, Quick Review completion, and full M6 i18n/runtime-path validation are being hardened.
+- No M7, V1.5, or V2 scope has been started.

@@ -21,6 +21,7 @@ class JourneyService:
                     status=(
                         "COMPLETED"
                         if day < state.current_day
+                        or (day == 30 and state.program_completed_at is not None)
                         else "CURRENT"
                         if day == state.current_day
                         else "UPCOMING"

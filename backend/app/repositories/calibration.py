@@ -14,6 +14,7 @@ from app.schemas import CalibrationSession, LearnerAssessment, VoiceAttempt
 class CalibrationRepository(Protocol):
     async def create_session(self, session: CalibrationSession) -> CalibrationSession: ...
     async def get_session(self, session_id: UUID, user_id: UUID) -> CalibrationSession | None: ...
+    async def get_latest_session(self, user_id: UUID) -> CalibrationSession | None: ...
     async def save_attempt(self, attempt: VoiceAttempt) -> VoiceAttempt: ...
     async def get_attempt(self, attempt_id: UUID, user_id: UUID) -> VoiceAttempt | None: ...
     async def list_attempts(self, session_id: UUID, user_id: UUID) -> list[VoiceAttempt]: ...
@@ -37,6 +38,14 @@ class SQLCalibrationRepository:
     async def get_session(self, session_id: UUID, user_id: UUID) -> CalibrationSession | None:
         row = await self._session.scalar(
             select(SessionRow).where(SessionRow.id == session_id, SessionRow.user_id == user_id)
+        )
+        return CalibrationSession.model_validate(row) if row else None
+
+    async def get_latest_session(self, user_id: UUID) -> CalibrationSession | None:
+        row = await self._session.scalar(
+            select(SessionRow)
+            .where(SessionRow.user_id == user_id, SessionRow.session_type == "CALIBRATION")
+            .order_by(SessionRow.started_at.desc())
         )
         return CalibrationSession.model_validate(row) if row else None
 
@@ -119,6 +128,10 @@ class InMemoryCalibrationRepository:
     async def get_session(self, session_id: UUID, user_id: UUID) -> CalibrationSession | None:
         value = self.sessions.get(session_id)
         return value if value and value.user_id == user_id else None
+
+    async def get_latest_session(self, user_id: UUID) -> CalibrationSession | None:
+        sessions = [item for item in self.sessions.values() if item.user_id == user_id]
+        return max(sessions, key=lambda item: item.started_at, default=None)
 
     async def save_attempt(self, attempt: VoiceAttempt) -> VoiceAttempt:
         existing = next(

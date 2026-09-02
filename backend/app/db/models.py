@@ -36,6 +36,7 @@ class UserRow(Base):
     xp: Mapped[int] = mapped_column(Integer, default=0)
     current_streak: Mapped[int] = mapped_column(SmallInteger, default=0)
     last_completed_date: Mapped[date | None] = mapped_column(Date)
+    program_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
@@ -104,6 +105,8 @@ class SessionRow(Base):
     session_plan: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    current_step: Mapped[int] = mapped_column(SmallInteger, default=0)
+    completion_ready: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class AttemptRow(Base):

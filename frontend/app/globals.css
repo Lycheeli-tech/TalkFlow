@@ -469,6 +469,11 @@ h1 {
 .my-english-shell { display: grid; gap: var(--space-8); }
 .my-english-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-6); }
 .memory-card { display: grid; align-content: start; gap: var(--space-4); min-height: 15rem; padding: clamp(1.25rem, 3vw, 2rem); }
+.app-shell { min-height: 100vh; }
+.app-content { max-width: 76rem; margin: 0 auto; padding: var(--space-6) clamp(1rem, 4vw, 3rem) 6rem; }
+.primary-nav { position: sticky; top: 0; z-index: 10; display: flex; justify-content: center; gap: .5rem; padding: .75rem 1rem; background: rgb(255 255 255 / 92%); border-bottom: 1px solid var(--color-border); backdrop-filter: blur(12px); }
+.primary-nav a { padding: .55rem .8rem; border-radius: 999px; color: var(--color-muted); text-decoration: none; }
+.primary-nav a:hover, .primary-nav a:focus-visible { background: var(--surface-muted); color: var(--color-text); }
 @media (max-width: 560px) { .today-heading { display: grid; } .today-progress { gap: .25rem; } }
 .calibration h2 { font-size: clamp(1.35rem, 3vw, 2rem); line-height: 1.25; }
 .transcript { display: grid; gap: .75rem; padding: 1rem; border-radius: var(--radius-md); background: var(--surface-muted); }
@@ -531,6 +536,8 @@ h1 {
   .journey-summary { display: grid; align-items: start; }
   .journey-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .my-english-grid { grid-template-columns: 1fr; }
+  .primary-nav { position: fixed; inset: auto 0 0; justify-content: space-around; padding: .6rem .35rem calc(.6rem + env(safe-area-inset-bottom)); }
+  .primary-nav a { flex: 1; padding: .6rem .2rem; text-align: center; font-size: .8rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
