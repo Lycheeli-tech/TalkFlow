@@ -181,13 +181,15 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 
 ## Milestone 6 — Practice & Progress
 
-**Status:** IN PROGRESS
+**Status:** COMPLETE
 
 **Branch:** `feat/practice-progress`
 
 **Base:** `m5-cross-session-loop` (`0ab52da`)
 
-### M6.1 Implemented
+**Verified implementation HEAD:** `946925a`
+
+### Implemented
 
 - Versioned deterministic `RewardEngine` for passive learn, imitation, recall, transfer, and mastery XP.
 - Deterministic daily streak behavior: same-day idempotency, consecutive-day increment, and gap reset.
@@ -204,18 +206,20 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
   passive-learning reward, preserves streak state, and advances the Journey day without duplicate
   XP on replay.
 
-### M6.1 Verified checks
+### Verified checks
 
-- Reward, progress, Quick Review, and Mock Interview tests: 8 passed.
-- Frontend ESLint, TypeScript, and production build checks passed for Practice UI.
-- Journey projection and user-isolation tests: 3 passed.
-- Frontend ESLint, TypeScript, and production build checks passed for Journey UI.
-- My English projection/repository tests: 4 passed; frontend ESLint, TypeScript, and production
-  build checks passed for My English UI.
-- Ruff format and lint checks passed for the M6.1 files.
+- Backend: 74 tests passed.
+- Ruff format and lint checks passed.
+- Seven versioned migrations and user provisioning validated.
+- Frontend ESLint, TypeScript, and production build checks passed.
+- Git diff check against `main` passed; no M7, V1.5, or V2 scope is included.
 
 ### M6 Known limitations
 
-- Richer authenticated progress projections are not implemented yet.
-- M6 full closeout validation and product-scope review remain pending.
-- No M7, V1.5, or V2 scope has been started.
+- Live Supabase and provider integration remains unvalidated; fake providers remain the default.
+- Today remains a low-fidelity session shell: its full in-session recording, TTS/STT, and Daily
+  Attempt capture are not implemented.
+- The 30-day Journey remains at Day 30 after its final session; post-program continuation is not
+  specified for the MVP.
+- The known Starlette/httpx deprecation warning remains.
+- Milestone 7, V1.5, and V2 have not been started.
