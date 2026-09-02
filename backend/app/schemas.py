@@ -24,6 +24,8 @@ class UserState(BaseModel):
     xp: int = Field(default=0, ge=0)
     current_streak: int = Field(default=0, ge=0)
     last_completed_date: date | None = None
+    current_day: int = Field(default=1, ge=1, le=30)
+    current_phase: Literal["BUILD", "TRANSFER", "PERFORM"] = "BUILD"
 
 
 class UserPreferencesUpdate(BaseModel):
@@ -386,6 +388,18 @@ class QuickReviewItem(BaseModel):
     meaning: str
     status: ExpressionStatus
     next_review_at: datetime | None = None
+
+
+class JourneyDay(BaseModel):
+    day: int
+    phase: LearningPhase
+    status: Literal["COMPLETED", "CURRENT", "UPCOMING"]
+
+
+class JourneyResponse(BaseModel):
+    current_day: int
+    current_phase: LearningPhase
+    days: list[JourneyDay]
 
 
 class MockInterviewRequest(BaseModel):

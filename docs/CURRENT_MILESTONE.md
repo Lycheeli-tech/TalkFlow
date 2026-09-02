@@ -196,15 +196,17 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - Minimal authenticated Quick Review API returning due, user-scoped expression projections.
 - Minimal Mock Interview service/API: bounded prompt selection and one-shot complete-answer analysis.
 - Responsive Practice UI at `/practice` with Quick Review and Mock Interview entry cards.
+- Deterministic 30-day Journey projection API at `/api/v1/journey`, including phase and day status.
 
 ### M6.1 Verified checks
 
 - Reward, progress, Quick Review, and Mock Interview tests: 8 passed.
 - Frontend ESLint, TypeScript, and production build checks passed for Practice UI.
+- Journey projection and user-isolation tests: 3 passed.
 - Ruff format and lint checks passed for the M6.1 files.
 
 ### M6 Known limitations
 
 - Richer authenticated progress projections are not implemented yet.
-- Journey map and My English projections remain pending.
+- Journey UI and My English projections remain pending.
 - No M7, V1.5, or V2 scope has been started.
