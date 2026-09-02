@@ -242,3 +242,19 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 M7 scope is limited to regression coverage, failure recovery, i18n completeness, logging,
 security/data-isolation checks, responsive UX validation, and README/setup documentation. No V1.5,
 V2, or new product behavior is authorized in this milestone.
+
+### M7 progress
+
+- Reviewed the documented M0–M6 golden path and existing ownership, Memory Gate, evidence,
+  idempotency, and provider-fallback boundaries; no new P1 correctness or security violation was
+  identified in this pass.
+- Added localized vocabulary keys for Journey phase labels and Practice entry labels in both English
+  and Simplified Chinese catalogs.
+- Clarified Python environment setup and fake-provider/live-integration expectations in `README.md`.
+
+### M7 validation blockers
+
+- Frontend lint, TypeScript, and production build could not run because Node.js is not installed or
+  available on PATH in the current execution environment.
+- Backend tests could not run because the environment lacks the project Python dependencies (`fastapi`
+  is not installed). These checks remain required for M7 closeout.
