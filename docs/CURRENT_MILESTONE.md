@@ -187,7 +187,7 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 
 **Base:** `m5-cross-session-loop` (`0ab52da`)
 
-**Verified implementation HEAD:** `012585e` (hardening implementation; final runtime/browser gate pending)
+**Verified implementation HEAD:** `b15c8c2`
 
 ### Implemented
 
@@ -221,17 +221,12 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - M5 cross-session regression and M6 runtime-path tests passed.
 - No M7, V1.5, or V2 scope is included.
 
-### Final closeout gate pending
-
-- A live SQL/Supabase runtime-path pass and one focused ~375 px browser smoke pass remain before
-  restoring `COMPLETE` under the strict M6 closeout protocol.
-
 ### Remaining limitations
 
-- Live Supabase and provider integration remains unvalidated; fake providers remain the default.
-- Today remains a low-fidelity session shell: full Daily voice/Attempt capture is not implemented.
+- Live Supabase/PostgreSQL runtime validation remains unperformed; fake providers remain the default.
+- A focused ~375 px browser smoke validation remains unperformed.
+- Full Daily voice/Attempt integration is not implemented; Today remains a low-fidelity session shell.
 - Mock Interview responses are intentionally ephemeral at M6; no new durable Mock Interview memory
   system was introduced.
-- The 30-day Journey has no post-program continuation behavior in the MVP.
 - The known Starlette/httpx deprecation warning remains.
 - Milestone 7, V1.5, and V2 have not been started.
