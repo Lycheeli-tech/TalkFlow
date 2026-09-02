@@ -32,7 +32,7 @@
 
 ## Milestone 2 — Voice Calibration
 
-**Status:** COMPLETE
+**Status:** IN PROGRESS
 
 **Branch:** `feat/voice-calibration`
 
@@ -187,7 +187,7 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 
 **Base:** `m5-cross-session-loop` (`0ab52da`)
 
-**Verified implementation HEAD:** `012585e`
+**Verified implementation HEAD:** `012585e` (hardening implementation; final runtime/browser gate pending)
 
 ### Implemented
 
@@ -220,6 +220,11 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - Frontend ESLint, TypeScript, and production build checks passed.
 - M5 cross-session regression and M6 runtime-path tests passed.
 - No M7, V1.5, or V2 scope is included.
+
+### Final closeout gate pending
+
+- A live SQL/Supabase runtime-path pass and one focused ~375 px browser smoke pass remain before
+  restoring `COMPLETE` under the strict M6 closeout protocol.
 
 ### Remaining limitations
 
