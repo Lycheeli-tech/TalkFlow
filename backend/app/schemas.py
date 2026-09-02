@@ -388,6 +388,25 @@ class QuickReviewItem(BaseModel):
     next_review_at: datetime | None = None
 
 
+class MockInterviewRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    question_id: str
+    transcript: str = Field(min_length=1, max_length=20_000)
+
+
+class MockInterviewPrompt(BaseModel):
+    question_id: str
+    family: str
+    question: str
+
+
+class MockInterviewResult(BaseModel):
+    prompt: MockInterviewPrompt
+    analysis: AttemptAnalysis
+    analyzer_version: str
+
+
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: Literal["fluentloop-api"] = "fluentloop-api"
