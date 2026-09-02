@@ -32,7 +32,7 @@
 
 ## Milestone 2 — Voice Calibration
 
-**Status:** IN PROGRESS
+**Status:** COMPLETE
 
 **Branch:** `feat/voice-calibration`
 
@@ -251,6 +251,10 @@ V2, or new product behavior is authorized in this milestone.
 - Added localized vocabulary keys for Journey phase labels and Practice entry labels in both English
   and Simplified Chinese catalogs.
 - Clarified Python environment setup and fake-provider/live-integration expectations in `README.md`.
+- Centralized interface locale in an app-level provider backed by the existing session preference and
+  synchronized it from the persisted user `interface_language` on authenticated entry.
+- Confirmed the interface locale now persists across Today, Practice, My English, and Journey routes,
+  including refreshes; learning content remains unchanged.
 
 ### M7 validation status
 
@@ -263,9 +267,15 @@ V2, or new product behavior is authorized in this milestone.
 - All nine migrations and user provisioning passed the repository PGlite validation command.
 - Desktop navigation and approximately 375 px responsive smoke checks passed for Today, Practice,
   My English, and Journey, with no horizontal overflow or browser console warnings/errors.
+- English → Simplified Chinese → all main routes, refresh persistence on Practice/My English/Journey,
+  and Simplified Chinese → English route checks passed.
 
-### M7 blocker
+### Remaining limitations
 
-- Simplified Chinese works on the onboarding page, but the selected interface locale does not carry
-  into Practice/My English/Journey navigation; those pages render in English. M7 remains IN PROGRESS
-  until cross-route locale persistence/rendering is corrected and revalidated.
+- Live Supabase/PostgreSQL, Auth, Storage, and OpenAI/STT/TTS provider integration remains untested
+  with real credentials and devices.
+- Full Daily voice/Attempt capture remains outside the implemented MVP scope.
+- Mock Interview responses remain intentionally ephemeral.
+- The known Starlette/httpx deprecation warning remains.
+- M7 is the final numbered MVP implementation milestone; the next phase is Live Integration,
+  deployment, real-device testing, and bug fixing, not Milestone 8.

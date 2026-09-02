@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 
+import { useInterfaceLocale } from "@/components/interface-locale-provider";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { VoiceCalibration } from "@/components/voice-calibration";
@@ -49,7 +50,7 @@ export function OnboardingFlow({
   initialTargetRole = "",
   onReady,
 }: { initialToken?: string; initialTargetRole?: string; onReady?: () => void }) {
-  const [locale, setLocale] = useState<InterfaceLocale>("en");
+  const { locale, setLocale } = useInterfaceLocale();
   const [step, setStep] = useState<Step>(initialToken ? "goal" : "auth");
   const [token, setToken] = useState(initialToken);
   const [email, setEmail] = useState("");
@@ -104,7 +105,6 @@ export function OnboardingFlow({
         default_session_length: sessionLength,
         target_role: targetRole,
       });
-      sessionStorage.setItem("fluentloop_interface_locale", locale);
       setStep("source");
     });
   }
