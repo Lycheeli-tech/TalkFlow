@@ -25,7 +25,9 @@ class MemoryRepository(Protocol):
     async def save_expression(self, expression: Expression) -> Expression: ...
     async def add_evidence(self, evidence: ExpressionAttempt) -> ExpressionAttempt: ...
     async def save_error_pattern(self, pattern: ErrorPattern) -> ErrorPattern: ...
+    async def list_error_patterns(self, user_id: UUID) -> list[ErrorPattern]: ...
     async def save_story(self, story: Story) -> Story: ...
+    async def list_stories(self, user_id: UUID) -> list[Story]: ...
 
 
 class InMemoryMemoryRepository:
@@ -100,11 +102,17 @@ class InMemoryMemoryRepository:
         self.error_patterns[pattern.id] = pattern
         return pattern
 
+    async def list_error_patterns(self, user_id: UUID) -> list[ErrorPattern]:
+        return [item for item in self.error_patterns.values() if item.user_id == user_id]
+
     async def save_story(self, story: Story) -> Story:
         if not story.confirmed_by_user:
             raise PermissionError("Only confirmed stories can be persisted.")
         self.stories[story.id] = story
         return story
+
+    async def list_stories(self, user_id: UUID) -> list[Story]:
+        return [item for item in self.stories.values() if item.user_id == user_id]
 
 
 class SQLMemoryRepository:
@@ -194,6 +202,16 @@ class SQLMemoryRepository:
         await self._session.commit()
         return pattern
 
+    async def list_error_patterns(self, user_id: UUID) -> list[ErrorPattern]:
+        rows = (
+            await self._session.scalars(
+                select(ErrorPatternRow)
+                .where(ErrorPatternRow.user_id == user_id)
+                .order_by(ErrorPatternRow.last_seen.desc())
+            )
+        ).all()
+        return [ErrorPattern.model_validate(row) for row in rows]
+
     async def save_story(self, story: Story) -> Story:
         if not story.confirmed_by_user:
             raise PermissionError("Only confirmed stories can be persisted.")
@@ -218,3 +236,13 @@ class SQLMemoryRepository:
         self._session.add(StoryRow(**story.model_dump()))
         await self._session.commit()
         return story
+
+    async def list_stories(self, user_id: UUID) -> list[Story]:
+        rows = (
+            await self._session.scalars(
+                select(StoryRow)
+                .where(StoryRow.user_id == user_id, StoryRow.confirmed_by_user.is_(True))
+                .order_by(StoryRow.updated_at.desc())
+            )
+        ).all()
+        return [Story.model_validate(row) for row in rows]

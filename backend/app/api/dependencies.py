@@ -42,6 +42,7 @@ from app.repositories.retrieval import (
 from app.repositories.users import SQLUserRepository, UserRepository
 from app.schemas import AuthenticatedUser
 from app.services.cross_session_uow import SQLCrossSessionUnitOfWork
+from app.services.mock_interview import MockInterviewService
 from app.services.verification import VerificationService
 from app.storage.audio import AudioStorage, FakeAudioStorage, SupabaseAudioStorage
 from app.storage.documents import DocumentStorage, FakeDocumentStorage, SupabaseDocumentStorage
@@ -175,6 +176,12 @@ def get_answer_analyzer() -> AnswerAnalyzer:
             api_key=settings.openai_api_key, model=settings.openai_calibration_model
         )
     return FakeAnswerAnalyzer()
+
+
+def get_mock_interview_service(
+    analyzer: AnswerAnalyzer = Depends(get_answer_analyzer),
+) -> MockInterviewService:
+    return MockInterviewService(analyzer)
 
 
 @lru_cache

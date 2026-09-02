@@ -32,7 +32,7 @@
 
 ## Milestone 2 — Voice Calibration
 
-**Status:** COMPLETE
+**Status:** IN PROGRESS
 
 **Branch:** `feat/voice-calibration`
 
@@ -181,4 +181,52 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 
 ## Milestone 6 — Practice & Progress
 
-**Status:** NOT STARTED
+**Status:** COMPLETE
+
+**Branch:** `feat/practice-progress`
+
+**Base:** `m5-cross-session-loop` (`0ab52da`)
+
+**Verified implementation HEAD:** `b15c8c2`
+
+### Implemented
+
+- Versioned deterministic `RewardEngine` for passive learn, imitation, recall, transfer, and mastery XP.
+- Deterministic daily streak behavior: same-day idempotency, consecutive-day increment, and gap reset.
+- PostgreSQL user progress fields (`xp`, `current_streak`, `last_completed_date`) with a versioned migration.
+- `ProgressService` application boundary and focused reward/persistence-contract tests.
+- Minimal authenticated Quick Review API returning due, user-scoped expression projections.
+- Minimal Mock Interview service/API: bounded prompt selection and one-shot complete-answer analysis.
+- Responsive Practice UI at `/practice` with Quick Review and Mock Interview entry cards.
+- Deterministic 30-day Journey projection API at `/api/v1/journey`, including phase and day status.
+- Responsive Journey UI at `/journey` with the 30-day phase/status map.
+- User-scoped My English projection API and responsive `/my-english` UI for Expressions, Patterns,
+  and confirmed Stories.
+- Authenticated entry routing now reaches Onboarding, Voice Calibration, or Today based on persisted
+  profile/calibration state, with Today / Practice / My English / Journey navigation.
+- Quick Review creates a hidden-target RetrievalOpportunity and uses the trusted verification path to
+  persist evidence and advance review scheduling.
+- Daily Sessions persist ordered step progress; only the server-side Recap boundary is reward-eligible.
+- Day 30 is terminal and idempotent, and reward dates are derived from the learner timezone.
+- Daily Session completion now atomically records the completed session, applies the versioned
+  passive-learning reward, preserves streak state, and advances the Journey day without duplicate
+  XP on replay.
+
+### Verified checks
+
+- Backend: 80 tests passed.
+- Ruff format and lint checks passed.
+- Nine versioned migrations and user provisioning validated.
+- Frontend ESLint, TypeScript, and production build checks passed.
+- M5 cross-session regression and M6 runtime-path tests passed.
+- No M7, V1.5, or V2 scope is included.
+
+### Remaining limitations
+
+- Live Supabase/PostgreSQL runtime validation remains unperformed; fake providers remain the default.
+- A focused ~375 px browser smoke validation remains unperformed.
+- Full Daily voice/Attempt integration is not implemented; Today remains a low-fidelity session shell.
+- Mock Interview responses are intentionally ephemeral at M6; no new durable Mock Interview memory
+  system was introduced.
+- The known Starlette/httpx deprecation warning remains.
+- Milestone 7, V1.5, and V2 have not been started.

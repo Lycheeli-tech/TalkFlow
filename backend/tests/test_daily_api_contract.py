@@ -7,7 +7,16 @@ from app.ai.fakes import FakeLLMService
 from app.api.v1.daily import create_daily_session
 from app.repositories.daily_sessions import InMemoryDailySessionRepository
 from app.repositories.profiles import InMemoryProfileRepository
-from app.schemas import AuthenticatedUser, ConfirmedProfile
+from app.schemas import AuthenticatedUser, ConfirmedProfile, UserState
+
+
+class InMemoryUserRepository:
+    def __init__(self, state: UserState) -> None:
+        self.state = state
+
+    async def get_or_create(self, user_id):
+        assert user_id == self.state.id
+        return self.state
 
 
 def test_daily_api_is_registered() -> None:
@@ -27,6 +36,7 @@ async def test_daily_api_reuses_the_persisted_in_progress_session() -> None:
         updated_at=now,
     )
     repository = InMemoryDailySessionRepository()
+    users = InMemoryUserRepository(UserState(id=user_id, current_day=2, current_phase="BUILD"))
     llm = FakeLLMService(
         {
             "question_prompt": "Tell me about your transition.",
@@ -34,8 +44,13 @@ async def test_daily_api_reuses_the_persisted_in_progress_session() -> None:
         }
     )
 
-    first = await create_daily_session(AuthenticatedUser(id=user_id), profiles, repository, llm)
-    second = await create_daily_session(AuthenticatedUser(id=user_id), profiles, repository, llm)
+    first = await create_daily_session(
+        AuthenticatedUser(id=user_id), profiles, repository, llm, users
+    )
+    second = await create_daily_session(
+        AuthenticatedUser(id=user_id), profiles, repository, llm, users
+    )
 
     assert first == second
     assert len(repository.sessions) == 1
+    assert first.plan.day == 2

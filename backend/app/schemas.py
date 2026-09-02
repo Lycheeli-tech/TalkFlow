@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 from uuid import UUID
 
@@ -8,6 +8,12 @@ from pydantic import BaseModel, ConfigDict, Field
 class AuthenticatedUser(BaseModel):
     id: UUID
     email: str | None = None
+
+
+class ApplicationEntry(BaseModel):
+    stage: Literal["ONBOARDING", "CALIBRATION", "TODAY"]
+    interface_language: Literal["en", "zh-CN"] = "en"
+    target_role: str | None = None
 
 
 class UserState(BaseModel):
@@ -21,6 +27,12 @@ class UserState(BaseModel):
     timezone: str = "UTC"
     target_role: str | None = None
     primary_goal: Literal["english_interview"] = "english_interview"
+    xp: int = Field(default=0, ge=0)
+    current_streak: int = Field(default=0, ge=0)
+    last_completed_date: date | None = None
+    current_day: int = Field(default=1, ge=1, le=30)
+    current_phase: Literal["BUILD", "TRANSFER", "PERFORM"] = "BUILD"
+    program_completed_at: datetime | None = None
 
 
 class UserPreferencesUpdate(BaseModel):
@@ -219,8 +231,23 @@ class DailyLessonContent(BaseModel):
 
 
 class DailySessionResponse(BaseModel):
+    session_id: UUID
+    status: Literal["IN_PROGRESS", "COMPLETED"] = "IN_PROGRESS"
+    current_step: int = Field(default=0, ge=0)
+    completion_ready: bool = False
     plan: DailySessionPlan
     content: DailyLessonContent
+
+
+class DailySessionCompletion(BaseModel):
+    session_id: UUID
+    status: Literal["COMPLETED"] = "COMPLETED"
+    awarded_xp: int = Field(ge=0)
+    progress: UserState
+
+
+class DailySessionAdvance(BaseModel):
+    session: DailySessionResponse
 
 
 class MasteryRules(BaseModel):
@@ -235,6 +262,26 @@ class ErrorPatternRules(BaseModel):
     version: Literal["error_pattern_rules_v1"] = "error_pattern_rules_v1"
     active_occurrences_required: int = Field(default=2, ge=2)
     resolved_corrections_required: int = Field(default=2, ge=1)
+
+
+class RewardRules(BaseModel):
+    version: Literal["reward_rules_v1"] = "reward_rules_v1"
+    passive_learn_xp: int = Field(default=1, ge=0)
+    imitation_xp: int = Field(default=2, ge=0)
+    recall_xp: int = Field(default=5, ge=0)
+    transfer_xp: int = Field(default=10, ge=0)
+    mastery_xp: int = Field(default=20, ge=0)
+
+
+class ProgressState(BaseModel):
+    xp: int = Field(default=0, ge=0)
+    current_streak: int = Field(default=0, ge=0)
+    last_completed_date: date | None = None
+
+
+class RewardEvent(BaseModel):
+    event_type: Literal["PASSIVE_LEARN", "IMITATION", "RECALL", "TRANSFER", "MASTERY"]
+    completed_on: date
 
 
 class Expression(BaseModel):
@@ -355,6 +402,57 @@ class RetrievalResult(BaseModel):
     recorded: bool
     expression_status: ExpressionStatus
     next_review_at: datetime | None = None
+
+
+class QuickReviewItem(BaseModel):
+    expression_id: UUID
+    text: str
+    meaning: str
+    status: ExpressionStatus
+    next_review_at: datetime | None = None
+
+
+class QuickReviewSubmit(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    transcript: str = Field(min_length=1, max_length=20_000)
+
+
+class MyEnglishResponse(BaseModel):
+    expressions: list[Expression]
+    patterns: list[ErrorPattern]
+    stories: list[Story]
+
+
+class JourneyDay(BaseModel):
+    day: int
+    phase: LearningPhase
+    status: Literal["COMPLETED", "CURRENT", "UPCOMING"]
+
+
+class JourneyResponse(BaseModel):
+    current_day: int
+    current_phase: LearningPhase
+    days: list[JourneyDay]
+
+
+class MockInterviewRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    question_id: str
+    transcript: str = Field(min_length=1, max_length=20_000)
+
+
+class MockInterviewPrompt(BaseModel):
+    question_id: str
+    family: str
+    question: str
+
+
+class MockInterviewResult(BaseModel):
+    prompt: MockInterviewPrompt
+    analysis: AttemptAnalysis
+    analyzer_version: str
 
 
 class HealthResponse(BaseModel):

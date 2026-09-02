@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from app.repositories.memory import MemoryRepository
-from app.schemas import Expression, ExpressionAttempt, Story
+from app.schemas import Expression, ExpressionAttempt, MyEnglishResponse, Story
 from app.services.mastery import MasteryEngine, ReviewScheduler
 from app.services.memory_gate import MemoryGate
 
@@ -45,3 +45,10 @@ class MemoryApplicationService:
 
     async def list_expressions(self, user_id: UUID) -> list[Expression]:
         return await self.repository.list_expressions(user_id)
+
+    async def my_english(self, user_id: UUID) -> MyEnglishResponse:
+        return MyEnglishResponse(
+            expressions=await self.repository.list_expressions(user_id),
+            patterns=await self.repository.list_error_patterns(user_id),
+            stories=await self.repository.list_stories(user_id),
+        )

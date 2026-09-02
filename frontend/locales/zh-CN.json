@@ -9,6 +9,7 @@
     "statusOnline": "FluentLoop API 已连接。",
     "statusOffline": "API 尚未连接。启动后端即可连接此页面。"
   },
+  "navigation": { "label": "主导航", "today": "今日", "practice": "练习", "myEnglish": "我的英语", "journey": "旅程" },
   "calibration": {
     "readyTitle": "你的档案已准备好。", "readyCopy": "接下来回答三个简短问题，让 FluentLoop 建立初步口语基线。", "begin": "开始语音校准", "working": "处理中……", "question": "问题", "listen": "播放问题", "record": "开始录音", "stop": "停止并提交", "processing": "正在保存录音，然后进行转写与分析……", "transcript": "转写文本", "readOnly": "校准转写不可编辑，以确保基线反映你的原始口语回答。", "retry": "重试处理", "next": "下一个问题", "results": "查看初始基线", "noCorrection": "请自然回答。FluentLoop 不会在回答过程中打断或纠正。", "provisional": "初步基线", "assessmentTitle": "你的初始口语档案", "fluency": "流利度", "naturalness": "自然度", "grammar": "语法", "retrieval": "提取能力", "structure": "结构", "primaryFocus": "首要重点", "evolves": "这是初步观察，不是永久分数；它会随着后续训练证据持续更新。", "ttsFallback": "暂时无法播放音频，请阅读屏幕上的问题后继续。", "micError": "需要麦克风权限才能录制回答。", "error": "出现了问题"
   },
@@ -53,5 +54,12 @@
     "working": "处理中……",
     "back": "返回",
     "error": "出现了问题"
+  },
+  "m6": {
+    "entry": { "loading": "正在加载 FluentLoop……", "error": "暂时无法加载你的学习空间。" },
+    "today": { "eyebrow": "今日", "title": "把你学过的英语，变成你真正说得出的英语。", "copy": "围绕你确认过的个人档案进行短时引导训练。", "start": "开始今日训练", "preparing": "准备中……", "continue": "继续", "saving": "保存中……", "complete": "完成今日训练", "completed": "今日已完成", "recap": "你已到达复盘步骤。", "saved": "已保存", "streak": "天连续训练。", "tomorrow": "明天是第", "programComplete": "30 天训练营已完成。", "error": "进度保存失败。" },
+    "practice": { "eyebrow": "FluentLoop · 练习", "title": "有目的地练习。", "copy": "先复习到期表达，再不被打断地完成一次面试回答。", "back": "返回今日", "reviewTitle": "保持到期表达的熟练度。", "reviewCopy": "有一个到期表达正在等待隐藏式提取。", "startReview": "开始快速复习", "reviewPreparing": "准备中……", "reviewPrompt": "你的回答", "reviewPlaceholder": "不要查找表达，直接回答……", "submitReview": "提交复习", "reviewSaving": "保存中……", "reviewSaved": "复习已保存", "reviewRecorded": "你的提取证据已记录。", "reviewReplay": "这次复习已经记录过了。", "noDue": "目前没有到期表达。", "interviewTitle": "完成一次回答，中途不纠正。", "startInterview": "开始模拟面试", "analyzing": "分析中……", "answer": "你的完整回答", "answerPlaceholder": "用自己的话回答……", "submit": "提交回答", "reviewed": "回答已分析", "tryAnother": "再试一个回答", "unavailable": "暂时无法加载练习数据。", "reviewUnavailable": "暂时无法开始复习。", "interviewUnavailable": "暂时无法开始面试。", "analysisUnavailable": "暂时无法分析。" },
+    "journey": { "eyebrow": "FluentLoop · 旅程", "title": "你的 30 天路径。", "copy": "从建立语言，到迁移运用，再到面试表现，逐步推进。", "practice": "练习", "today": "今日", "loading": "正在加载旅程……", "unavailable": "暂时无法加载旅程。", "signin": "请先从今日页面登录，以查看个人旅程。" },
+    "myEnglish": { "eyebrow": "FluentLoop · 我的英语", "title": "真正能用的英语。", "copy": "查看你正在建立的表达、模式和已确认故事。", "practice": "练习", "loading": "正在加载你的学习记忆……", "unavailable": "暂时无法加载我的英语。", "signin": "请先从今日页面登录，以查看个人学习记忆。", "expressions": "表达", "patterns": "模式", "stories": "故事", "expressionEmpty": "你学习并提取过的表达会显示在这里。", "patternEmpty": "重复出现的证据会形成模式。", "storyEmpty": "只有你确认的故事才会保存。" }
   }
 }

@@ -1,6 +1,12 @@
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "http://localhost:8000";
 
+export type ApplicationEntry = {
+  stage: "ONBOARDING" | "CALIBRATION" | "TODAY";
+  interface_language: "en" | "zh-CN";
+  target_role: string | null;
+};
+
 export type CandidateProfile = {
   target_role: string;
   primary_goal: "english_interview";
@@ -34,6 +40,10 @@ async function apiFetch<T>(path: string, token: string, init?: RequestInit): Pro
     throw new Error(payload?.detail ?? `Request failed with status ${response.status}.`);
   }
   return response.json() as Promise<T>;
+}
+
+export function getApplicationEntry(token: string) {
+  return apiFetch<ApplicationEntry>("/api/v1/entry", token);
 }
 
 export async function savePreferences(
@@ -118,6 +128,10 @@ export type DailySessionPlan = {
 };
 
 export type DailySessionResponse = {
+  session_id: string;
+  status: "IN_PROGRESS" | "COMPLETED";
+  current_step: number;
+  completion_ready: boolean;
   plan: DailySessionPlan;
   content: {
     question_prompt: string;
@@ -131,4 +145,69 @@ export type DailySessionResponse = {
 
 export function createDailySession(token: string) {
   return apiFetch<DailySessionResponse>("/api/v1/daily/sessions", token, { method: "POST" });
+}
+
+export function advanceDailySession(token: string, sessionId: string) {
+  return apiFetch<DailySessionResponse>(`/api/v1/daily/sessions/${sessionId}/advance`, token, { method: "POST" });
+}
+
+export function startQuickReview(token: string, sessionId: string) {
+  return apiFetch<RetrievalOpportunityResponse>(`/api/v1/memory/quick-review/start?session_id=${encodeURIComponent(sessionId)}`, token, { method: "POST" });
+}
+
+export type RetrievalOpportunityResponse = { opportunity_id: string; session_id: string; question_family: string; question_text: string; status: "CREATED" | "CONSUMED" | "EXPIRED" };
+export type RetrievalResult = { opportunity_id: string; opportunity_status: "CONSUMED"; recorded: boolean; expression_status: string; next_review_at: string | null };
+
+export function submitQuickReview(token: string, opportunityId: string, transcript: string) {
+  return apiFetch<RetrievalResult>(`/api/v1/memory/quick-review/${opportunityId}/submit`, token, { method: "POST", body: JSON.stringify({ transcript }) });
+}
+
+export type DailySessionCompletion = {
+  session_id: string;
+  status: "COMPLETED";
+  awarded_xp: number;
+  progress: { xp: number; current_streak: number; current_day: number; current_phase: "BUILD" | "TRANSFER" | "PERFORM"; program_completed_at: string | null };
+};
+
+export function completeDailySession(token: string, sessionId: string) {
+  return apiFetch<DailySessionCompletion>(`/api/v1/daily/sessions/${sessionId}/complete`, token, { method: "POST" });
+}
+
+
+export type QuickReviewItem = { expression_id: string; text: string; meaning: string; status: string; next_review_at: string | null };
+export type MockInterviewPrompt = { question_id: string; family: string; question: string };
+export type MockInterviewResult = { prompt: MockInterviewPrompt; analysis: { fluency: string; naturalness: string; grammar: string; retrieval: string; structure: string; strengths: string[]; focus_areas: string[] }; analyzer_version: string };
+
+export function getQuickReview(token: string) {
+  return apiFetch<QuickReviewItem[]>("/api/v1/memory/quick-review", token);
+}
+
+export function getMockInterviewPrompt(token: string) {
+  return apiFetch<MockInterviewPrompt>("/api/v1/practice/mock-interview/prompt", token);
+}
+
+export function evaluateMockInterview(token: string, questionId: string, transcript: string) {
+  return apiFetch<MockInterviewResult>("/api/v1/practice/mock-interview/evaluate", token, {
+    method: "POST",
+    body: JSON.stringify({ question_id: questionId, transcript }),
+  });
+}
+
+
+export type JourneyDay = { day: number; phase: "BUILD" | "TRANSFER" | "PERFORM"; status: "COMPLETED" | "CURRENT" | "UPCOMING" };
+export type JourneyResponse = { current_day: number; current_phase: JourneyDay["phase"]; days: JourneyDay[] };
+
+export function getJourney(token: string) {
+  return apiFetch<JourneyResponse>("/api/v1/journey", token);
+}
+
+
+export type MyEnglishResponse = {
+  expressions: { id: string; text: string; meaning: string; status: string }[];
+  patterns: { id: string; pattern_type: string; original_example: string; status: string }[];
+  stories: { id: string; title: string; content: string; source_type: string }[];
+};
+
+export function getMyEnglish(token: string) {
+  return apiFetch<MyEnglishResponse>("/api/v1/memory/my-english", token);
 }

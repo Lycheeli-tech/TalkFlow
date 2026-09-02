@@ -444,6 +444,36 @@ h1 {
 .today-progress span { height: .35rem; border-radius: 999px; background: #e5e7eb; }
 .today-progress span[data-active="true"], .today-progress span[data-complete="true"] { background: #4f46e5; }
 .today-step { margin: 0; }
+.practice-shell { display: grid; gap: var(--space-8); }
+.practice-header { display: flex; justify-content: space-between; gap: var(--space-8); align-items: end; }
+.practice-header h1 { max-width: 10ch; }
+.practice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); }
+.practice-card { display: grid; gap: var(--space-4); padding: clamp(1.25rem, 3vw, 2rem); }
+.practice-card h2 { margin: 0; font-size: clamp(1.4rem, 3vw, 2rem); line-height: 1.1; }
+.review-list { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+.review-list li { display: grid; gap: .15rem; padding: .85rem 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.review-list span { color: var(--color-text-muted); font-size: var(--text-sm); }
+.interview-question { margin: 0; font-size: var(--text-lg); font-weight: 650; }
+.journey-shell { display: grid; gap: var(--space-8); }
+.journey-card { display: grid; gap: var(--space-6); padding: clamp(1.25rem, 3vw, 2rem); }
+.journey-summary { display: flex; justify-content: space-between; gap: var(--space-6); align-items: end; }
+.journey-summary h2 { margin: 0; font-size: clamp(1.5rem, 3vw, 2.15rem); line-height: 1.1; }
+.journey-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.journey-grid li { display: grid; min-height: 5rem; align-content: space-between; gap: var(--space-2); padding: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-sm); color: var(--color-text-muted); font-size: .72rem; }
+.journey-grid li strong { font-size: .78rem; }
+.journey-grid li[data-phase="BUILD"] { border-top: 3px solid #3f8f65; }
+.journey-grid li[data-phase="TRANSFER"] { border-top: 3px solid #d2933d; }
+.journey-grid li[data-phase="PERFORM"] { border-top: 3px solid #6d63b5; }
+.journey-grid li[data-status="COMPLETED"] { background: rgb(40 103 77 / 9%); color: var(--color-text); }
+.journey-grid li[data-status="CURRENT"] { border-color: var(--color-accent); box-shadow: 0 0 0 3px rgb(40 103 77 / 12%); color: var(--color-text); }
+.my-english-shell { display: grid; gap: var(--space-8); }
+.my-english-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-6); }
+.memory-card { display: grid; align-content: start; gap: var(--space-4); min-height: 15rem; padding: clamp(1.25rem, 3vw, 2rem); }
+.app-shell { min-height: 100vh; }
+.app-content { max-width: 76rem; margin: 0 auto; padding: var(--space-6) clamp(1rem, 4vw, 3rem) 6rem; }
+.primary-nav { position: sticky; top: 0; z-index: 10; display: flex; justify-content: center; gap: .5rem; padding: .75rem 1rem; background: rgb(255 255 255 / 92%); border-bottom: 1px solid var(--color-border); backdrop-filter: blur(12px); }
+.primary-nav a { padding: .55rem .8rem; border-radius: 999px; color: var(--color-muted); text-decoration: none; }
+.primary-nav a:hover, .primary-nav a:focus-visible { background: var(--surface-muted); color: var(--color-text); }
 @media (max-width: 560px) { .today-heading { display: grid; } .today-progress { gap: .25rem; } }
 .calibration h2 { font-size: clamp(1.35rem, 3vw, 2rem); line-height: 1.25; }
 .transcript { display: grid; gap: .75rem; padding: 1rem; border-radius: var(--radius-md); background: var(--surface-muted); }
@@ -500,6 +530,14 @@ h1 {
   .review-grid {
     grid-template-columns: 1fr;
   }
+
+  .practice-header { display: grid; align-items: start; }
+  .practice-grid { grid-template-columns: 1fr; }
+  .journey-summary { display: grid; align-items: start; }
+  .journey-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .my-english-grid { grid-template-columns: 1fr; }
+  .primary-nav { position: fixed; inset: auto 0 0; justify-content: space-around; padding: .6rem .35rem calc(.6rem + env(safe-area-inset-bottom)); }
+  .primary-nav a { flex: 1; padding: .6rem .2rem; text-align: center; font-size: .8rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
