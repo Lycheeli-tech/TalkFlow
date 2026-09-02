@@ -198,6 +198,8 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - Responsive Practice UI at `/practice` with Quick Review and Mock Interview entry cards.
 - Deterministic 30-day Journey projection API at `/api/v1/journey`, including phase and day status.
 - Responsive Journey UI at `/journey` with the 30-day phase/status map.
+- User-scoped My English projection API and responsive `/my-english` UI for Expressions, Patterns,
+  and confirmed Stories.
 
 ### M6.1 Verified checks
 
@@ -205,10 +207,12 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - Frontend ESLint, TypeScript, and production build checks passed for Practice UI.
 - Journey projection and user-isolation tests: 3 passed.
 - Frontend ESLint, TypeScript, and production build checks passed for Journey UI.
+- My English projection/repository tests: 4 passed; frontend ESLint, TypeScript, and production
+  build checks passed for My English UI.
 - Ruff format and lint checks passed for the M6.1 files.
 
 ### M6 Known limitations
 
 - Richer authenticated progress projections are not implemented yet.
-- My English projections remain pending.
+- Daily Session completion → deterministic progress/reward integration remains pending.
 - No M7, V1.5, or V2 scope has been started.

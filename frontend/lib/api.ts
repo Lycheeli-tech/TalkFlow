@@ -160,3 +160,14 @@ export type JourneyResponse = { current_day: number; current_phase: JourneyDay["
 export function getJourney(token: string) {
   return apiFetch<JourneyResponse>("/api/v1/journey", token);
 }
+
+
+export type MyEnglishResponse = {
+  expressions: { id: string; text: string; meaning: string; status: string }[];
+  patterns: { id: string; pattern_type: string; original_example: string; status: string }[];
+  stories: { id: string; title: string; content: string; source_type: string }[];
+};
+
+export function getMyEnglish(token: string) {
+  return apiFetch<MyEnglishResponse>("/api/v1/memory/my-english", token);
+}

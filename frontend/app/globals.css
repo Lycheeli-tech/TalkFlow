@@ -466,6 +466,9 @@ h1 {
 .journey-grid li[data-phase="PERFORM"] { border-top: 3px solid #6d63b5; }
 .journey-grid li[data-status="COMPLETED"] { background: rgb(40 103 77 / 9%); color: var(--color-text); }
 .journey-grid li[data-status="CURRENT"] { border-color: var(--color-accent); box-shadow: 0 0 0 3px rgb(40 103 77 / 12%); color: var(--color-text); }
+.my-english-shell { display: grid; gap: var(--space-8); }
+.my-english-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-6); }
+.memory-card { display: grid; align-content: start; gap: var(--space-4); min-height: 15rem; padding: clamp(1.25rem, 3vw, 2rem); }
 @media (max-width: 560px) { .today-heading { display: grid; } .today-progress { gap: .25rem; } }
 .calibration h2 { font-size: clamp(1.35rem, 3vw, 2rem); line-height: 1.25; }
 .transcript { display: grid; gap: .75rem; padding: 1rem; border-radius: var(--radius-md); background: var(--surface-muted); }
@@ -527,6 +530,7 @@ h1 {
   .practice-grid { grid-template-columns: 1fr; }
   .journey-summary { display: grid; align-items: start; }
   .journey-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .my-english-grid { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

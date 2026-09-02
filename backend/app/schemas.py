@@ -390,6 +390,12 @@ class QuickReviewItem(BaseModel):
     next_review_at: datetime | None = None
 
 
+class MyEnglishResponse(BaseModel):
+    expressions: list[Expression]
+    patterns: list[ErrorPattern]
+    stories: list[Story]
+
+
 class JourneyDay(BaseModel):
     day: int
     phase: LearningPhase

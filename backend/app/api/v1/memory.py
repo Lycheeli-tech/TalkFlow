@@ -13,6 +13,7 @@ from app.repositories.retrieval import RetrievalOpportunityRepository
 from app.schemas import (
     AuthenticatedUser,
     Expression,
+    MyEnglishResponse,
     QuickReviewItem,
     ResolveRetrievalRequest,
     RetrievalOpportunityResponse,
@@ -32,6 +33,14 @@ async def list_expressions(
     repository: MemoryRepository = Depends(get_memory_repository),
 ) -> list[Expression]:
     return await MemoryApplicationService(repository).list_expressions(current_user.id)
+
+
+@router.get("/my-english", response_model=MyEnglishResponse)
+async def get_my_english(
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    repository: MemoryRepository = Depends(get_memory_repository),
+) -> MyEnglishResponse:
+    return await MemoryApplicationService(repository).my_english(current_user.id)
 
 
 @router.get("/quick-review", response_model=list[QuickReviewItem])
