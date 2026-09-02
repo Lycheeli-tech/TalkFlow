@@ -81,3 +81,9 @@ Production memory uses the PostgreSQL repository. Normal durable writes pass thr
 Resolving a persisted Daily Attempt uses a small cross-session unit of work. Verified evidence,
 deterministic Expression mastery/review updates, and RetrievalOpportunity consumption commit in one
 PostgreSQL transaction; fixtures emulate the same rollback and idempotency semantics in memory.
+
+### ADR-020 — Versioned Deterministic Rewards
+
+XP and streak updates are deterministic application rules behind a versioned `RewardRules` contract.
+Reward events may be emitted by later practice flows, but LLM/provider output must not directly decide
+XP, streak, or durable progress state.

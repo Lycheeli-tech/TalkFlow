@@ -181,4 +181,25 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 
 ## Milestone 6 — Practice & Progress
 
-**Status:** NOT STARTED
+**Status:** IN PROGRESS
+
+**Branch:** `feat/practice-progress`
+
+**Base:** `m5-cross-session-loop` (`0ab52da`)
+
+### M6.1 Implemented
+
+- Versioned deterministic `RewardEngine` for passive learn, imitation, recall, transfer, and mastery XP.
+- Deterministic daily streak behavior: same-day idempotency, consecutive-day increment, and gap reset.
+- Focused reward-domain tests; no persistence, API, UI, Mock Interview, or Quick Review has been added yet.
+
+### M6.1 Verified checks
+
+- Reward tests: 3 passed.
+- Ruff format and lint checks passed for the M6.1 files.
+
+### M6 Known limitations
+
+- XP/streak persistence and authenticated progress API are not implemented yet.
+- Mock Interview, Quick Review, Journey map, and My English projections remain pending.
+- No M7, V1.5, or V2 scope has been started.

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 from uuid import UUID
 
@@ -235,6 +235,26 @@ class ErrorPatternRules(BaseModel):
     version: Literal["error_pattern_rules_v1"] = "error_pattern_rules_v1"
     active_occurrences_required: int = Field(default=2, ge=2)
     resolved_corrections_required: int = Field(default=2, ge=1)
+
+
+class RewardRules(BaseModel):
+    version: Literal["reward_rules_v1"] = "reward_rules_v1"
+    passive_learn_xp: int = Field(default=1, ge=0)
+    imitation_xp: int = Field(default=2, ge=0)
+    recall_xp: int = Field(default=5, ge=0)
+    transfer_xp: int = Field(default=10, ge=0)
+    mastery_xp: int = Field(default=20, ge=0)
+
+
+class ProgressState(BaseModel):
+    xp: int = Field(default=0, ge=0)
+    current_streak: int = Field(default=0, ge=0)
+    last_completed_date: date | None = None
+
+
+class RewardEvent(BaseModel):
+    event_type: Literal["PASSIVE_LEARN", "IMITATION", "RECALL", "TRANSFER", "MASTERY"]
+    completed_on: date
 
 
 class Expression(BaseModel):
