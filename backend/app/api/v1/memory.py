@@ -13,11 +13,13 @@ from app.repositories.retrieval import RetrievalOpportunityRepository
 from app.schemas import (
     AuthenticatedUser,
     Expression,
+    QuickReviewItem,
     ResolveRetrievalRequest,
     RetrievalOpportunityResponse,
     RetrievalResult,
 )
 from app.services.memory import MemoryApplicationService
+from app.services.quick_review import QuickReviewService
 from app.services.retrieval import RetrievalService
 from app.services.verification import VerificationService
 
@@ -30,6 +32,18 @@ async def list_expressions(
     repository: MemoryRepository = Depends(get_memory_repository),
 ) -> list[Expression]:
     return await MemoryApplicationService(repository).list_expressions(current_user.id)
+
+
+@router.get("/quick-review", response_model=list[QuickReviewItem])
+async def list_quick_review(
+    limit: int = 10,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    repository: MemoryRepository = Depends(get_memory_repository),
+) -> list[QuickReviewItem]:
+    try:
+        return await QuickReviewService(repository).list_due(current_user.id, limit=limit)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
 
 
 @router.get("/retrieval/due", response_model=RetrievalOpportunityResponse)

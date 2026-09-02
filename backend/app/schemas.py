@@ -380,6 +380,14 @@ class RetrievalResult(BaseModel):
     next_review_at: datetime | None = None
 
 
+class QuickReviewItem(BaseModel):
+    expression_id: UUID
+    text: str
+    meaning: str
+    status: ExpressionStatus
+    next_review_at: datetime | None = None
+
+
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: Literal["fluentloop-api"] = "fluentloop-api"

@@ -193,15 +193,16 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - Deterministic daily streak behavior: same-day idempotency, consecutive-day increment, and gap reset.
 - PostgreSQL user progress fields (`xp`, `current_streak`, `last_completed_date`) with a versioned migration.
 - `ProgressService` application boundary and focused reward/persistence-contract tests.
-- No Practice API/UI, Mock Interview, or Quick Review has been added yet.
+- Minimal authenticated Quick Review API returning due, user-scoped expression projections.
+- No Mock Interview or Practice UI has been added yet.
 
 ### M6.1 Verified checks
 
-- Reward and progress tests: 4 passed.
+- Reward, progress, and Quick Review tests: 6 passed.
 - Ruff format and lint checks passed for the M6.1 files.
 
 ### M6 Known limitations
 
-- Authenticated progress API and Practice UI are not implemented yet.
-- Mock Interview, Quick Review, Journey map, and My English projections remain pending.
+- Practice UI and richer authenticated progress projections are not implemented yet.
+- Mock Interview, Journey map, and My English projections remain pending.
 - No M7, V1.5, or V2 scope has been started.
