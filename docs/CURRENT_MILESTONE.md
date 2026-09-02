@@ -257,5 +257,15 @@ V2, or new product behavior is authorized in this milestone.
 - Recovered `backend/.venv` and verified the full backend suite: 80 passed, with the known
   Starlette/httpx deprecation warning.
 - Ruff format/check passed using the project environment.
-- Migration validation, frontend lint, TypeScript, production build, and browser smoke checks remain
-  blocked because Node.js is not installed or available on PATH in the current execution environment.
+- Recovered the bundled Node.js 24.19.0 runtime and repository-declared pnpm 11.19.0; the earlier
+  failure was caused by the Node directory being absent from the execution PATH.
+- Frontend ESLint, TypeScript, and the Next.js production build passed.
+- All nine migrations and user provisioning passed the repository PGlite validation command.
+- Desktop navigation and approximately 375 px responsive smoke checks passed for Today, Practice,
+  My English, and Journey, with no horizontal overflow or browser console warnings/errors.
+
+### M7 blocker
+
+- Simplified Chinese works on the onboarding page, but the selected interface locale does not carry
+  into Practice/My English/Journey navigation; those pages render in English. M7 remains IN PROGRESS
+  until cross-route locale persistence/rendering is corrected and revalidated.
