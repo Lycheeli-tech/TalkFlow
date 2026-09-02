@@ -56,6 +56,7 @@
     "error": "出现了问题"
   },
   "m6": {
+    "entry": { "loading": "正在加载 FluentLoop……", "error": "暂时无法加载你的学习空间。" },
     "today": { "eyebrow": "今日", "title": "把你学过的英语，变成你真正说得出的英语。", "copy": "围绕你确认过的个人档案进行短时引导训练。", "start": "开始今日训练", "preparing": "准备中……", "continue": "继续", "saving": "保存中……", "complete": "完成今日训练", "completed": "今日已完成", "recap": "你已到达复盘步骤。", "saved": "已保存", "streak": "天连续训练。", "tomorrow": "明天是第", "programComplete": "30 天训练营已完成。", "error": "进度保存失败。" },
     "practice": { "eyebrow": "FluentLoop · 练习", "title": "有目的地练习。", "copy": "先复习到期表达，再不被打断地完成一次面试回答。", "back": "返回今日", "reviewTitle": "保持到期表达的熟练度。", "reviewCopy": "有一个到期表达正在等待隐藏式提取。", "startReview": "开始快速复习", "reviewPreparing": "准备中……", "reviewPrompt": "你的回答", "reviewPlaceholder": "不要查找表达，直接回答……", "submitReview": "提交复习", "reviewSaving": "保存中……", "reviewSaved": "复习已保存", "reviewRecorded": "你的提取证据已记录。", "reviewReplay": "这次复习已经记录过了。", "noDue": "目前没有到期表达。", "interviewTitle": "完成一次回答，中途不纠正。", "startInterview": "开始模拟面试", "analyzing": "分析中……", "answer": "你的完整回答", "answerPlaceholder": "用自己的话回答……", "submit": "提交回答", "reviewed": "回答已分析", "tryAnother": "再试一个回答", "unavailable": "暂时无法加载练习数据。", "reviewUnavailable": "暂时无法开始复习。", "interviewUnavailable": "暂时无法开始面试。", "analysisUnavailable": "暂时无法分析。" },
     "journey": { "eyebrow": "FluentLoop · 旅程", "title": "你的 30 天路径。", "copy": "从建立语言，到迁移运用，再到面试表现，逐步推进。", "practice": "练习", "today": "今日", "loading": "正在加载旅程……", "unavailable": "暂时无法加载旅程。", "signin": "请先从今日页面登录，以查看个人旅程。" },
