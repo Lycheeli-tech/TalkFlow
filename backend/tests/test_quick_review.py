@@ -4,7 +4,8 @@ from uuid import uuid4
 import pytest
 
 from app.repositories.memory import InMemoryMemoryRepository
-from app.schemas import Expression
+from app.repositories.retrieval import InMemoryRetrievalOpportunityRepository
+from app.schemas import AuthenticatedUser, Expression, QuickReviewSubmit
 from app.services.quick_review import QuickReviewService
 
 
@@ -40,3 +41,32 @@ async def test_quick_review_is_due_sorted_and_user_scoped() -> None:
 async def test_quick_review_rejects_unbounded_limit() -> None:
     with pytest.raises(ValueError):
         await QuickReviewService(InMemoryMemoryRepository()).list_due(uuid4(), limit=0)
+
+
+@pytest.mark.asyncio
+async def test_quick_review_opportunity_hides_target_and_submit_contract_is_strict() -> None:
+    from app.api.v1.memory import start_quick_review
+
+    now = datetime.now(UTC)
+    user_id = uuid4()
+    expression = Expression(
+        id=uuid4(),
+        user_id=user_id,
+        text="make the pivot",
+        meaning="change direction",
+        source_type="CURRICULUM",
+        next_review_at=now - timedelta(minutes=1),
+        created_at=now,
+        updated_at=now,
+    )
+    memory = InMemoryMemoryRepository()
+    await memory.save_expression(expression)
+    opportunity = await start_quick_review(
+        session_id=uuid4(),
+        current_user=AuthenticatedUser(id=user_id),
+        repository=memory,
+        opportunities=InMemoryRetrievalOpportunityRepository(),
+    )
+    assert expression.text not in opportunity.question_text
+    with pytest.raises(ValueError):
+        QuickReviewSubmit.model_validate({"transcript": "answer", "independent_evidence": True})
