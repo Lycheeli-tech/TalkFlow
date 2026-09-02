@@ -93,3 +93,13 @@ XP, streak, or durable progress state.
 A valid Daily Session completion records the session state and applies the versioned passive-learning
 reward, streak update, and Journey advancement in one persistence transaction. Replaying a completed
 session returns its progress state without awarding XP again.
+
+### ADR-022 — Learner-Local Reward Date
+
+Streak and completion rewards use the server timestamp converted through the learner's persisted IANA
+timezone. Client-provided local dates are never authoritative.
+
+### ADR-023 — Server-Gated Daily Progress
+
+Daily step progression is persisted on the Session. Only the final configured Recap step can transition
+an in-progress Daily Session into a reward-eligible completion; the MVP does not fabricate voice evidence.
