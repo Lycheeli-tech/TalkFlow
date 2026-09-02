@@ -252,9 +252,10 @@ V2, or new product behavior is authorized in this milestone.
   and Simplified Chinese catalogs.
 - Clarified Python environment setup and fake-provider/live-integration expectations in `README.md`.
 
-### M7 validation blockers
+### M7 validation status
 
-- Frontend lint, TypeScript, and production build could not run because Node.js is not installed or
-  available on PATH in the current execution environment.
-- Backend tests could not run because the environment lacks the project Python dependencies (`fastapi`
-  is not installed). These checks remain required for M7 closeout.
+- Recovered `backend/.venv` and verified the full backend suite: 80 passed, with the known
+  Starlette/httpx deprecation warning.
+- Ruff format/check passed using the project environment.
+- Migration validation, frontend lint, TypeScript, production build, and browser smoke checks remain
+  blocked because Node.js is not installed or available on PATH in the current execution environment.
