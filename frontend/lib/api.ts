@@ -132,3 +132,23 @@ export type DailySessionResponse = {
 export function createDailySession(token: string) {
   return apiFetch<DailySessionResponse>("/api/v1/daily/sessions", token, { method: "POST" });
 }
+
+
+export type QuickReviewItem = { expression_id: string; text: string; meaning: string; status: string; next_review_at: string | null };
+export type MockInterviewPrompt = { question_id: string; family: string; question: string };
+export type MockInterviewResult = { prompt: MockInterviewPrompt; analysis: { fluency: string; naturalness: string; grammar: string; retrieval: string; structure: string; strengths: string[]; focus_areas: string[] }; analyzer_version: string };
+
+export function getQuickReview(token: string) {
+  return apiFetch<QuickReviewItem[]>("/api/v1/memory/quick-review", token);
+}
+
+export function getMockInterviewPrompt(token: string) {
+  return apiFetch<MockInterviewPrompt>("/api/v1/practice/mock-interview/prompt", token);
+}
+
+export function evaluateMockInterview(token: string, questionId: string, transcript: string) {
+  return apiFetch<MockInterviewResult>("/api/v1/practice/mock-interview/evaluate", token, {
+    method: "POST",
+    body: JSON.stringify({ question_id: questionId, transcript }),
+  });
+}

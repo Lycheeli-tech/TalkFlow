@@ -195,15 +195,16 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - `ProgressService` application boundary and focused reward/persistence-contract tests.
 - Minimal authenticated Quick Review API returning due, user-scoped expression projections.
 - Minimal Mock Interview service/API: bounded prompt selection and one-shot complete-answer analysis.
-- No Practice UI has been added yet.
+- Responsive Practice UI at `/practice` with Quick Review and Mock Interview entry cards.
 
 ### M6.1 Verified checks
 
 - Reward, progress, Quick Review, and Mock Interview tests: 8 passed.
+- Frontend ESLint, TypeScript, and production build checks passed for Practice UI.
 - Ruff format and lint checks passed for the M6.1 files.
 
 ### M6 Known limitations
 
-- Practice UI and richer authenticated progress projections are not implemented yet.
+- Richer authenticated progress projections are not implemented yet.
 - Journey map and My English projections remain pending.
 - No M7, V1.5, or V2 scope has been started.

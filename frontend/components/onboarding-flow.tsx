@@ -83,6 +83,7 @@ export function OnboardingFlow() {
       const accessToken = mode === "in" ? await signIn(email, password) : await signUp(email, password);
       if (accessToken) {
         setToken(accessToken);
+        sessionStorage.setItem("fluentloop_access_token", accessToken);
         setStep("goal");
       } else {
         setNotice(messages.confirmationSent);
