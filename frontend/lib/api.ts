@@ -152,3 +152,11 @@ export function evaluateMockInterview(token: string, questionId: string, transcr
     body: JSON.stringify({ question_id: questionId, transcript }),
   });
 }
+
+
+export type JourneyDay = { day: number; phase: "BUILD" | "TRANSFER" | "PERFORM"; status: "COMPLETED" | "CURRENT" | "UPCOMING" };
+export type JourneyResponse = { current_day: number; current_phase: JourneyDay["phase"]; days: JourneyDay[] };
+
+export function getJourney(token: string) {
+  return apiFetch<JourneyResponse>("/api/v1/journey", token);
+}

@@ -454,6 +454,18 @@ h1 {
 .review-list li { display: grid; gap: .15rem; padding: .85rem 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
 .review-list span { color: var(--color-text-muted); font-size: var(--text-sm); }
 .interview-question { margin: 0; font-size: var(--text-lg); font-weight: 650; }
+.journey-shell { display: grid; gap: var(--space-8); }
+.journey-card { display: grid; gap: var(--space-6); padding: clamp(1.25rem, 3vw, 2rem); }
+.journey-summary { display: flex; justify-content: space-between; gap: var(--space-6); align-items: end; }
+.journey-summary h2 { margin: 0; font-size: clamp(1.5rem, 3vw, 2.15rem); line-height: 1.1; }
+.journey-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.journey-grid li { display: grid; min-height: 5rem; align-content: space-between; gap: var(--space-2); padding: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-sm); color: var(--color-text-muted); font-size: .72rem; }
+.journey-grid li strong { font-size: .78rem; }
+.journey-grid li[data-phase="BUILD"] { border-top: 3px solid #3f8f65; }
+.journey-grid li[data-phase="TRANSFER"] { border-top: 3px solid #d2933d; }
+.journey-grid li[data-phase="PERFORM"] { border-top: 3px solid #6d63b5; }
+.journey-grid li[data-status="COMPLETED"] { background: rgb(40 103 77 / 9%); color: var(--color-text); }
+.journey-grid li[data-status="CURRENT"] { border-color: var(--color-accent); box-shadow: 0 0 0 3px rgb(40 103 77 / 12%); color: var(--color-text); }
 @media (max-width: 560px) { .today-heading { display: grid; } .today-progress { gap: .25rem; } }
 .calibration h2 { font-size: clamp(1.35rem, 3vw, 2rem); line-height: 1.25; }
 .transcript { display: grid; gap: .75rem; padding: 1rem; border-radius: var(--radius-md); background: var(--surface-muted); }
@@ -513,6 +525,8 @@ h1 {
 
   .practice-header { display: grid; align-items: start; }
   .practice-grid { grid-template-columns: 1fr; }
+  .journey-summary { display: grid; align-items: start; }
+  .journey-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
