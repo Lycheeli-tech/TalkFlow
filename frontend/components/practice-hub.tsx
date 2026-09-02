@@ -6,7 +6,8 @@ import Link from "next/link";
 import { createDailySession, evaluateMockInterview, getMockInterviewPrompt, getQuickReview, MockInterviewPrompt, MockInterviewResult, QuickReviewItem, RetrievalOpportunityResponse, RetrievalResult, startQuickReview, submitQuickReview } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getMessages, getStoredLocale } from "@/lib/i18n";
+import { useInterfaceLocale } from "@/components/interface-locale-provider";
+import { getMessages } from "@/lib/i18n";
 
 export function PracticeHub({ token }: { token: string }) {
   const [review, setReview] = useState<QuickReviewItem[]>([]);
@@ -18,7 +19,8 @@ export function PracticeHub({ token }: { token: string }) {
   const [transcript, setTranscript] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const copy = getMessages(getStoredLocale()).m6.practice;
+  const { locale } = useInterfaceLocale();
+  const copy = getMessages(locale).m6.practice;
   const unavailable = copy.unavailable;
 
   useEffect(() => {

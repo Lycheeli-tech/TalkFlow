@@ -32,7 +32,7 @@
 
 ## Milestone 2 — Voice Calibration
 
-**Status:** IN PROGRESS
+**Status:** COMPLETE
 
 **Branch:** `feat/voice-calibration`
 
@@ -230,3 +230,52 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
   system was introduced.
 - The known Starlette/httpx deprecation warning remains.
 - Milestone 7, V1.5, and V2 have not been started.
+
+## Milestone 7 — Hardening
+
+**Status:** IN PROGRESS
+
+**Branch:** `feat/hardening`
+
+**Base:** `m6-practice-progress` (`669b7d9`)
+
+M7 scope is limited to regression coverage, failure recovery, i18n completeness, logging,
+security/data-isolation checks, responsive UX validation, and README/setup documentation. No V1.5,
+V2, or new product behavior is authorized in this milestone.
+
+### M7 progress
+
+- Reviewed the documented M0–M6 golden path and existing ownership, Memory Gate, evidence,
+  idempotency, and provider-fallback boundaries; no new P1 correctness or security violation was
+  identified in this pass.
+- Added localized vocabulary keys for Journey phase labels and Practice entry labels in both English
+  and Simplified Chinese catalogs.
+- Clarified Python environment setup and fake-provider/live-integration expectations in `README.md`.
+- Centralized interface locale in an app-level provider backed by the existing session preference and
+  synchronized it from the persisted user `interface_language` on authenticated entry.
+- Confirmed the interface locale now persists across Today, Practice, My English, and Journey routes,
+  including refreshes; learning content remains unchanged.
+
+### M7 validation status
+
+- Recovered `backend/.venv` and verified the full backend suite: 80 passed, with the known
+  Starlette/httpx deprecation warning.
+- Ruff format/check passed using the project environment.
+- Recovered the bundled Node.js 24.19.0 runtime and repository-declared pnpm 11.19.0; the earlier
+  failure was caused by the Node directory being absent from the execution PATH.
+- Frontend ESLint, TypeScript, and the Next.js production build passed.
+- All nine migrations and user provisioning passed the repository PGlite validation command.
+- Desktop navigation and approximately 375 px responsive smoke checks passed for Today, Practice,
+  My English, and Journey, with no horizontal overflow or browser console warnings/errors.
+- English → Simplified Chinese → all main routes, refresh persistence on Practice/My English/Journey,
+  and Simplified Chinese → English route checks passed.
+
+### Remaining limitations
+
+- Live Supabase/PostgreSQL, Auth, Storage, and OpenAI/STT/TTS provider integration remains untested
+  with real credentials and devices.
+- Full Daily voice/Attempt capture remains outside the implemented MVP scope.
+- Mock Interview responses remain intentionally ephemeral.
+- The known Starlette/httpx deprecation warning remains.
+- M7 is the final numbered MVP implementation milestone; the next phase is Live Integration,
+  deployment, real-device testing, and bug fixing, not Milestone 8.

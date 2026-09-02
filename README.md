@@ -19,7 +19,14 @@ Setup:
 
 1. Copy `.env.example` to `.env` and provide local development values.
 2. Run `pnpm install` at the repository root.
-3. Create `backend/.venv` and install `backend` with its `dev` extras.
+3. Create and activate a Python environment, then install the backend with its development extras:
+
+   ```text
+   python -m venv backend/.venv
+   backend/.venv/Scripts/activate      # Windows
+   source backend/.venv/bin/activate   # macOS/Linux
+   python -m pip install -e "backend[dev]"
+   ```
 4. Apply the SQL files in `supabase/migrations` to the Supabase database.
 5. Start the API from `backend` with `uvicorn app.main:app --reload`.
 6. Start the web app with `pnpm dev`.
@@ -37,3 +44,7 @@ ruff check backend
 
 The first live LLM, speech-to-text, and text-to-speech providers will be chosen
 in the milestone that needs them. Foundation uses deterministic fake providers.
+
+For local deterministic development, keep the provider settings in `.env` at
+`fake`. Real Supabase/OpenAI credentials are required only for the later live
+integration gate; never expose server-only keys through `NEXT_PUBLIC_*` values.

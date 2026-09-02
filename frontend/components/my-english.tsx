@@ -5,12 +5,14 @@ import Link from "next/link";
 
 import { getMyEnglish, MyEnglishResponse } from "@/lib/api";
 import { Card } from "@/components/ui/card";
-import { getMessages, getStoredLocale } from "@/lib/i18n";
+import { useInterfaceLocale } from "@/components/interface-locale-provider";
+import { getMessages } from "@/lib/i18n";
 
 export function MyEnglish({ token }: { token: string }) {
   const [memory, setMemory] = useState<MyEnglishResponse | null>(null);
   const [error, setError] = useState("");
-  const copy = getMessages(getStoredLocale()).m6.myEnglish;
+  const { locale } = useInterfaceLocale();
+  const copy = getMessages(locale).m6.myEnglish;
   const unavailable = copy.unavailable;
 
   useEffect(() => {

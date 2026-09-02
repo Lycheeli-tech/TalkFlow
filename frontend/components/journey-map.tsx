@@ -5,7 +5,8 @@ import Link from "next/link";
 
 import { getJourney, JourneyResponse } from "@/lib/api";
 import { Card } from "@/components/ui/card";
-import { getMessages, getStoredLocale } from "@/lib/i18n";
+import { useInterfaceLocale } from "@/components/interface-locale-provider";
+import { getMessages } from "@/lib/i18n";
 
 const phaseCopy = {
   BUILD: "Build",
@@ -16,7 +17,8 @@ const phaseCopy = {
 export function JourneyMap({ token }: { token: string }) {
   const [journey, setJourney] = useState<JourneyResponse | null>(null);
   const [error, setError] = useState("");
-  const copy = getMessages(getStoredLocale()).m6.journey;
+  const { locale } = useInterfaceLocale();
+  const copy = getMessages(locale).m6.journey;
   const unavailable = copy.unavailable;
 
   useEffect(() => {

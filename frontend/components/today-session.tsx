@@ -5,7 +5,8 @@ import { useState } from "react";
 import { advanceDailySession, completeDailySession, createDailySession, DailySessionCompletion, DailySessionResponse } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getMessages, getStoredLocale } from "@/lib/i18n";
+import { useInterfaceLocale } from "@/components/interface-locale-provider";
+import { getMessages } from "@/lib/i18n";
 
 export function TodaySession({ token }: { token: string }) {
   const [session, setSession] = useState<DailySessionResponse | null>(null);
@@ -13,7 +14,8 @@ export function TodaySession({ token }: { token: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [completion, setCompletion] = useState<DailySessionCompletion | null>(null);
-  const copy = getMessages(getStoredLocale()).m6.today;
+  const { locale } = useInterfaceLocale();
+  const copy = getMessages(locale).m6.today;
 
   async function begin() {
     setBusy(true);

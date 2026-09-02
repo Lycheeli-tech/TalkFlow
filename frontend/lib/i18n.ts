@@ -3,6 +3,8 @@ import zhCN from "@/locales/zh-CN.json";
 
 export type InterfaceLocale = "en" | "zh-CN";
 
+export const INTERFACE_LOCALE_STORAGE_KEY = "fluentloop_interface_locale";
+
 const catalogs = {
   en,
   "zh-CN": zhCN,
@@ -14,5 +16,5 @@ export function getMessages(locale: InterfaceLocale) {
 
 export function getStoredLocale(): InterfaceLocale {
   if (typeof window === "undefined") return "en";
-  return sessionStorage.getItem("fluentloop_interface_locale") === "zh-CN" ? "zh-CN" : "en";
+  return sessionStorage.getItem(INTERFACE_LOCALE_STORAGE_KEY) === "zh-CN" ? "zh-CN" : "en";
 }
