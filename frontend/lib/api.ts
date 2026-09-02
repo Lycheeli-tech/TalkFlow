@@ -118,6 +118,8 @@ export type DailySessionPlan = {
 };
 
 export type DailySessionResponse = {
+  session_id: string;
+  status: "IN_PROGRESS" | "COMPLETED";
   plan: DailySessionPlan;
   content: {
     question_prompt: string;
@@ -131,6 +133,17 @@ export type DailySessionResponse = {
 
 export function createDailySession(token: string) {
   return apiFetch<DailySessionResponse>("/api/v1/daily/sessions", token, { method: "POST" });
+}
+
+export type DailySessionCompletion = {
+  session_id: string;
+  status: "COMPLETED";
+  awarded_xp: number;
+  progress: { xp: number; current_streak: number; current_day: number; current_phase: "BUILD" | "TRANSFER" | "PERFORM" };
+};
+
+export function completeDailySession(token: string, sessionId: string) {
+  return apiFetch<DailySessionCompletion>(`/api/v1/daily/sessions/${sessionId}/complete`, token, { method: "POST" });
 }
 
 

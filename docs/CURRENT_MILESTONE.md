@@ -200,6 +200,9 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 - Responsive Journey UI at `/journey` with the 30-day phase/status map.
 - User-scoped My English projection API and responsive `/my-english` UI for Expressions, Patterns,
   and confirmed Stories.
+- Daily Session completion now atomically records the completed session, applies the versioned
+  passive-learning reward, preserves streak state, and advances the Journey day without duplicate
+  XP on replay.
 
 ### M6.1 Verified checks
 
@@ -214,5 +217,5 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 ### M6 Known limitations
 
 - Richer authenticated progress projections are not implemented yet.
-- Daily Session completion → deterministic progress/reward integration remains pending.
+- M6 full closeout validation and product-scope review remain pending.
 - No M7, V1.5, or V2 scope has been started.

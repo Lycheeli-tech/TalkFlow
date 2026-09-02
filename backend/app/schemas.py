@@ -224,8 +224,17 @@ class DailyLessonContent(BaseModel):
 
 
 class DailySessionResponse(BaseModel):
+    session_id: UUID
+    status: Literal["IN_PROGRESS", "COMPLETED"] = "IN_PROGRESS"
     plan: DailySessionPlan
     content: DailyLessonContent
+
+
+class DailySessionCompletion(BaseModel):
+    session_id: UUID
+    status: Literal["COMPLETED"] = "COMPLETED"
+    awarded_xp: int = Field(ge=0)
+    progress: UserState
 
 
 class MasteryRules(BaseModel):

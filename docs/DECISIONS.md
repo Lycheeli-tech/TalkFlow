@@ -87,3 +87,9 @@ PostgreSQL transaction; fixtures emulate the same rollback and idempotency seman
 XP and streak updates are deterministic application rules behind a versioned `RewardRules` contract.
 Reward events may be emitted by later practice flows, but LLM/provider output must not directly decide
 XP, streak, or durable progress state.
+
+### ADR-021 — Atomic Daily Completion Progress
+
+A valid Daily Session completion records the session state and applies the versioned passive-learning
+reward, streak update, and Journey advancement in one persistence transaction. Replaying a completed
+session returns its progress state without awarding XP again.
