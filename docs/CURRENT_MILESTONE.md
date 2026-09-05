@@ -233,7 +233,7 @@ Scope: bounded inventories, deterministic Daily Planner, minimum daily-session p
 
 ## Milestone 7 — Hardening
 
-**Status:** IN PROGRESS
+**Status:** COMPLETE
 
 **Branch:** `feat/hardening`
 
@@ -279,3 +279,26 @@ V2, or new product behavior is authorized in this milestone.
 - The known Starlette/httpx deprecation warning remains.
 - M7 is the final numbered MVP implementation milestone; the next phase is Live Integration,
   deployment, real-device testing, and bug fixing, not Milestone 8.
+
+## Phase 2 — MVP Activation
+
+### Gate A — Live Infrastructure
+
+**Status:** COMPLETE
+
+- The live `TalkFlow` Supabase project is configured locally through ignored environment files.
+- Ten migrations are applied and validated, including RLS hardening for durable learning memory.
+- Auth/JWKS, automatic user provisioning, all-table RLS and two-user isolation, private Resume and
+  Audio Storage, SQL-backed Profile/Session/Attempt/Memory/RetrievalOpportunity/progress persistence,
+  and reconnection recovery passed live validation.
+- The application connects through the regional Supabase Session Pooler.
+- No live secret or connection string is present in Git-tracked files.
+
+### Remaining activation work
+
+- Gate B — Live AI Providers: NOT STARTED.
+- Gate C — Real Voice Pipeline: NOT STARTED.
+- Gate D — Real Daily Learning Loop: NOT STARTED.
+- Gate E — Real Day 1 → Day 2 Cross-Session Aha: NOT STARTED.
+- Gate F — Local MVP Acceptance: NOT STARTED.
+- Deployment configuration and real-device validation remain later activation work.
