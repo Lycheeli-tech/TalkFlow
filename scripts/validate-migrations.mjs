@@ -59,5 +59,29 @@ if (result.rows.length !== 1) {
   throw new Error("Foundation migration did not provision the user row.");
 }
 
+const expectedRlsTables = [
+  "attempts",
+  "error_patterns",
+  "expression_attempts",
+  "expressions",
+  "learner_assessments",
+  "profiles",
+  "retrieval_opportunities",
+  "sessions",
+  "source_documents",
+  "stories",
+  "users",
+];
+const rlsResult = await database.query(
+  `select tablename
+   from pg_tables
+   where schemaname = 'public' and rowsecurity = true
+   order by tablename`,
+);
+const rlsTables = rlsResult.rows.map((row) => row.tablename);
+if (JSON.stringify(rlsTables) !== JSON.stringify(expectedRlsTables)) {
+  throw new Error(`Unexpected RLS coverage: ${rlsTables.join(", ")}`);
+}
+
 await database.close();
 console.log(`Validated ${migrationFiles.length} migration(s) and user provisioning.`);
