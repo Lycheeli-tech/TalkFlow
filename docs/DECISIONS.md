@@ -103,3 +103,10 @@ timezone. Client-provided local dates are never authoritative.
 
 Daily step progression is persisted on the Session. Only the final configured Recap step can transition
 an in-progress Daily Session into a reward-eligible completion; the MVP does not fabricate voice evidence.
+
+### ADR-024 — Mainland-China Live AI Provider
+
+Phase 2 live activation uses Alibaba Cloud Model Studio (Bailian), China (Beijing), for text LLM,
+speech-to-text, and text-to-speech services. Provider abstractions remain intact and deterministic
+domain rules remain outside model control. Runtime OpenAI adapters and credentials are removed;
+fake providers remain available for deterministic tests and local fallback.

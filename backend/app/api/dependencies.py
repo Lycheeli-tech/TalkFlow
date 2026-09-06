@@ -5,6 +5,14 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.bailian import (
+    BailianAnswerAnalyzer,
+    BailianCalibrationQuestionGenerator,
+    BailianLLMService,
+    BailianProfileExtractor,
+    BailianSpeechToTextService,
+    BailianTextToSpeechService,
+)
 from app.ai.fakes import (
     FakeAnswerAnalyzer,
     FakeCalibrationQuestionGenerator,
@@ -20,13 +28,6 @@ from app.ai.interfaces import (
     ProfileExtractor,
     SpeechToTextService,
     TextToSpeechService,
-)
-from app.ai.profile_extractor import OpenAIProfileExtractor
-from app.ai.voice import (
-    OpenAIAnswerAnalyzer,
-    OpenAICalibrationQuestionGenerator,
-    OpenAISpeechToTextService,
-    OpenAITextToSpeechService,
 )
 from app.core.config import get_settings
 from app.core.security import JWTVerificationError, SupabaseTokenVerifier, TokenVerifier
@@ -119,17 +120,28 @@ def get_verification_service(
 @lru_cache
 def get_question_generator() -> CalibrationQuestionGenerator:
     settings = get_settings()
-    if settings.llm_provider == "openai":
-        if not settings.openai_api_key:
-            raise RuntimeError("OPENAI_API_KEY is required for calibration questions.")
-        return OpenAICalibrationQuestionGenerator(
-            api_key=settings.openai_api_key, model=settings.openai_calibration_model
+    if settings.llm_provider == "bailian":
+        if not settings.bailian_api_key:
+            raise RuntimeError("BAILIAN_API_KEY is required for calibration questions.")
+        return BailianCalibrationQuestionGenerator(
+            api_key=settings.bailian_api_key,
+            base_url=settings.bailian_compatible_base_url,
+            model=settings.bailian_text_model,
         )
     return FakeCalibrationQuestionGenerator()
 
 
 @lru_cache
 def get_llm_service() -> LLMService:
+    settings = get_settings()
+    if settings.llm_provider == "bailian":
+        if not settings.bailian_api_key:
+            raise RuntimeError("BAILIAN_API_KEY is required for lesson content.")
+        return BailianLLMService(
+            api_key=settings.bailian_api_key,
+            base_url=settings.bailian_compatible_base_url,
+            model=settings.bailian_text_model,
+        )
     return FakeLLMService(
         {
             "question_prompt": "Tell me about your transition.",
@@ -145,11 +157,13 @@ def get_llm_service() -> LLMService:
 @lru_cache
 def get_stt_service() -> SpeechToTextService:
     settings = get_settings()
-    if settings.stt_provider == "openai":
-        if not settings.openai_api_key:
-            raise RuntimeError("OPENAI_API_KEY is required for STT.")
-        return OpenAISpeechToTextService(
-            api_key=settings.openai_api_key, model=settings.openai_stt_model
+    if settings.stt_provider == "bailian":
+        if not settings.bailian_api_key:
+            raise RuntimeError("BAILIAN_API_KEY is required for STT.")
+        return BailianSpeechToTextService(
+            api_key=settings.bailian_api_key,
+            base_url=settings.bailian_compatible_base_url,
+            model=settings.bailian_stt_model,
         )
     return FakeSpeechToTextService()
 
@@ -157,11 +171,14 @@ def get_stt_service() -> SpeechToTextService:
 @lru_cache
 def get_tts_service() -> TextToSpeechService:
     settings = get_settings()
-    if settings.tts_provider == "openai":
-        if not settings.openai_api_key:
-            raise RuntimeError("OPENAI_API_KEY is required for TTS.")
-        return OpenAITextToSpeechService(
-            api_key=settings.openai_api_key, model=settings.openai_tts_model
+    if settings.tts_provider == "bailian":
+        if not settings.bailian_api_key:
+            raise RuntimeError("BAILIAN_API_KEY is required for TTS.")
+        return BailianTextToSpeechService(
+            api_key=settings.bailian_api_key,
+            base_url=settings.bailian_dashscope_base_url,
+            model=settings.bailian_tts_model,
+            default_voice=settings.bailian_tts_voice,
         )
     return FakeTextToSpeechService()
 
@@ -169,11 +186,13 @@ def get_tts_service() -> TextToSpeechService:
 @lru_cache
 def get_answer_analyzer() -> AnswerAnalyzer:
     settings = get_settings()
-    if settings.llm_provider == "openai":
-        if not settings.openai_api_key:
-            raise RuntimeError("OPENAI_API_KEY is required for answer analysis.")
-        return OpenAIAnswerAnalyzer(
-            api_key=settings.openai_api_key, model=settings.openai_calibration_model
+    if settings.llm_provider == "bailian":
+        if not settings.bailian_api_key:
+            raise RuntimeError("BAILIAN_API_KEY is required for answer analysis.")
+        return BailianAnswerAnalyzer(
+            api_key=settings.bailian_api_key,
+            base_url=settings.bailian_compatible_base_url,
+            model=settings.bailian_text_model,
         )
     return FakeAnswerAnalyzer()
 
@@ -200,12 +219,13 @@ def get_audio_storage() -> AudioStorage:
 @lru_cache
 def get_profile_extractor() -> ProfileExtractor:
     settings = get_settings()
-    if settings.profile_extractor_provider == "openai":
-        if not settings.openai_api_key:
-            raise RuntimeError("OPENAI_API_KEY is required for the OpenAI profile extractor.")
-        return OpenAIProfileExtractor(
-            api_key=settings.openai_api_key,
-            model=settings.openai_profile_model,
+    if settings.profile_extractor_provider == "bailian":
+        if not settings.bailian_api_key:
+            raise RuntimeError("BAILIAN_API_KEY is required for the profile extractor.")
+        return BailianProfileExtractor(
+            api_key=settings.bailian_api_key,
+            base_url=settings.bailian_compatible_base_url,
+            model=settings.bailian_text_model,
         )
     return FakeProfileExtractor()
 

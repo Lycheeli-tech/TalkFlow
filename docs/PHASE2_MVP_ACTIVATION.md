@@ -9,7 +9,7 @@ document, not a replacement specification. There is no Milestone 8.
 | Gate | Scope | Status |
 | --- | --- | --- |
 | A | Live Infrastructure | COMPLETE — live Supabase project configured and validated |
-| B | Live AI Providers | NOT STARTED |
+| B | Live AI Providers | IN PROGRESS — Bailian adapters implemented; live key validation pending |
 | C | Real Voice Pipeline | NOT STARTED |
 | D | Real Daily Learning Loop | NOT STARTED |
 | E | Real Day 1 → Day 2 Cross-Session Aha | NOT STARTED |
@@ -61,3 +61,17 @@ M7-merged `main` state. Secrets remain in ignored local environment files.
 - No M8 exists. Later gates require the human review boundaries defined in the
   activation instructions, including real provider, microphone, Daily Session,
   cross-session, and local golden-path use.
+
+## Gate B — Live AI Providers
+
+**Status:** IN PROGRESS
+
+- Alibaba Cloud Model Studio (Bailian), China (Beijing), replaces OpenAI for all runtime AI calls.
+- Qwen structured text providers cover profile extraction, calibration questions, answer analysis,
+  and Daily Lesson content.
+- Qwen3-ASR covers turn-based English speech transcription from browser audio data.
+- Qwen3-TTS covers English question speech synthesis.
+- Fake providers remain available for deterministic tests and recovery.
+- Provider contract tests and the full backend regression suite pass.
+- Live API-key, model-entitlement, latency, structured-output, ASR, TTS, and human experience
+  validation are pending. Gate C has not started.

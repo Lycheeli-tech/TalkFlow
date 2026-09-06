@@ -296,7 +296,8 @@ V2, or new product behavior is authorized in this milestone.
 
 ### Remaining activation work
 
-- Gate B — Live AI Providers: NOT STARTED.
+- Gate B — Live AI Providers: IN PROGRESS; Bailian adapters are implemented and live credential
+  validation is pending.
 - Gate C — Real Voice Pipeline: NOT STARTED.
 - Gate D — Real Daily Learning Loop: NOT STARTED.
 - Gate E — Real Day 1 → Day 2 Cross-Session Aha: NOT STARTED.

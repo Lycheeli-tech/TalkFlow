@@ -46,5 +46,5 @@ The first live LLM, speech-to-text, and text-to-speech providers will be chosen
 in the milestone that needs them. Foundation uses deterministic fake providers.
 
 For local deterministic development, keep the provider settings in `.env` at
-`fake`. Real Supabase/OpenAI credentials are required only for the later live
+`fake`. Real Supabase/Bailian credentials are required only for the later live
 integration gate; never expose server-only keys through `NEXT_PUBLIC_*` values.
