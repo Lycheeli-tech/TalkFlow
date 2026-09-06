@@ -9,8 +9,8 @@ document, not a replacement specification. There is no Milestone 8.
 | Gate | Scope | Status |
 | --- | --- | --- |
 | A | Live Infrastructure | COMPLETE — live Supabase project configured and validated |
-| B | Live AI Providers | IN PROGRESS — Bailian adapters implemented; live key validation pending |
-| C | Real Voice Pipeline | NOT STARTED |
+| B | Live AI Providers | COMPLETE — Bailian text, ASR, and TTS validated live |
+| C | Real Voice Pipeline | IN PROGRESS — live browser/device validation starting |
 | D | Real Daily Learning Loop | NOT STARTED |
 | E | Real Day 1 → Day 2 Cross-Session Aha | NOT STARTED |
 | F | Local MVP Acceptance | NOT STARTED |
@@ -64,7 +64,7 @@ M7-merged `main` state. Secrets remain in ignored local environment files.
 
 ## Gate B — Live AI Providers
 
-**Status:** IN PROGRESS
+**Status:** COMPLETE
 
 - Alibaba Cloud Model Studio (Bailian), China (Beijing), replaces OpenAI for all runtime AI calls.
 - Qwen structured text providers cover profile extraction, calibration questions, answer analysis,
@@ -73,5 +73,12 @@ M7-merged `main` state. Secrets remain in ignored local environment files.
 - Qwen3-TTS covers English question speech synthesis.
 - Fake providers remain available for deterministic tests and recovery.
 - Provider contract tests and the full backend regression suite pass.
-- Live API-key, model-entitlement, latency, structured-output, ASR, TTS, and human experience
-  validation are pending. Gate C has not started.
+- The Beijing API key and model entitlements passed live validation.
+- Live structured outputs passed for profile extraction, calibration questions, answer analysis,
+  and Daily Lesson content.
+- Qwen3-TTS and Qwen3-ASR passed a real English TTS → STT round trip with an exact transcript.
+- The user accepted the generated English voice for pronunciation, naturalness, speed, and volume.
+- Runtime dependency inspection confirmed all six AI boundaries resolve to Bailian providers, and
+  the configured API key is absent from Git-tracked files.
+- Gate C is now IN PROGRESS for real browser microphone, recording-format, upload, persistence,
+  failure-recovery, and retry validation.
