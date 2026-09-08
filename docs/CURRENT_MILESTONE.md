@@ -301,7 +301,8 @@ V2, or new product behavior is authorized in this milestone.
 - Gate C — Real Voice Pipeline: COMPLETE.
 - Gate D — Real Daily Learning Loop: COMPLETE on `feat/real-daily-learning-loop`.
 - Gate E — Real Day 1 → Day 2 Cross-Session Aha: COMPLETE on `feat/real-cross-session-aha`.
-- Gate F — Local MVP Acceptance: NOT STARTED.
+- Gate F — Local MVP Acceptance: COMPLETE on `chore/phase2-gate-f-local-mvp-acceptance`; all 24
+  Build Spec acceptance criteria and the critical cross-session path are evidence-backed.
 - Deployment configuration and real-device validation remain later activation work.
 
 ### Gate C live-browser progress (2026-09-08)
@@ -366,5 +367,18 @@ V2, or new product behavior is authorized in this milestone.
   transfer, moving the Expression to `TRANSFERRED` without incorrectly marking it `MASTERED`.
 - English and Simplified Chinese Recap Aha, refresh recovery, private audio, reconnection,
   cross-user rejection, main routes, 375px layout, and clean console passed.
-- Backend 88 tests, Ruff, frontend TypeScript/ESLint/build, and `git diff --check` passed. Gate F,
-  realtime voice, M8, V1.5, and V2 were not started.
+- Backend 88 tests, Ruff, frontend TypeScript/ESLint/build, and `git diff --check` passed. Gate F
+  subsequently completed integrated local acceptance; realtime voice, M8, V1.5, and V2 were not
+  started.
+
+### Gate F completion (2026-09-09)
+
+- Mapped all 24 Build Spec Section 21 criteria to Gates A–E implementation/live evidence and
+  revalidated the configured MVP as an integrated local system.
+- Authenticated Day 3 browser checks passed for Today, Practice/Quick Review, Mock Interview prompt,
+  My English, Journey, English/简体中文 switching, and reload persistence.
+- Read-only live verification passed for profile/calibration, completed Daily Sessions, analyzed
+  Attempts, memory/retrieval evidence, Memory Gate, ownership, two-connection persistence, and
+  non-empty private audio.
+- No Gate F product change was necessary. Deployment, realtime voice, M8, V1.5, V2, and later scope
+  remain unstarted.

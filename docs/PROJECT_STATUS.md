@@ -2,9 +2,9 @@
 
 ## Last Updated
 
-- 2026-09-08
-- Branch: `feat/real-cross-session-aha`
-- HEAD: Gate E closeout commit (`feat: complete phase 2 gate e cross-session aha`)
+- 2026-09-09
+- Branch: `chore/phase2-gate-f-local-mvp-acceptance`
+- HEAD: Gate F closeout checkpoint (`docs: complete phase 2 gate f acceptance`)
 
 ## Product
 
@@ -20,15 +20,15 @@ deployment and real-device validation follow the activation gates. No Milestone 
 ## Current Work
 
 - Phase: Phase 2 — MVP Activation
-- Gate: E — Real Day 1 → Day 2 Cross-Session Aha
+- Gate: F — Local MVP Acceptance
 - Status: COMPLETE
-- Objective achieved: a due Day 1 Expression is hidden in a natural Day 2 interview question;
-  trusted real voice evidence atomically updates memory/mastery/review and appears at Recap.
+- Objective achieved: all 24 Build Spec MVP acceptance criteria and the critical cross-session path
+  are covered by automated, live-provider, real-browser, and durable-state evidence.
 
 ## Stable Baseline
 
-Phase 1 stable baseline is tag `m7-hardening` at merge commit `cbfed8f`. Gates A–C are merged and
-pushed on `main`; Gate D is merged and Gate E is closing on `feat/real-cross-session-aha`.
+Phase 1 stable baseline is tag `m7-hardening` at merge commit `cbfed8f`. Gates A–E are merged and
+pushed on `main`; Gate F is complete on `chore/phase2-gate-f-local-mvp-acceptance` pending review.
 
 ## Implemented
 
@@ -41,18 +41,17 @@ pushed on `main`; Gate D is merged and Gate E is closing on `feat/real-cross-ses
 
 ## Not Yet Activated / Not Yet Complete
 
-- Gate A–C are COMPLETE.
-- Gates A–E are COMPLETE. Gate F local MVP acceptance is not started.
+- Gates A–F are COMPLETE locally.
 - Deployment-host setup and real-device coverage remain future activation work.
 
 ## Current Blockers
 
-No confirmed Gate E blocker. Known limitations are recorded in `PHASE2_MVP_ACTIVATION.md`.
+No confirmed Gate F blocker. Known limitations are recorded in `PHASE2_MVP_ACTIVATION.md`.
 
 ## Next Steps
 
-1. Review the Gate E checkpoint.
-2. Do not begin Gate F until explicitly requested.
+1. Review the Gate F checkpoint.
+2. Do not merge or push without explicit instruction; do not begin later scope implicitly.
 
 ## Verification Snapshot
 
@@ -66,6 +65,9 @@ No confirmed Gate E blocker. Known limitations are recorded in `PHASE2_MVP_ACTIV
   complete.
 - Gate E live hidden retrieval, real voice evidence, atomic resolution, failure recovery,
   reconnection, isolation, bilingual Recap, 375px routes, and console checks: complete.
+- Gate F: all 24 MVP criteria mapped to prior/current evidence; authenticated Day 3 Today,
+  Practice, My English, Journey, locale/reload persistence, durable data, ownership, and private
+  audio checks passed. Full automated closeout passed again.
 
 ## Source of Truth
 

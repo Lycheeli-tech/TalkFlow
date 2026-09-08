@@ -11,7 +11,8 @@
 4. `docs/CURRENT_MILESTONE.md`
 5. `docs/DECISIONS.md`
 6. `docs/PHASE2_MVP_ACTIVATION.md`
-7. Build Spec 中与 Gate E、跨 Session Retrieval、Memory/Mastery 相关的完整章节
+7. Build Spec 中与 Gate F、MVP Acceptance、Daily/Review、跨 Session Retrieval、
+   Memory/Mastery 相关的完整章节
 
 开始工作前必须先运行 `git status`、确认分支/HEAD 和本地服务。不要依赖旧对话历史。
 
@@ -23,10 +24,10 @@
 - Phase 2 Gate C — Real Voice Pipeline：COMPLETE。
 - Phase 2 Gate D — Real Daily Learning Loop：COMPLETE。
 - Phase 2 Gate E — Real Day 1 → Day 2 Cross-Session Aha：COMPLETE。
-- Phase 2 Gate F — Local MVP Acceptance：NOT STARTED。
-- Gate D 完成分支：`feat/real-daily-learning-loop`。
-- Gate D checkpoint：`97bee4f feat: complete phase 2 gate d daily loop`。
-- Gate D 合并/推送状态应由新代理重新检查；本文件随后会随 merge 一起进入 `main`。
+- Phase 2 Gate F — Local MVP Acceptance：COMPLETE，等待 checkpoint review。
+- Gate E checkpoint：`7bc2d86 feat: complete phase 2 gate e cross-session aha`。
+- Gate E merge：`2128501`，已进入并推送 `main`；rollback tag 为
+  `phase2-gate-e-cross-session-aha`。
 
 ## Gate D 已验证基线
 
@@ -64,11 +65,21 @@
 
 全部 Gate E 条件通过；checkpoint 见 `feat/real-cross-session-aha`。完成后停止，不自动开始 Gate F。
 
+## Gate F 完成事实
+
+- Build Spec Section 21 的 24 项 MVP acceptance criteria 均有自动化、真实 provider、真实
+  浏览器或 durable-state 证据；关键跨 Session Aha 路径继续成立。
+- 登录后的 Day 3 Today、Practice/Quick Review、Mock Interview prompt、My English、Journey、
+  English/简体中文切换与刷新持久化已通过集成复核。
+- 只读 live 检查确认 Profile/Calibration、Daily completion、Analyzed Attempts、Memory/
+  Retrieval、Memory Gate、ownership、双连接持久化与非空私有音频。
+- Gate F 没有新增产品代码、migration、prompt 或架构决策；后续范围未开始。
+
 ## 下一步
 
-- 审查 `feat/real-cross-session-aha` 上的 Gate E checkpoint。
-- 未经明确请求，不要合并、推送或开始 Gate F。
-- Gate E 的详细实现、live evidence 和限制见 `docs/HANDOFF.md` 与
+- 审查 `chore/phase2-gate-f-local-mvp-acceptance` 上的 Gate F checkpoint。
+- 未经明确请求，不要合并、推送或开始部署、V1.5、V2 或其他后续范围。
+- Gate F 的完整 acceptance mapping、live evidence 和限制见 `docs/HANDOFF.md` 与
   `docs/PHASE2_MVP_ACTIVATION.md`。
 
 ## 运行环境
@@ -91,7 +102,7 @@
 - 提取候选不是事实；只有用户确认后才能成为 durable profile/story truth。
 - 原始音频和 Attempt 在 STT/分析失败时必须保留；retry 必须复用同一 Attempt。
 - 使用 versioned migrations/prompts/rules；高风险改动前创建 Git checkpoint。
-- 不修改 Build Spec，不实现 V1.5/V2，不创建 M8，不开始 Gate F。
+- 不修改 Build Spec，不实现 V1.5/V2，不创建 M8，不开始部署或任何 Gate F 之后的范围。
 - 不打印、提交或粘贴 `.env`、Supabase/Bailian/数据库密钥、JWT、用户标识、私有路径或
   音频内容。
 - 不覆盖用户修改，尤其是 `frontend/next-env.d.ts`。

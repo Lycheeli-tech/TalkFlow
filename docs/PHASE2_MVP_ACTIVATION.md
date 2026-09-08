@@ -13,7 +13,7 @@ document, not a replacement specification. There is no Milestone 8.
 | C | Real Voice Pipeline | COMPLETE — real browser recording, private audio persistence, Bailian ASR/analysis, recovery, retry, reconnection, and bilingual route checks validated |
 | D | Real Daily Learning Loop | COMPLETE — live Daily content, ordered voice-gated steps, private audio/Attempt evidence, Recap progress, reconnection, bilingual routes, and responsive UI validated |
 | E | Real Day 1 → Day 2 Cross-Session Aha | COMPLETE — hidden Day 2 retrieval, real voice evidence, atomic deterministic update, and Recap Aha validated live |
-| F | Local MVP Acceptance | NOT STARTED |
+| F | Local MVP Acceptance | COMPLETE — all 24 Build Spec criteria and the critical cross-session path are covered by integrated local evidence |
 
 ## Gate A completion inventory
 
@@ -248,4 +248,41 @@ database/provider evidence.
 - Exact phrase verification is intentionally conservative: ASR lexical substitutions count as a
   failed retrieval even if semantically similar, preventing vague model judgment from changing
   mastery. The learner can recover through a later opportunity.
-- Gate F, deployment-host setup, realtime voice, M8, V1.5, and V2 remain out of scope and unstarted.
+- Gate F is complete. Deployment-host setup, realtime voice, M8, V1.5, and V2 remain out of scope
+  and unstarted.
+
+## Gate F — Local MVP Acceptance
+
+**Status:** COMPLETE
+
+### Acceptance result
+
+- All 24 criteria in Build Spec Section 21 are covered. Criteria 1–8 are backed by the Gate C real
+  onboarding/calibration path; 9–11 by deterministic duration plans and Gate D Daily voice; 12–16
+  by Gate E Expression, hidden retrieval, evidence, and deterministic mastery; 17 by deterministic
+  error-pattern domain tests; 18–20 by the live My English, Mock Interview, Journey, XP/streak path;
+  21–22 by retained-attempt failure regressions and the full test suite; and 23–24 by bilingual
+  live checks plus reload, reconnection, PostgreSQL, and private Storage verification.
+- The critical MVP validation passed previously and remains present: an expression learned in one
+  session was independently used in a later different question/session, producing trusted evidence
+  and an atomic deterministic progress update without revealing the target beforehand.
+- An authenticated Day 3 browser pass rechecked Today, Practice/Quick Review, Mock Interview prompt,
+  My English Expressions/Patterns/Stories, Journey's 30-day map, English/简体中文 state, and reload
+  persistence. The initial real lesson generation completed successfully after provider latency.
+- A user-scoped read-only live check confirmed a profile, assessment, at least two completed Daily
+  Sessions, analyzed Attempts, memory and retrieval rows, Memory Gate integrity, row ownership,
+  identical progress through two database connections, and readable non-empty private audio.
+- Automated closeout: backend 88 tests, Ruff format/check, frontend TypeScript/ESLint/production
+  build, all 11 migrations, and `git diff --check` passed.
+- Gate F required no product-code, schema, prompt, or architecture change. No later scope started.
+
+### Accepted limitations
+
+- Pre-Gate-E Day 1 test accounts may require a one-time due-Expression backfill.
+- Conservative exact-phrase verification can false-negative when ASR substitutes vocabulary; it
+  reschedules review instead of incorrectly granting evidence.
+- The 20-minute live account omits IMITATE by the deterministic duration contract; the shared
+  IMITATE voice path is automated-test covered.
+- Access tokens have no refresh-token lifecycle; expiry safely returns to login and requires a new
+  sign-in. One known Starlette/httpx deprecation warning remains in backend tests.
+- Deployment-host setup and physical-device coverage are outside Local MVP Acceptance.
