@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 from app.ai.interfaces import AnswerAnalyzer, SpeechToTextService, TextToSpeechService
 from app.repositories.calibration import VoiceAttemptRepository
 from app.repositories.daily_sessions import DailySessionRepository
+from app.repositories.retrieval import RetrievalOpportunityRepository
 from app.schemas import DailySessionResponse, DailyStep, VoiceAttempt
 from app.storage.audio import AudioStorage
 
@@ -13,6 +14,8 @@ VOICE_STEPS: frozenset[DailyStep] = frozenset(
 
 
 def prompt_for_step(session: DailySessionResponse, step: DailyStep) -> str:
+    if step == "INTERVIEW" and session.retrieval_opportunity is not None:
+        return session.retrieval_opportunity.question_text
     content = session.content
     if step == "IMITATE" and content.imitation_variants:
         return content.imitation_variants[0]
@@ -33,6 +36,7 @@ class DailyVoiceService:
         tts: TextToSpeechService,
         analyzer: AnswerAnalyzer,
         audio: AudioStorage,
+        opportunities: RetrievalOpportunityRepository | None = None,
     ) -> None:
         self._sessions = sessions
         self._attempts = attempts
@@ -40,6 +44,7 @@ class DailyVoiceService:
         self._tts = tts
         self._analyzer = analyzer
         self._audio = audio
+        self._opportunities = opportunities
 
     async def synthesize(self, *, user_id: UUID, session_id: UUID, step: DailyStep) -> bytes:
         session = await self._require_current_voice_step(user_id, session_id, step)
@@ -114,6 +119,22 @@ class DailyVoiceService:
         session = await self._sessions.get(user_id=user_id, session_id=session_id)
         if session is None:
             raise LookupError("Daily session was not found for this user.")
+        if self._opportunities is not None:
+            opportunity = await self._opportunities.get_for_session(session_id, user_id)
+            if opportunity is not None:
+                from app.schemas import RetrievalOpportunityResponse
+
+                session = session.model_copy(
+                    update={
+                        "retrieval_opportunity": RetrievalOpportunityResponse(
+                            opportunity_id=opportunity.id,
+                            session_id=opportunity.session_id,
+                            question_family=opportunity.question_family,
+                            question_text=opportunity.question_text,
+                            status=opportunity.status,
+                        )
+                    }
+                )
         current = session.plan.steps[session.current_step]
         if step != current or step not in VOICE_STEPS:
             raise ValueError("Recording is only allowed for the current voice step.")

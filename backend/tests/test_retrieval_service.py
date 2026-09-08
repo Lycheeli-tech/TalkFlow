@@ -45,6 +45,14 @@ async def test_due_retrieval_is_user_scoped_and_does_not_expose_target_text() ->
     assert result.user_id == owner
     assert "hidden target" not in result.question_text
 
+    replay = await RetrievalService(repository, opportunities).create_due_opportunity(
+        user_id=owner,
+        session_id=result.session_id,
+        question_family="RELEVANT_EXPERIENCE",
+        question_text="What previous experience prepares you for this role?",
+    )
+    assert replay == result
+
 
 @pytest.mark.asyncio
 async def test_meta_hint_is_rejected() -> None:

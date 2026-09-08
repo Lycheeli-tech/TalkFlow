@@ -149,6 +149,8 @@ export type DailySessionResponse = {
     transfer_prompts: string[];
     follow_up_questions: string[];
   };
+  retrieval_opportunity: RetrievalOpportunityResponse | null;
+  retrieval_result: RetrievalResult | null;
 };
 
 export function createDailySession(token: string) {
@@ -187,6 +189,13 @@ export function startQuickReview(token: string, sessionId: string) {
 
 export type RetrievalOpportunityResponse = { opportunity_id: string; session_id: string; question_family: string; question_text: string; status: "CREATED" | "CONSUMED" | "EXPIRED" };
 export type RetrievalResult = { opportunity_id: string; opportunity_status: "CONSUMED"; recorded: boolean; expression_status: string; next_review_at: string | null };
+
+export function resolveRetrieval(token: string, opportunityId: string, attemptId: string) {
+  return apiFetch<RetrievalResult>(`/api/v1/memory/retrieval/${opportunityId}/resolve`, token, {
+    method: "POST",
+    body: JSON.stringify({ attempt_id: attemptId }),
+  });
+}
 
 export function submitQuickReview(token: string, opportunityId: string, transcript: string) {
   return apiFetch<RetrievalResult>(`/api/v1/memory/quick-review/${opportunityId}/submit`, token, { method: "POST", body: JSON.stringify({ transcript }) });

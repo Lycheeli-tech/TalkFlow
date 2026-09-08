@@ -19,6 +19,28 @@ from app.schemas import Expression, ExpressionAttempt, RetrievalResult, TrustedT
 from app.services.memory import MemoryApplicationService
 
 
+def _normalize(value: str) -> str:
+    return " ".join(
+        "".join(character.casefold() if character.isalnum() else " " for character in value).split()
+    )
+
+
+def _trusted_analysis(
+    *, expression: Expression, attempt_analysis: object, transcript: str
+) -> TrustedTransferAnalysis:
+    try:
+        return TrustedTransferAnalysis.model_validate(attempt_analysis)
+    except ValueError:
+        target = _normalize(expression.text.replace("…", ""))
+        used = bool(target) and target in _normalize(transcript)
+        return TrustedTransferAnalysis(
+            target_used=used,
+            usage_correct=used,
+            direct_hint_used=False,
+            verifier_version="deterministic_exact_usage_verifier_v1",
+        )
+
+
 class CrossSessionUnitOfWork(Protocol):
     async def resolve(
         self, *, user_id: UUID, opportunity_id: UUID, attempt_id: UUID
@@ -190,8 +212,12 @@ class SQLCrossSessionUnitOfWork:
                 )
             if opportunity.status != "CREATED":
                 raise ValueError("Retrieval opportunity is not consumable.")
-            analysis = TrustedTransferAnalysis.model_validate(attempt.analysis)
             expression = Expression.model_validate(expression_row)
+            analysis = _trusted_analysis(
+                expression=expression,
+                attempt_analysis=attempt.analysis,
+                transcript=attempt.transcript,
+            )
             history_rows = (
                 await self.session.scalars(
                     select(ExpressionAttemptRow).where(

@@ -12,7 +12,7 @@ document, not a replacement specification. There is no Milestone 8.
 | B | Live AI Providers | COMPLETE — Bailian text, ASR, and TTS validated live |
 | C | Real Voice Pipeline | COMPLETE — real browser recording, private audio persistence, Bailian ASR/analysis, recovery, retry, reconnection, and bilingual route checks validated |
 | D | Real Daily Learning Loop | COMPLETE — live Daily content, ordered voice-gated steps, private audio/Attempt evidence, Recap progress, reconnection, bilingual routes, and responsive UI validated |
-| E | Real Day 1 → Day 2 Cross-Session Aha | NOT STARTED |
+| E | Real Day 1 → Day 2 Cross-Session Aha | COMPLETE — hidden Day 2 retrieval, real voice evidence, atomic deterministic update, and Recap Aha validated live |
 | F | Local MVP Acceptance | NOT STARTED |
 
 ## Gate A completion inventory
@@ -199,3 +199,53 @@ database/provider evidence.
   transcripts were intentionally low-content and validate transport/provider persistence rather
   than answer quality.
 - Gate E cross-session retrieval/Aha and Gate F acceptance remain NOT STARTED.
+
+## Gate E — Real Day 1 → Day 2 Cross-Session Aha
+
+**Status:** COMPLETE
+
+### Completed scope and live evidence
+
+- Completing Day 1 now idempotently creates curriculum-backed `LEARNING` Expressions with a
+  deterministic next-day review date. Later Daily Session creation/resume selects a due non-mastered
+  Expression and creates or restores a single user/session-scoped RetrievalOpportunity.
+- The opportunity replaces the Interview prompt only with interviewer-safe data. The live Day 2
+  question was natural in its new conflict-resolution context and did not expose the target text or
+  a meta-hint before the learner answered.
+- Real browser recordings passed MediaRecorder → private learner-audio → Attempt → Bailian
+  Qwen3-ASR → structured answer analysis. The resolve API accepted only `attempt_id`; callers could
+  not submit correctness, independence, mastery, review, or evidence flags.
+- Verification required an analyzed, transcript-bearing, same-user, same-session Attempt whose
+  question matched the opportunity. A versioned deterministic exact-usage verifier converted the
+  trusted transcript into target-use/correctness flags; the existing MemoryApplicationService and
+  mastery/review rules remained authoritative for durable state.
+- The existing SQL cross-session unit of work atomically wrote ExpressionAttempt evidence, updated
+  Expression counters/status/review, and consumed the opportunity. Replay/idempotency, rollback,
+  ownership, and anti-forgery regressions remain covered.
+- Live failure recovery was observed: an ASR mismatch produced FAILURE evidence, consumed the first
+  opportunity, preserved its analyzed Attempt/private audio, and scheduled the next review. A second
+  additive Day 2 recovery Session preserved the original evidence and a new real recording produced
+  SUCCESS transfer evidence. Final state was `TRANSFERRED`, not `MASTERED`, with one failure and one
+  transfer success across two consumed opportunities.
+- Two independent live database connections returned the same state. Both linked Attempts were
+  analyzed by live providers, both private audio objects were non-empty, every linked owner matched,
+  and resolving with another existing user was rejected without mutation.
+- Recap displayed the cross-session win in English and Simplified Chinese, restored it after reload,
+  and retained learner state across locale switching. Today, Practice, My English, and Journey passed
+  at approximately 375px without horizontal overflow; browser console had no warnings/errors.
+- Day 2 completion persisted `+1 XP`, retained the streak, and advanced to Day 3.
+
+### Automated closeout
+
+- Backend: 88 tests passed; Ruff format/check passed.
+- Frontend: TypeScript, ESLint, and Next.js production build passed.
+- `git diff --check` passed; no migration was needed because Gate E uses the existing M4/M5 schema.
+
+### Known limitations
+
+- The pre-Gate-E live account had completed Day 1 before automatic Expression activation existed,
+  so its curriculum Expression was backfilled as due from the persisted completed Day 1 Session.
+- Exact phrase verification is intentionally conservative: ASR lexical substitutions count as a
+  failed retrieval even if semantically similar, preventing vague model judgment from changing
+  mastery. The learner can recover through a later opportunity.
+- Gate F, deployment-host setup, realtime voice, M8, V1.5, and V2 remain out of scope and unstarted.

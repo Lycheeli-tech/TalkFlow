@@ -3,8 +3,8 @@
 ## Last Updated
 
 - 2026-09-08
-- Branch: `feat/real-daily-learning-loop`
-- HEAD: Gate D closeout commit (`feat: complete phase 2 gate d daily loop`)
+- Branch: `feat/real-cross-session-aha`
+- HEAD: Gate E closeout commit (`feat: complete phase 2 gate e cross-session aha`)
 
 ## Product
 
@@ -20,15 +20,15 @@ deployment and real-device validation follow the activation gates. No Milestone 
 ## Current Work
 
 - Phase: Phase 2 — MVP Activation
-- Gate: D — Real Daily Learning Loop
+- Gate: E — Real Day 1 → Day 2 Cross-Session Aha
 - Status: COMPLETE
-- Objective achieved: the real Daily Session now records durable turn-based voice evidence,
-  gates ordered progression, and persists Recap rewards/progress.
+- Objective achieved: a due Day 1 Expression is hidden in a natural Day 2 interview question;
+  trusted real voice evidence atomically updates memory/mastery/review and appears at Recap.
 
 ## Stable Baseline
 
 Phase 1 stable baseline is tag `m7-hardening` at merge commit `cbfed8f`. Gates A–C are merged and
-pushed on `main`; Gate D is closing on `feat/real-daily-learning-loop`.
+pushed on `main`; Gate D is merged and Gate E is closing on `feat/real-cross-session-aha`.
 
 ## Implemented
 
@@ -42,22 +42,21 @@ pushed on `main`; Gate D is closing on `feat/real-daily-learning-loop`.
 ## Not Yet Activated / Not Yet Complete
 
 - Gate A–C are COMPLETE.
-- Gate D real Daily Learning Loop is complete; Gate E cross-session live aha and Gate F local MVP
-  acceptance are not started.
+- Gates A–E are COMPLETE. Gate F local MVP acceptance is not started.
 - Deployment-host setup and real-device coverage remain future activation work.
 
 ## Current Blockers
 
-No confirmed Gate D blocker. Known limitations are recorded in `PHASE2_MVP_ACTIVATION.md`.
+No confirmed Gate E blocker. Known limitations are recorded in `PHASE2_MVP_ACTIVATION.md`.
 
 ## Next Steps
 
-1. Review the Gate D checkpoint.
-2. Do not begin Gate E until explicitly requested.
+1. Review the Gate E checkpoint.
+2. Do not begin Gate F until explicitly requested.
 
 ## Verification Snapshot
 
-- Backend: 87 passed after Gate D validation.
+- Backend: 88 passed after Gate E validation.
 - Ruff format/check: passed.
 - Frontend ESLint, TypeScript, and production build: passed during M7/Gate B validation.
 - Eleven migrations validate locally; the Gate D constraint migration is applied live.
@@ -65,6 +64,8 @@ No confirmed Gate D blocker. Known limitations are recorded in `PHASE2_MVP_ACTIV
 - Gate C real browser microphone/upload/retry validation: complete.
 - Gate D real Daily voice/Attempt/Recap/progress/reconnection and bilingual responsive checks:
   complete.
+- Gate E live hidden retrieval, real voice evidence, atomic resolution, failure recovery,
+  reconnection, isolation, bilingual Recap, 375px routes, and console checks: complete.
 
 ## Source of Truth
 

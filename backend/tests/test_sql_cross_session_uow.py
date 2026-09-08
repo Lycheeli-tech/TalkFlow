@@ -4,7 +4,30 @@ from uuid import uuid4
 import pytest
 
 from app.db.models import AttemptRow, ExpressionAttemptRow, ExpressionRow, RetrievalOpportunityRow
-from app.services.cross_session_uow import SQLCrossSessionUnitOfWork
+from app.schemas import Expression
+from app.services.cross_session_uow import SQLCrossSessionUnitOfWork, _trusted_analysis
+
+
+def test_generic_daily_analysis_is_verified_by_deterministic_exact_usage() -> None:
+    now = datetime.now(UTC)
+    expression = Expression(
+        id=uuid4(),
+        user_id=uuid4(),
+        text="highly transferable",
+        meaning="useful",
+        source_type="CURRICULUM",
+        created_at=now,
+        updated_at=now,
+    )
+    analysis = _trusted_analysis(
+        expression=expression,
+        attempt_analysis={"fluency": "FUNCTIONAL"},
+        transcript="My prior experience is highly transferable to this role.",
+    )
+    assert analysis.target_used is True
+    assert analysis.usage_correct is True
+    assert analysis.direct_hint_used is False
+    assert analysis.verifier_version == "deterministic_exact_usage_verifier_v1"
 
 
 class ScalarRows:
