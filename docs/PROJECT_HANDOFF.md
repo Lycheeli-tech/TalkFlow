@@ -1,94 +1,111 @@
-# FluentLoop / TalkFlow 项目交接
+# FluentLoop / TalkFlow 跨窗口交接
 
-本文档用于在新 Codex 窗口恢复项目上下文。它是导航摘要，不替代
-`FLUENTLOOP_MVP_BUILD_SPEC_v1.1.md`；Build Spec 始终是产品与架构唯一事实来源。
+本文档是新 Codex 窗口的导航入口，不替代
+`FLUENTLOOP_MVP_BUILD_SPEC_v1.1.md`。Build Spec 始终是产品和架构事实来源。
 
-## 项目目标
+## 新窗口必读顺序
 
-产品显示名是 **FluentLoop**，仓库名保持 **TalkFlow**。MVP 目标是帮助学习者把真实经历
-转化为可说出口的英文面试表达，并通过跨 Session 的证据积累形成可解释的复习与掌握状态。
-核心学习循环：Recall → Learn → Imitate → Retrieve → Transfer → Interview → Recap。
+1. `AGENTS.md`
+2. `docs/PROJECT_HANDOFF.md`
+3. `docs/HANDOFF.md`
+4. `docs/CURRENT_MILESTONE.md`
+5. `docs/DECISIONS.md`
+6. `docs/PHASE2_MVP_ACTIVATION.md`
+7. Build Spec 中与 Gate E、跨 Session Retrieval、Memory/Mastery 相关的完整章节
 
-## 已完成范围
+开始工作前必须先运行 `git status`、确认分支/HEAD 和本地服务。不要依赖旧对话历史。
 
-Phase 1 的 M0–M7 已完成并合并到 `main`，最新稳定标签为 `m7-hardening`。已实现：
+## 当前事实
 
-- M0–M2：基础工程、Onboarding/Profile、turn-based Voice Calibration、原始音频/Attempt/Transcript/Analysis 持久化与失败重试。
-- M3：Today/Daily Session 外壳、固定 BUILD → TRANSFER → PERFORM 骨架、确定性 Planner。
-- M4：结构化 Memory、Memory Gate、ExpressionAttempt 证据、确定性 Mastery/Review/ErrorPattern、确认门控 Story。
-- M5：跨 Session RetrievalOpportunity、隐藏目标防泄漏、可信 Verification、Day 1 → Day 2 fixture 闭环与原子事务。
-- M6：Practice、Quick Review、Mock Interview（结果暂不持久化）、Journey、My English、XP/Streak/Progress。
-- M7：回归/安全/用户隔离、i18n 完整性与跨路由语言持久化、响应式与 setup 文档。
+- Phase 1 M0–M7：COMPLETE；没有 M8。
+- Phase 2 Gate A — Live Infrastructure：COMPLETE。
+- Phase 2 Gate B — Live AI Providers：COMPLETE。
+- Phase 2 Gate C — Real Voice Pipeline：COMPLETE。
+- Phase 2 Gate D — Real Daily Learning Loop：COMPLETE。
+- Phase 2 Gate E — Real Day 1 → Day 2 Cross-Session Aha：NOT STARTED。
+- Phase 2 Gate F — Local MVP Acceptance：NOT STARTED。
+- Gate D 完成分支：`feat/real-daily-learning-loop`。
+- Gate D checkpoint：`97bee4f feat: complete phase 2 gate d daily loop`。
+- Gate D 合并/推送状态应由新代理重新检查；本文件随后会随 merge 一起进入 `main`。
 
-## Phase 2 激活状态
+## Gate D 已验证基线
 
-Phase 2 没有 M8，只有 Live Integration gates：
+- Daily 的 RECALL、IMITATE、RETRIEVE、TRANSFER、INTERVIEW 使用 turn-based
+  MediaRecorder → 私有 `learner-audio` → Attempt → Bailian Qwen3-ASR → transcript →
+  Bailian analysis；LEARN/RECAP 保持被动步骤。
+- 服务端在当前语音 Attempt 达到 `ANALYZED` 前拒绝 advance；非当前/被动步骤拒绝录音。
+- 分析失败保留原始音频和 transcript；retry 复用同一 Attempt ID/audio path，不创建重复
+  Attempt。自动化回归已覆盖。
+- 真实 Day 1 完成至 Recap，保存 `+1 XP`、streak 并推进 Day 2；刷新和下一日 Session
+  持久化通过。
+- 三个真实 Daily Attempt 只读核验为 `ANALYZED`，Bailian STT/analysis、transcript、
+  analysis 和非空私有音频对象均存在。
+- `202609080011_daily_voice_attempts.sql` 已通过本地迁移序列验证并应用到当前 Supabase。
+- English/简体中文、Today/Practice/My English/Journey、约 375px、production build、刷新与
+  hydration/console 检查通过。
+- Gate D closeout：后端 87 tests、Ruff、TypeScript、ESLint、Next.js build、11 migrations
+  均通过；详细证据和限制见 `docs/HANDOFF.md` 与 `docs/PHASE2_MVP_ACTIVATION.md`。
 
-- **Gate A — Live Infrastructure：COMPLETE**。真实 Supabase TalkFlow 项目已验证：10 个迁移、Auth/JWKS、自动 user provisioning、11 张用户数据表 RLS/双用户隔离、私有 `resumes` 与 `learner-audio` Storage、SQL Profile/Session/Attempt/Memory/RetrievalOpportunity/Progress、重连恢复。
-- **Gate B — Live AI Providers：COMPLETE**。中国大陆北京 Bailian 已接入并现场验证 profile extraction、校准问题、答案分析、Daily 内容；Qwen3-ASR 与 Qwen3-TTS 通过真实 TTS → STT round trip，用户已确认语音效果通过。
-- **Gate C — Real Voice Pipeline：IN PROGRESS**。本地前后端已启动，浏览器已打开 `http://localhost:3000/`，等待用户登录/完成 Onboarding 到 Voice Calibration 页面，然后做真实麦克风录音、上传、持久化、ASR、分析、失败重试与约 375px smoke。
-- Gate D Daily Learning Loop：NOT STARTED。
-- Gate E Day 1 → Day 2 Cross-Session Aha：NOT STARTED。
-- Gate F Local MVP Acceptance：NOT STARTED。
+## Gate E 唯一目标
 
-## 当前 Git 状态
+验证真实 Day 1 → Day 2 跨 Session Aha：
 
-当前分支是 `feat/live-ai-providers`，HEAD 为 `d16cbc3`。Gate B 相关提交：
+1. 从前一 Session 已学习/确认的 Expression 产生到期或合适的 RetrievalOpportunity。
+2. 下一 Daily Session 在不泄露目标表达的自然新语境中进行隐藏式提取。
+3. 真实语音 Attempt 完成 STT 和结构化分析。
+4. `VerificationService` 只读取可信、同用户、同 Session、已分析的 Attempt；调用方不得
+   提交 mastery/正确性标志。
+5. `MemoryApplicationService` 和版本化确定性规则写入 ExpressionAttempt、更新 recall /
+   transfer 证据、review schedule 与 mastery；LLM 不做规则判定。
+6. RetrievalOpportunity 消费、证据写入和状态更新保持同一事务、可重试、幂等。
+7. 在 UI 中验证用户能看到跨 Session 的“以前学过的内容现在能说出来”的结果，同时不在
+   回答前暴露目标表达。
+8. 验证刷新/重连、用户隔离、失败恢复、English/简体中文、主路由、约 375px 和 console。
 
-```text
-d16cbc3 docs: complete phase 2 gate b
-235b902 feat: replace openai runtime with bailian providers
-e2615ca docs: complete phase 2 gate a
-97a023e fix: enforce rls on durable learning memory
-99835fd docs: start phase 2 activation gate a
-```
+只在全部 Gate E 条件通过后更新状态文档并创建 checkpoint；完成后停止，不自动开始 Gate F。
 
-这些 Phase 2 提交目前在本地分支；不要假设已经推送。`origin/main` 仍指向 M7 merge
-`cbfed8f`，除非重新检查远端。工作区在最后检查时有一个由 Next.js 开发环境产生的已跟踪修改
-`frontend/next-env.d.ts`；不要擅自覆盖或清理它，先确认是否是用户现有工作。此前 Gate B 生成的
-临时 `artifacts/gate-b-tts.wav` 已删除。
+## Gate E 开始时的建议检查
 
-## 运行环境与配置
+- 先确认 `main` 已包含 Gate D checkpoint，再创建 Gate E 功能分支。
+- 阅读 M4/M5 的现有实现和测试：Memory Gate、RetrievalOpportunity、
+  `VerificationService`、`MemoryApplicationService`、cross-session unit of work、
+  `test_day1_day2_slice.py`。现有 fixture 不是 live Gate E 通过证据。
+- 检查真实测试账号当前位于 Day 2，且有一个进行中的 Day 2 BUILD Session；不要假定该账号
+  的低内容自动化 transcript 是合格学习证据。
+- 在写代码前先盘点现有 Daily Attempt 到 Verification/Memory 的连接缺口，避免复制 M5
+  已有事务和确定性规则。
+
+## 运行环境
 
 - 仓库：`D:\Code\TalkFlow`
-- 后端解释器：`D:\Code\TalkFlow\backend\.venv\Scripts\python.exe`
-- 前端依赖已存在：`D:\Code\TalkFlow\frontend\node_modules`
-- Node：`C:\Users\Galatea\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin`
-- pnpm：`C:\Users\Galatea\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\fallback\pnpm.cmd`
-- 启动后端：在 `backend` 使用 venv 的 `python -m uvicorn app.main:app --host 127.0.0.1 --port 8000`
-- 启动前端：在 `frontend` 将上述 Node/pnpm 路径临时加入 PATH 后执行 `pnpm dev`
-- 根 `.env`（忽略）保存数据库、Supabase server key、Bailian key 与 provider 选择；
-  `frontend/.env.local`（忽略）只保存浏览器安全配置。绝不打印、提交或粘贴 secret。
-- 当前运行 provider：Bailian；模型配置和 URL 见 `.env.example` 与 `backend/app/core/config.py`。
-- Supabase 使用 ap-northeast-1 Session Pooler；Auth 使用 JWKS，`SUPABASE_JWT_SECRET` 留空。
+- 后端虚拟环境：优先 `D:\Code\TalkFlow\backend\.venv`，备用
+  `D:\Code\TalkFlow\backend.venv`
+- 前端依赖：`D:\Code\TalkFlow\frontend\node_modules`
+- 后端通常运行于 `http://127.0.0.1:8000`
+- 前端通常运行于 `http://localhost:3000`
+- 当前真实 provider：Alibaba Cloud Model Studio/Bailian；fake provider 保留用于测试。
+- 后端必须在允许访问已配置 Supabase/Bailian 的环境运行，否则 JWKS 验证会返回 401。
 
-## 关键架构约束
+## 不可违反的边界
 
 - 模块化单体：Next.js + FastAPI + PostgreSQL/Supabase。
-- LLM/STT/TTS 必须通过 provider abstraction；当前生产 provider 是 Bailian，fake provider 仍用于 fixture/test。
-- MVP 只做 turn-based voice，不做 realtime voice；不引入 LangChain/LangGraph。
-- 确定性规则（Memory Gate、Mastery、Review、Reward、Progress、Planner）不能交给 LLM。
-- 提取候选不是事实；只有用户确认后才进入 durable memory/Story。
-- 生产 durable memory 写入必须走 `MemoryApplicationService`/Memory Gate；Repository 是低层存储边界。
-- Mastery 默认 recall ≥ 3、transfer ≥ 2、至少 3 个 distinct sessions；full/direct hint 或非独立证据不计入。
-- 原始音频和 Attempt 必须在 STT/分析失败时保留；retry 复用同一 Attempt，不重复创建。
-- 使用 versioned migrations、prompt/rule definitions；高风险改动先做 Git checkpoint。
-- 不实现 V1.5/V2，也不创建 M8；Phase 2 后续是 Live Integration、部署、真实设备 bug bash。
+- LLM/STT/TTS 必须走 provider abstraction；MVP 仅 turn-based voice，不做 realtime。
+- 不使用 LangChain/LangGraph。
+- Memory Gate、Mastery、Review、Reward、Progress、Planner 等确定性规则不能交给 LLM。
+- 提取候选不是事实；只有用户确认后才能成为 durable profile/story truth。
+- 原始音频和 Attempt 在 STT/分析失败时必须保留；retry 必须复用同一 Attempt。
+- 使用 versioned migrations/prompts/rules；高风险改动前创建 Git checkpoint。
+- 不修改 Build Spec，不实现 V1.5/V2，不创建 M8，不开始 Gate F。
+- 不打印、提交或粘贴 `.env`、Supabase/Bailian/数据库密钥、JWT、用户标识、私有路径或
+  音频内容。
+- 不覆盖用户修改，尤其是 `frontend/next-env.d.ts`。
 
-## Gate C 下一步
+## 文档职责
 
-1. 先重新 `git status`，保留 `frontend/next-env.d.ts` 等用户修改；确认服务仍运行。
-2. 让用户在本地页面登录或创建测试账号并完成 Onboarding，直到显示“开始语音校准”。账号密码只在本地页面输入，不发送到聊天。
-3. 用户授权浏览器麦克风并用英文完成三个 EXPERIENCE → MOTIVATION → PROJECT 回答；助手验证 TTS 播放、MediaRecorder 格式、上传、私有 Storage、STT、transcript/analysis/assessment 持久化。
-4. 人为制造一次可安全恢复的 provider/网络失败（若不安全则使用已有失败路径），验证失败状态、原始音频保留与 retry；检查重连后的 Session/Attempt。
-5. 做 English/简体中文界面、主路由、约 375px viewport、浏览器 console 检查；只在所有 Gate C 条件通过后更新 Phase 2 文档并 checkpoint。
-6. Gate C 完成后停止等待 review；不得自动开始 Gate D。
-
-## 验证与文档协议
-
-开始任何 milestone/gate 前读取 `AGENTS.md`、`docs/CURRENT_MILESTONE.md`、`docs/DECISIONS.md`、相关 Build Spec 章节。实现后运行针对性测试；closeout 时按 gate 要求运行完整检查。修改状态时同步 `docs/CURRENT_MILESTONE.md` 与 `docs/PHASE2_MVP_ACTIVATION.md`；稳定架构变化才追加 `docs/DECISIONS.md`。不要修改 Build Spec 两个规格文件。
-
-## 已知限制
-
-Gate B 之前的 M7 limitation 文本仍有历史性 OpenAI 表述，Phase 2 状态文档已明确 Bailian 是当前 runtime provider；以后更新状态时应避免复制旧表述。后续仍需部署主机配置、真实设备/浏览器麦克风覆盖、完整 Daily voice/Attempt integration、Mock Interview durable memory，以及已知 Starlette/httpx deprecation warning 的处理。
-
+- `docs/PROJECT_HANDOFF.md`：跨窗口导航入口。
+- `docs/HANDOFF.md`：最近一次 Gate 的具体实现、验证和运行状态。
+- `docs/PHASE2_MVP_ACTIVATION.md`：Gate 状态与 live evidence。
+- `docs/CURRENT_MILESTONE.md`：历史里程碑和当前生命周期。
+- `docs/PROJECT_STATUS.md`：精简项目仪表盘。
+- `docs/ISSUES.md`：已知问题、根因、修复和回归证据。
+- `docs/DECISIONS.md`：仅记录稳定架构决策。
