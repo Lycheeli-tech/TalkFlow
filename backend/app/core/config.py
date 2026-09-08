@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     supabase_url: str = "http://127.0.0.1:54321"
     supabase_jwks_url: str = "http://127.0.0.1:54321/auth/v1/.well-known/jwks.json"
     supabase_jwt_audience: str = "authenticated"
+    supabase_jwt_leeway_seconds: int = 30
     supabase_jwt_secret: str = ""
     supabase_service_role_key: str = ""
     cors_origins: str = "http://localhost:3000"

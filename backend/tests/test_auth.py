@@ -57,3 +57,48 @@ def test_expired_token_is_rejected() -> None:
 
     with pytest.raises(JWTVerificationError):
         SupabaseTokenVerifier(settings).verify(token)
+
+
+def test_token_with_small_clock_skew_is_accepted() -> None:
+    """A token whose iat is seconds in the future (client clock skew) must not be rejected."""
+    settings = Settings(
+        supabase_url="https://example.supabase.co",
+        supabase_jwt_secret="test-secret-that-is-never-used-outside-tests",
+    )
+    token = jwt.encode(
+        {
+            "sub": str(uuid4()),
+            "email": "learner@example.com",
+            "aud": "authenticated",
+            "iss": "https://example.supabase.co/auth/v1",
+            "iat": datetime.now(UTC) + timedelta(seconds=20),
+            "exp": datetime.now(UTC) + timedelta(minutes=5),
+        },
+        settings.supabase_jwt_secret,
+        algorithm="HS256",
+    )
+
+    user = SupabaseTokenVerifier(settings).verify(token)
+
+    assert user.id is not None
+
+
+def test_expired_token_beyond_leeway_is_rejected() -> None:
+    settings = Settings(
+        supabase_url="https://example.supabase.co",
+        supabase_jwt_secret="test-secret-that-is-never-used-outside-tests",
+    )
+    token = jwt.encode(
+        {
+            "sub": str(uuid4()),
+            "aud": "authenticated",
+            "iss": "https://example.supabase.co/auth/v1",
+            "iat": datetime.now(UTC) - timedelta(hours=2),
+            "exp": datetime.now(UTC) - timedelta(minutes=30),
+        },
+        settings.supabase_jwt_secret,
+        algorithm="HS256",
+    )
+
+    with pytest.raises(JWTVerificationError):
+        SupabaseTokenVerifier(settings).verify(token)

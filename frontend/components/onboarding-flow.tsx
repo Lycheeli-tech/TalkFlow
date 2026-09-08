@@ -12,6 +12,8 @@ import {
   confirmProfile,
   importProfilePdf,
   importProfileText,
+  ACCESS_TOKEN_STORAGE_KEY,
+  ACCESS_TOKEN_STORAGE_EVENT,
   savePreferences,
 } from "@/lib/api";
 import { getMessages, InterfaceLocale } from "@/lib/i18n";
@@ -88,7 +90,8 @@ export function OnboardingFlow({
       const accessToken = mode === "in" ? await signIn(email, password) : await signUp(email, password);
       if (accessToken) {
         setToken(accessToken);
-        sessionStorage.setItem("fluentloop_access_token", accessToken);
+        sessionStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, accessToken);
+        window.dispatchEvent(new Event(ACCESS_TOKEN_STORAGE_EVENT));
         setStep("goal");
       } else {
         setNotice(messages.confirmationSent);

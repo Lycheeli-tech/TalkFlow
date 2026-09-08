@@ -46,6 +46,7 @@ class SupabaseTokenVerifier:
                 algorithms=algorithms,
                 audience=self._settings.supabase_jwt_audience,
                 issuer=f"{self._settings.supabase_url.rstrip('/')}/auth/v1",
+                leeway=self._settings.supabase_jwt_leeway_seconds,
                 options={"require": ["sub", "exp", "aud", "iss"]},
             )
             return AuthenticatedUser(

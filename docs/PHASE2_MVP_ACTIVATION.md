@@ -10,7 +10,7 @@ document, not a replacement specification. There is no Milestone 8.
 | --- | --- | --- |
 | A | Live Infrastructure | COMPLETE — live Supabase project configured and validated |
 | B | Live AI Providers | COMPLETE — Bailian text, ASR, and TTS validated live |
-| C | Real Voice Pipeline | IN PROGRESS — live browser/device validation starting |
+| C | Real Voice Pipeline | COMPLETE — real browser recording, private audio persistence, Bailian ASR/analysis, recovery, retry, reconnection, and bilingual route checks validated |
 | D | Real Daily Learning Loop | NOT STARTED |
 | E | Real Day 1 → Day 2 Cross-Session Aha | NOT STARTED |
 | F | Local MVP Acceptance | NOT STARTED |
@@ -82,3 +82,66 @@ M7-merged `main` state. Secrets remain in ignored local environment files.
   the configured API key is absent from Git-tracked files.
 - Gate C is now IN PROGRESS for real browser microphone, recording-format, upload, persistence,
   failure-recovery, and retry validation.
+
+## Gate C — Real Voice Pipeline
+
+**Status:** COMPLETE
+
+### Confirmed in the real local browser path
+
+- A real user completed login and onboarding through Voice Calibration.
+- Three English calibration answers were recorded successfully in the browser.
+- The user proceeded from calibration into Today.
+- Today displayed five persisted-looking step markers; the final Recap boundary completed and
+  displayed `+1 XP`.
+- The existing M2/M6 runtime path is therefore reachable from onboarding through calibration and
+  the Today completion shell.
+- After a fresh login and reload, the authenticated entry correctly resumed at Today, confirming
+  the persisted calibration-stage route for this user.
+- A 375px browser viewport smoke check passed with no horizontal overflow (`scrollWidth =
+  clientWidth = 375`) and no browser console errors or warnings observed during the check.
+- A read-only live Supabase aggregate check found two completed Calibration Sessions, each with
+  three Attempts; all six Attempts were `ANALYZED` and had non-empty audio paths, transcripts, and
+  analysis records, with two LearnerAssessment rows present. This confirms database-level shape
+  and processing persistence, but does not yet prove the private Storage objects or identify which
+  aggregate rows belong to the current user.
+- A recursive read-only listing of the private `learner-audio` bucket found 6 nested audio files
+  totaling 1,696,172 bytes. Paths and content were not exposed; current-user attribution remains
+  covered by the user-scoped path convention and still needs a focused exact-match check.
+- Anonymous aggregate comparison found database Attempts grouped per user as `[3, 3]` and private
+  Storage files grouped per user directory as `[3, 3]`, matching the expected three-attempt shape
+  without exposing user IDs or paths.
+- On 2026-09-08, two independently created live database connections each found seven analyzed
+  Attempts with seven audio references, transcripts, and analyses across three users, plus two
+  LearnerAssessment rows. Each connection loaded the same non-empty private audio object. No audio
+  content, path, user identifier, or credential was printed.
+
+These are human-observed results from the local browser session. They are not yet a substitute for
+database/provider evidence.
+
+### Code and debug evidence recorded
+
+- Auth-01 debugging identified stale/expired Supabase access-token handling as the cause of the
+  later authentication error; token storage synchronization and 401 cleanup were added.
+- A hydration mismatch caused by reading `sessionStorage` during the initial render was fixed by
+  using a client-synchronized token subscription in `AppEntry`.
+- Local frontend/backend reachability and the 8000-port stale Python process conflict were
+  investigated; the current frontend and backend endpoints respond locally.
+- `backend/tests/test_voice_calibration_service.py` passed (4 tests). Its controlled analyzer
+  outage confirms `ANALYSIS_FAILED` retains original audio and transcript, and retry reuses the
+  exact Attempt ID and audio path without adding an Attempt.
+- An automated real-browser silent recording on 2026-09-08 captured `audio/webm;codecs=opus`,
+  uploaded a non-empty private object, and reached `STT_FAILED` with the Bailian no-text response.
+  The live aggregate count moved from 7 to 8 Attempts; clicking Retry did not create a ninth
+  Attempt. A transient Supabase Session Pooler disconnect during the initial Attempt lookup caused
+  an HTTP 500/`Failed to fetch`; invalidated-connection retry now recovers that safe read, and the
+  same browser Retry returned normally to `STT_FAILED` without a duplicate Attempt.
+- The working tree still contains uncommitted debug changes; it has not yet been made a Gate C
+  checkpoint.
+
+### Final bilingual route evidence
+
+- In an authenticated session, the app-shell 中文 control changed the navigation and Today content
+  to Simplified Chinese without refresh.
+- Practice, My English, and Journey each loaded from the Chinese navigation with localized content.
+- No Gate D, Gate E, Gate F, M8, V1.5, or V2 scope was started.

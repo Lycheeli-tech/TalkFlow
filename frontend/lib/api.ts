@@ -1,6 +1,9 @@
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "http://localhost:8000";
 
+export const ACCESS_TOKEN_STORAGE_KEY = "fluentloop_access_token";
+export const ACCESS_TOKEN_STORAGE_EVENT = "fluentloop-access-token-change";
+
 export type ApplicationEntry = {
   stage: "ONBOARDING" | "CALIBRATION" | "TODAY";
   interface_language: "en" | "zh-CN";
@@ -36,6 +39,10 @@ async function apiFetch<T>(path: string, token: string, init?: RequestInit): Pro
     },
   });
   if (!response.ok) {
+    if (response.status === 401 && typeof window !== "undefined") {
+      sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+      window.dispatchEvent(new Event(ACCESS_TOKEN_STORAGE_EVENT));
+    }
     const payload = (await response.json().catch(() => null)) as { detail?: string } | null;
     throw new Error(payload?.detail ?? `Request failed with status ${response.status}.`);
   }

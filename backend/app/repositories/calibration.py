@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
-from typing import Protocol
+from typing import Protocol, TypeVar
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import AttemptRow, LearnerAssessmentRow, SessionRow
 from app.schemas import CalibrationSession, LearnerAssessment, VoiceAttempt
+
+T = TypeVar("T")
 
 
 class CalibrationRepository(Protocol):
@@ -28,8 +32,17 @@ class SQLCalibrationRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
+    async def _retry_invalidated_connection(self, operation: Callable[[], Awaitable[T]]) -> T:
+        try:
+            return await operation()
+        except DBAPIError as error:
+            if not error.connection_invalidated:
+                raise
+            await self._session.rollback()
+            return await operation()
+
     async def create_session(self, session: CalibrationSession) -> CalibrationSession:
-        row = SessionRow(**session.model_dump(mode="json"))
+        row = SessionRow(**session.model_dump())
         self._session.add(row)
         await self._session.commit()
         await self._session.refresh(row)
@@ -57,9 +70,10 @@ class SQLCalibrationRepository:
         return VoiceAttempt.model_validate(row)
 
     async def get_attempt(self, attempt_id: UUID, user_id: UUID) -> VoiceAttempt | None:
-        row = await self._session.scalar(
-            select(AttemptRow).where(AttemptRow.id == attempt_id, AttemptRow.user_id == user_id)
+        statement = select(AttemptRow).where(
+            AttemptRow.id == attempt_id, AttemptRow.user_id == user_id
         )
+        row = await self._retry_invalidated_connection(lambda: self._session.scalar(statement))
         return VoiceAttempt.model_validate(row) if row else None
 
     async def list_attempts(self, session_id: UUID, user_id: UUID) -> list[VoiceAttempt]:

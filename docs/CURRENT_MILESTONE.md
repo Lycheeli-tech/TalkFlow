@@ -298,8 +298,40 @@ V2, or new product behavior is authorized in this milestone.
 
 - Gate B — Live AI Providers: COMPLETE; Bailian structured text, Qwen3-ASR, Qwen3-TTS, runtime
   wiring, secret isolation, and human voice experience passed live validation.
-- Gate C — Real Voice Pipeline: IN PROGRESS.
+- Gate C — Real Voice Pipeline: COMPLETE.
 - Gate D — Real Daily Learning Loop: NOT STARTED.
 - Gate E — Real Day 1 → Day 2 Cross-Session Aha: NOT STARTED.
 - Gate F — Local MVP Acceptance: NOT STARTED.
 - Deployment configuration and real-device validation remain later activation work.
+
+### Gate C live-browser progress (2026-09-08)
+
+- Human validation completed login/onboarding, three real English Voice Calibration recordings,
+  transition into Today, five Today progress markers, and the final Recap boundary with `+1 XP`.
+- A subsequent fresh login/reload resumed at Today; a 375px viewport had no horizontal overflow,
+  and no browser console errors or warnings were observed.
+- A read-only live Supabase check found two completed Calibration Sessions with three Attempts
+  each; all six Attempts were `ANALYZED` with audio paths, transcripts, and analysis present, and
+  two LearnerAssessment rows existed. This is aggregate evidence, not yet current-user Storage
+  object verification.
+- A recursive private `learner-audio` listing found 6 nested audio objects totaling 1,696,172
+  bytes; no paths or audio content were exposed.
+- Anonymous aggregate comparison matched database Attempts per user `[3, 3]` with Storage files
+  per user directory `[3, 3]`, without exposing IDs or paths.
+- Two fresh live database connections each found seven analyzed Attempts with audio references,
+  transcripts, and analysis across three users, two LearnerAssessment rows, and a successful
+  non-empty private-audio load. This is reconnection and persistence evidence.
+- The focused service suite passed 4 tests, including a controlled analyzer outage that preserves
+  original audio/transcript and retries the same Attempt ID/path without duplication.
+- An automated browser recording produced `audio/webm;codecs=opus`, uploaded a non-empty private
+  audio object, and reached live `STT_FAILED` on a Bailian no-text response. The Attempt aggregate
+  moved from 7 to 8; retry did not add a ninth Attempt. A transient Session Pooler disconnect in
+  the initial read was fixed with an invalidated-connection retry, and the same browser Retry now
+  returns normally to `STT_FAILED`.
+- This confirms the currently implemented calibration and Today completion shell are reachable in
+  the local browser.
+- Gate C is **COMPLETE**. In an authenticated session, the app-shell 中文 control localized Today,
+  Practice, My English, and Journey without refresh; route content loaded normally.
+- English, 375px, console, MediaRecorder MIME, live STT failure/audio retention, same-Attempt
+  retry, private storage, persistence, analysis, assessment, and reconnection checks passed.
+- Gate D, Gate E, and Gate F remain untouched and not started.
