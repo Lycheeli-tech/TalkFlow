@@ -2,19 +2,19 @@
 
 ## Updated
 
-- 2026-09-07
-- Branch: `feat/live-ai-providers`
-- HEAD: `359ee48` (working tree carries the uncommitted AUTH-01 debug fix)
+- 2026-09-08
+- Branch: `feat/real-daily-learning-loop`
+- HEAD: `d004ef1` (`feat: complete phase 2 gate c voice pipeline`)
 
 ## Current Task
 
-Debug/recovery: restore Authentication → authenticated frontend/backend communication → Voice
-Calibration, then resume Phase 2 Gate C — Real Voice Pipeline validation.
+Phase 2 Gate D — Real Daily Learning Loop activation.
 
 ## Why This Task Exists
 
-Gate C browser validation hit `Failed to fetch`, then `The access token is invalid or expired`,
-then the login path became unusable. Root causes are now fixed; see `docs/ISSUES.md` AUTH-01.
+Gate A–C are complete and merged to `main`. Gate D now validates the existing Daily Session runtime
+against the Build Spec's complete Recall → Learn → Imitate → Retrieve → Transfer → Interview → Recap
+loop without beginning Gate E/F.
 
 ## What Has Been Completed
 
@@ -72,9 +72,10 @@ normally to `STT_FAILED` and did not create a duplicate Attempt.
 
 ## Next Action
 
-1. Complete authenticated Simplified Chinese route smoke.
-2. Once that live check passes, inspect the final diff (no secrets/.env staged) and create one
-   coherent Gate C checkpoint. Do not merge, push, or start Gate D.
+1. Add the minimum Daily turn-based voice/Attempt path needed for evidence-bearing Daily steps.
+2. Validate real Daily content, ordered step persistence, provider processing, raw-audio recovery,
+   Recap progress, i18n/responsive/console, and reconnection.
+3. Create a Gate D checkpoint and stop before Gate E.
 
 ## Relevant Files
 
@@ -89,13 +90,14 @@ normally to `STT_FAILED` and did not create a duplicate Attempt.
 ## Do Not Change
 
 - No Build Spec edits, no new auth architecture (e.g. refresh-token flow), no provider replacement,
-  no schema/migration changes, no realtime voice, M8, V1.5/V2, Gate D/E/F, unrelated refactor.
+  no realtime voice, M8, V1.5/V2, Gate E/F, unrelated refactor.
 - Do not print or commit `.env`/`.env.local` secrets; do not touch `frontend/next-env.d.ts`.
 
 ## Verification Still Required
 
-Only authenticated Simplified Chinese route smoke remains. The real browser MIME, live STT failure,
-private-audio retention, and same-Attempt retry response have all been observed.
+The live Daily Session creation path is confirmed: Day 1, BUILD, 20-minute plan, Bailian-generated
+question and language content. The current Today UI only advances passive steps and contains no
+Daily voice/Attempt capture; this is the Gate D implementation gap.
 
 ## Last Verified Baseline
 

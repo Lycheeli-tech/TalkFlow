@@ -2,9 +2,9 @@
 
 ## Last Updated
 
-- 2026-09-07
-- Branch: `feat/live-ai-providers`
-- HEAD: `d16cbc3` (`docs: complete phase 2 gate b`)
+- 2026-09-08
+- Branch: `feat/real-daily-learning-loop`
+- HEAD: `d004ef1` (`feat: complete phase 2 gate c voice pipeline`)
 
 ## Product
 
@@ -20,10 +20,10 @@ deployment and real-device validation follow the activation gates. No Milestone 
 ## Current Work
 
 - Phase: Phase 2 — MVP Activation
-- Gate: C — Real Voice Pipeline
+- Gate: D — Real Daily Learning Loop
 - Status: IN PROGRESS
-- Objective: validate browser microphone recording, private audio upload, Attempt persistence, Bailian
-  ASR/TTS/analysis, recovery/retry, and real browser/mobile behavior.
+- Objective: validate the real Daily Session plan/content/step/Recap/progress loop and determine
+  the minimum required Daily turn-based voice evidence.
 
 ## Stable Baseline
 
@@ -42,14 +42,15 @@ state before any merge or push.
 
 ## Not Yet Activated / Not Yet Complete
 
-- Gate C real browser voice pipeline is unfinished.
-- Gate D real Daily Learning Loop, Gate E cross-session live aha, and Gate F local MVP acceptance are not started.
+- Gate A–C are COMPLETE.
+- Gate D real Daily Learning Loop is in progress; Gate E cross-session live aha and Gate F local MVP
+  acceptance are not started.
 - Deployment-host setup and real-device coverage remain future activation work.
 
 ## Current Blockers
 
-No confirmed product defect. Gate C is waiting for a real browser login/Onboarding path and human
-microphone interaction before its live acceptance checks can complete.
+No confirmed product defect. Gate D discovery is determining whether the existing Today shell needs
+minimal Daily turn-based voice integration for Build Spec compliance.
 
 ## Next Steps
 
@@ -61,12 +62,12 @@ microphone interaction before its live acceptance checks can complete.
 
 ## Verification Snapshot
 
-- Backend: 81 passed after Gate B provider work; prior M7 full suite was 80 passed.
+- Backend: 83 passed after Gate C validation.
 - Ruff format/check: passed.
 - Frontend ESLint, TypeScript, and production build: passed during M7/Gate B validation.
 - Ten live Supabase migrations and provisioning/RLS/storage/reconnection probes: passed in Gate A.
 - Bailian live text, TTS→STT, and human voice acceptance: passed in Gate B.
-- Gate C real browser microphone/upload/retry validation: not yet verified.
+- Gate C real browser microphone/upload/retry validation: complete.
 
 ## Source of Truth
 

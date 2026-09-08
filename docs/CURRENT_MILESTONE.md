@@ -299,7 +299,7 @@ V2, or new product behavior is authorized in this milestone.
 - Gate B — Live AI Providers: COMPLETE; Bailian structured text, Qwen3-ASR, Qwen3-TTS, runtime
   wiring, secret isolation, and human voice experience passed live validation.
 - Gate C — Real Voice Pipeline: COMPLETE.
-- Gate D — Real Daily Learning Loop: NOT STARTED.
+- Gate D — Real Daily Learning Loop: IN PROGRESS on `feat/real-daily-learning-loop`.
 - Gate E — Real Day 1 → Day 2 Cross-Session Aha: NOT STARTED.
 - Gate F — Local MVP Acceptance: NOT STARTED.
 - Deployment configuration and real-device validation remain later activation work.
@@ -334,4 +334,4 @@ V2, or new product behavior is authorized in this milestone.
   Practice, My English, and Journey without refresh; route content loaded normally.
 - English, 375px, console, MediaRecorder MIME, live STT failure/audio retention, same-Attempt
   retry, private storage, persistence, analysis, assessment, and reconnection checks passed.
-- Gate D, Gate E, and Gate F remain untouched and not started.
+- Gate D is validating the live Daily Loop. Gate E and Gate F remain untouched and not started.

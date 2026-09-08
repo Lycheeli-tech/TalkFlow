@@ -11,7 +11,7 @@ document, not a replacement specification. There is no Milestone 8.
 | A | Live Infrastructure | COMPLETE — live Supabase project configured and validated |
 | B | Live AI Providers | COMPLETE — Bailian text, ASR, and TTS validated live |
 | C | Real Voice Pipeline | COMPLETE — real browser recording, private audio persistence, Bailian ASR/analysis, recovery, retry, reconnection, and bilingual route checks validated |
-| D | Real Daily Learning Loop | NOT STARTED |
+| D | Real Daily Learning Loop | IN PROGRESS — validating live Daily content, durable ordered steps, Recap progress, and the required turn-based Daily voice evidence |
 | E | Real Day 1 → Day 2 Cross-Session Aha | NOT STARTED |
 | F | Local MVP Acceptance | NOT STARTED |
 
@@ -145,3 +145,17 @@ database/provider evidence.
   to Simplified Chinese without refresh.
 - Practice, My English, and Journey each loaded from the Chinese navigation with localized content.
 - No Gate D, Gate E, Gate F, M8, V1.5, or V2 scope was started.
+
+## Gate D — Real Daily Learning Loop
+
+**Status:** IN PROGRESS
+
+### Scope
+
+- Validate the existing real Daily Session path: deterministic plan, Bailian versioned lesson
+  content, persisted ordered steps, server-gated Recap completion, and deterministic progress.
+- Add only the minimum Daily turn-based voice evidence required by the Build Spec if the current
+  low-fidelity Today shell cannot satisfy the live loop. Keep raw-audio preservation and provider
+  abstractions intact.
+- Gate E cross-day retrieval/Aha, Gate F acceptance, realtime voice, M8, V1.5, and V2 remain out
+  of scope.
