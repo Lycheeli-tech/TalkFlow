@@ -30,6 +30,7 @@ class DailySessionRepository(Protocol):
     ) -> DailySessionCompletion: ...
 
     async def advance(self, *, user_id: UUID, session_id: UUID) -> DailySessionResponse: ...
+    async def get(self, *, user_id: UUID, session_id: UUID) -> DailySessionResponse | None: ...
 
 
 class SQLDailySessionRepository:
@@ -75,6 +76,8 @@ class SQLDailySessionRepository:
         return DailySessionResponse(
             session_id=row.id,
             status=row.status,
+            current_step=row.current_step,
+            completion_ready=row.completion_ready,
             plan=DailySessionPlan.model_validate(payload["plan"]),
             content=DailyLessonContent.model_validate(payload["content"]),
         )
@@ -142,6 +145,26 @@ class SQLDailySessionRepository:
             session_id=row.id,
             awarded_xp=awarded_xp,
             progress=UserState.model_validate(user),
+        )
+
+    async def get(self, *, user_id: UUID, session_id: UUID) -> DailySessionResponse | None:
+        row = await self._session.scalar(
+            select(SessionRow).where(
+                SessionRow.id == session_id,
+                SessionRow.user_id == user_id,
+                SessionRow.session_type == "DAILY",
+            )
+        )
+        if row is None:
+            return None
+        payload = row.session_plan or {}
+        return DailySessionResponse(
+            session_id=row.id,
+            status=row.status,
+            current_step=row.current_step,
+            completion_ready=row.completion_ready,
+            plan=DailySessionPlan.model_validate(payload["plan"]),
+            content=DailyLessonContent.model_validate(payload["content"]),
         )
 
     async def advance(self, *, user_id: UUID, session_id: UUID) -> DailySessionResponse:
@@ -260,3 +283,13 @@ class InMemoryDailySessionRepository:
         )
         self.sessions[(user_id, match.plan.day)] = updated
         return updated
+
+    async def get(self, *, user_id: UUID, session_id: UUID) -> DailySessionResponse | None:
+        return next(
+            (
+                item
+                for (owner, _), item in self.sessions.items()
+                if owner == user_id and item.session_id == session_id
+            ),
+            None,
+        )

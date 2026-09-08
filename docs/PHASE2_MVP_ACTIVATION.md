@@ -11,7 +11,7 @@ document, not a replacement specification. There is no Milestone 8.
 | A | Live Infrastructure | COMPLETE — live Supabase project configured and validated |
 | B | Live AI Providers | COMPLETE — Bailian text, ASR, and TTS validated live |
 | C | Real Voice Pipeline | COMPLETE — real browser recording, private audio persistence, Bailian ASR/analysis, recovery, retry, reconnection, and bilingual route checks validated |
-| D | Real Daily Learning Loop | IN PROGRESS — validating live Daily content, durable ordered steps, Recap progress, and the required turn-based Daily voice evidence |
+| D | Real Daily Learning Loop | COMPLETE — live Daily content, ordered voice-gated steps, private audio/Attempt evidence, Recap progress, reconnection, bilingual routes, and responsive UI validated |
 | E | Real Day 1 → Day 2 Cross-Session Aha | NOT STARTED |
 | F | Local MVP Acceptance | NOT STARTED |
 
@@ -80,7 +80,7 @@ M7-merged `main` state. Secrets remain in ignored local environment files.
 - The user accepted the generated English voice for pronunciation, naturalness, speed, and volume.
 - Runtime dependency inspection confirmed all six AI boundaries resolve to Bailian providers, and
   the configured API key is absent from Git-tracked files.
-- Gate C is now IN PROGRESS for real browser microphone, recording-format, upload, persistence,
+- Gate C completed real browser microphone, recording-format, upload, persistence,
   failure-recovery, and retry validation.
 
 ## Gate C — Real Voice Pipeline
@@ -148,9 +148,9 @@ database/provider evidence.
 
 ## Gate D — Real Daily Learning Loop
 
-**Status:** IN PROGRESS
+**Status:** COMPLETE
 
-### Scope
+### Completed scope
 
 - Validate the existing real Daily Session path: deterministic plan, Bailian versioned lesson
   content, persisted ordered steps, server-gated Recap completion, and deterministic progress.
@@ -159,3 +159,43 @@ database/provider evidence.
   abstractions intact.
 - Gate E cross-day retrieval/Aha, Gate F acceptance, realtime voice, M8, V1.5, and V2 remain out
   of scope.
+
+### Live and automated evidence
+
+- The low-fidelity Today shell was replaced with an evidence-bearing, turn-based Daily voice UI.
+  RECALL, IMITATE, RETRIEVE, TRANSFER, and INTERVIEW require an `ANALYZED` Attempt before the
+  server permits advancement; LEARN and RECAP remain passive steps according to the persisted
+  duration-specific plan.
+- Real Day 1 Daily completion passed through RETRIEVE, TRANSFER, INTERVIEW, and RECAP. Each voice
+  step used browser `MediaRecorder`, live Bailian TTS, Qwen3-ASR, and versioned Bailian analysis.
+  Recap persisted `+1 XP`, a one-day streak, and advanced the account to Day 2.
+- A page reload preserved authentication and progression; creating the next session produced a
+  persisted Day 2 BUILD plan. Day 2 RECALL also passed the real browser voice path, covering the
+  beginning of the canonical loop that the earlier Day 1 shell had already advanced past.
+- A user-scoped read-only database/Storage verification found three Day 1 Daily Attempts
+  (`RETRIEVE`, `TRANSFER`, `INTERVIEW`) in `ANALYZED` state. All had Bailian STT, analyzer version
+  `answer_analyzer_v1`, saved transcripts/analysis, and independently readable non-empty private
+  audio objects (448,520; 617,602; and 575,098 bytes). No paths, identifiers, content, or secrets
+  were exposed.
+- The live database initially rejected Daily question types under the calibration-era CHECK
+  constraint. Versioned migration `202609080011_daily_voice_attempts.sql` extends the allowed
+  values without deleting or rewriting existing Attempts; all eleven migrations validate locally
+  and the migration was applied successfully to the configured live project.
+- Controlled automated failure coverage proves analysis failure keeps original audio and
+  transcript, retry reuses the exact Attempt ID/audio path, and no duplicate Attempt is created.
+  Additional tests prove passive/non-current recording rejection and server-side advancement
+  gating.
+- English and Simplified Chinese route checks passed for Today, Practice, My English, and Journey.
+  A Journey hard-coded-English gap and three secondary-route hydration mismatches were fixed.
+  The approximately 375px viewport showed no horizontal breakage, and a clean post-fix reload
+  produced no new console warning/error or Next.js Issue badge.
+
+### Known limitations
+
+- The test account uses a 20-minute plan, which intentionally omits IMITATE under the existing
+  deterministic duration contract; IMITATE is covered by the shared voice service and tests but
+  was not exercised in this live 20-minute session.
+- Browser automation recorded audible prompt playback through the available microphone path;
+  transcripts were intentionally low-content and validate transport/provider persistence rather
+  than answer quality.
+- Gate E cross-session retrieval/Aha and Gate F acceptance remain NOT STARTED.

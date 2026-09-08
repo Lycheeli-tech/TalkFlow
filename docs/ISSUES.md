@@ -1,6 +1,6 @@
 # FluentLoop Issues
 
-## AUTH-01: Expired-token dead end blocked the login entry path (FIXED, login re-validation pending)
+## AUTH-01: Expired-token dead end blocked the login entry path (FIXED)
 
 Status: fix implemented and partially regression-tested; full authenticated-path re-validation
 waits for a real Supabase account login.
@@ -51,8 +51,8 @@ entry path into the application.
 - Browser check: fresh unauthenticated context renders a usable login form.
 - Browser check: injecting a stale token and reloading produces backend 401 → token removed from
   `sessionStorage` → UI returns to the login form; no error-page dead end, no redirect loop.
-- Pending: successful login → authenticated entry fetch → stage routing (needs a real account),
-  then Gate C voice validation.
+- Successful login → authenticated entry fetch → persisted TODAY routing has now passed repeatedly
+  with a real account. Secondary routes use the same hydration-safe token subscription.
 
 ### Previous Gate C blocker
 
@@ -60,7 +60,7 @@ Real Supabase account authentication and the initial microphone path have now be
 the user. The remaining Gate C work is persistence/provider/retry/reconnection evidence and final
 browser smoke validation.
 
-## GATE-C-01: Initial real-browser voice path reached Today (OPEN)
+## GATE-C-01: Initial real-browser voice path reached Today (CLOSED)
 
 ### Evidence
 
@@ -91,6 +91,31 @@ This confirms the reachable UI path, private-audio persistence, durable Attempt/
 LearnerAssessment shape, reconnection, and the service-level failure/retry contract. It does not
 replace a live browser/provider fault injection for the final failure-recovery evidence.
 
-### Next checks
+### Closeout
 
-Complete the authenticated Simplified Chinese route smoke. Keep Gate C open until it is recorded.
+The authenticated Simplified Chinese route smoke passed and Gate C is complete.
+
+## GATE-D-01: Daily Attempt types rejected by live CHECK constraint (FIXED)
+
+### Symptom and cause
+
+The first real Daily recording uploaded successfully but Attempt insertion returned HTTP 500 and
+the browser displayed `Failed to fetch`. The live `attempts_question_type_check` still allowed only
+calibration and Quick Review categories, so PostgreSQL rejected `RETRIEVE`.
+
+### Fix and evidence
+
+- Added and applied versioned migration `202609080011_daily_voice_attempts.sql`, preserving all
+  previous categories and adding the five Daily voice step types.
+- Repeated real browser submissions returned 200 and persisted `ANALYZED` Attempts with Bailian
+  STT/analysis and non-empty private audio objects.
+- Local migration validation passes for all eleven migrations.
+
+## GATE-D-02: Secondary-route hydration and Journey localization gaps (FIXED)
+
+- Practice, My English, and Journey previously read `sessionStorage` during the first client render,
+  producing server/client text mismatch on refresh. They now use the shared hydration-safe access
+  token subscription.
+- Journey's hard-coded English summary, phase, day, and accessibility labels now use locale files;
+  Daily phase/step/minute labels are localized as well.
+- Post-fix reload showed no Next.js Issue badge or new console warning/error.

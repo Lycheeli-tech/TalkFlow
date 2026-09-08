@@ -32,7 +32,11 @@ from app.ai.interfaces import (
 from app.core.config import get_settings
 from app.core.security import JWTVerificationError, SupabaseTokenVerifier, TokenVerifier
 from app.db.session import get_database_session
-from app.repositories.calibration import CalibrationRepository, SQLCalibrationRepository
+from app.repositories.calibration import (
+    CalibrationRepository,
+    SQLCalibrationRepository,
+    VoiceAttemptRepository,
+)
 from app.repositories.daily_sessions import DailySessionRepository, SQLDailySessionRepository
 from app.repositories.memory import MemoryRepository, SQLMemoryRepository
 from app.repositories.profiles import ProfileRepository, SQLProfileRepository
@@ -90,6 +94,12 @@ async def get_profile_repository(
 async def get_calibration_repository(
     session: AsyncSession = Depends(get_database_session),
 ) -> AsyncIterator[CalibrationRepository]:
+    yield SQLCalibrationRepository(session)
+
+
+async def get_voice_attempt_repository(
+    session: AsyncSession = Depends(get_database_session),
+) -> AsyncIterator[VoiceAttemptRepository]:
     yield SQLCalibrationRepository(session)
 
 

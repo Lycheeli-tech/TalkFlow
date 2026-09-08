@@ -299,7 +299,7 @@ V2, or new product behavior is authorized in this milestone.
 - Gate B — Live AI Providers: COMPLETE; Bailian structured text, Qwen3-ASR, Qwen3-TTS, runtime
   wiring, secret isolation, and human voice experience passed live validation.
 - Gate C — Real Voice Pipeline: COMPLETE.
-- Gate D — Real Daily Learning Loop: IN PROGRESS on `feat/real-daily-learning-loop`.
+- Gate D — Real Daily Learning Loop: COMPLETE on `feat/real-daily-learning-loop`.
 - Gate E — Real Day 1 → Day 2 Cross-Session Aha: NOT STARTED.
 - Gate F — Local MVP Acceptance: NOT STARTED.
 - Deployment configuration and real-device validation remain later activation work.
@@ -334,4 +334,20 @@ V2, or new product behavior is authorized in this milestone.
   Practice, My English, and Journey without refresh; route content loaded normally.
 - English, 375px, console, MediaRecorder MIME, live STT failure/audio retention, same-Attempt
   retry, private storage, persistence, analysis, assessment, and reconnection checks passed.
-- Gate D is validating the live Daily Loop. Gate E and Gate F remain untouched and not started.
+- Gate D completed the live Daily Loop. Gate E and Gate F remain untouched and not started.
+
+### Gate D completion (2026-09-08)
+
+- Added the minimum Daily turn-based voice path using the existing provider and private-audio
+  abstractions. Voice steps create durable Attempts and cannot advance until analysis succeeds.
+- Added versioned migration `202609080011_daily_voice_attempts.sql` for Daily Attempt types and
+  applied it to the configured live project after local validation of all eleven migrations.
+- Real browser evidence passed for Daily TTS, `MediaRecorder` upload, Qwen3-ASR, Bailian analysis,
+  transcript/analysis persistence, private audio existence, Recap `+1 XP`, streak/day progression,
+  and reload/next-day persistence.
+- Failure/retry tests confirm original audio and transcript survive analysis failure and retry
+  reuses one Attempt. Non-current/passive recording and pre-analysis advancement are rejected.
+- Backend: 87 tests passed; Ruff passed. Frontend TypeScript and ESLint passed. English/简体中文,
+  main routes, approximately 375px layout, and post-fix hydration/console checks passed.
+- Known limits: the live 20-minute plan omits IMITATE by deterministic duration design; its voice
+  path is test-covered. Gate E/F, realtime voice, M8, V1.5, and V2 were not started.

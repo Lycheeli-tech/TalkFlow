@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { OnboardingFlow } from "@/components/onboarding-flow";
 import { VoiceCalibration } from "@/components/voice-calibration";
-import { TodaySession } from "@/components/today-session";
+import { TodaySessionLive } from "@/components/today-session-live";
 import { useInterfaceLocale } from "@/components/interface-locale-provider";
 import {
   getApplicationEntry,
@@ -29,8 +29,12 @@ function getStoredAccessToken(): string {
   return sessionStorage.getItem(ACCESS_TOKEN_STORAGE_KEY) ?? "";
 }
 
+export function useAccessToken(): string {
+  return useSyncExternalStore(subscribeToAccessToken, getStoredAccessToken, () => "");
+}
+
 export function AppEntry() {
-  const token = useSyncExternalStore(subscribeToAccessToken, getStoredAccessToken, () => "");
+  const token = useAccessToken();
   const [entry, setEntry] = useState<ApplicationEntry | null>(null);
   const [error, setError] = useState("");
   const { locale, setLocale } = useInterfaceLocale();
@@ -59,7 +63,7 @@ export function AppEntry() {
   if (entry?.stage === "ONBOARDING") return <OnboardingFlow initialToken={token} initialTargetRole={entry.target_role ?? ""} onReady={() => void getApplicationEntry(token).then(setEntry)} />;
   const messages = getMessages(locale);
   if (entry?.stage === "CALIBRATION") return <AppShell><VoiceCalibration token={token} copy={messages.calibration} onComplete={() => setEntry({ ...entry, stage: "TODAY" })} /></AppShell>;
-  return <AppShell><TodaySession token={token} /></AppShell>;
+  return <AppShell><TodaySessionLive token={token} /></AppShell>;
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {

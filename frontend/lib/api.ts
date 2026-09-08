@@ -94,7 +94,8 @@ export function confirmProfile(token: string, sourceId: string, candidate: Candi
 
 export type CalibrationQuestion = { category: "EXPERIENCE" | "MOTIVATION" | "PROJECT"; text: string };
 export type CalibrationSession = { id: string; status: "IN_PROGRESS" | "COMPLETED"; questions: CalibrationQuestion[] };
-export type VoiceAttempt = { id: string; question_type: CalibrationQuestion["category"]; transcript: string | null; status: "AUDIO_SAVED" | "STT_FAILED" | "TRANSCRIBED" | "ANALYSIS_FAILED" | "ANALYZED"; provider_error: string | null };
+export type DailyStep = "RECALL" | "LEARN" | "IMITATE" | "RETRIEVE" | "TRANSFER" | "INTERVIEW" | "RECAP";
+export type VoiceAttempt = { id: string; question_type: CalibrationQuestion["category"] | DailyStep; transcript: string | null; status: "AUDIO_SAVED" | "STT_FAILED" | "TRANSCRIBED" | "ANALYSIS_FAILED" | "ANALYZED"; provider_error: string | null };
 export type LearnerAssessment = { fluency: string; naturalness: string; grammar: string; retrieval: string; structure: string; strengths: string[]; primary_focus: string; secondary_focus: string | null; observed_patterns: string[]; assessment_version: string };
 
 export function startCalibration(token: string) {
@@ -130,7 +131,7 @@ export type DailySessionPlan = {
   topic_family: string;
   question_family: string;
   strategy_id: string;
-  steps: string[];
+  steps: DailyStep[];
   scaffolding_level: "HIGH" | "MEDIUM" | "LOW";
 };
 
@@ -156,6 +157,28 @@ export function createDailySession(token: string) {
 
 export function advanceDailySession(token: string, sessionId: string) {
   return apiFetch<DailySessionResponse>(`/api/v1/daily/sessions/${sessionId}/advance`, token, { method: "POST" });
+}
+
+export function getDailyAttempts(token: string, sessionId: string) {
+  return apiFetch<VoiceAttempt[]>(`/api/v1/daily/sessions/${sessionId}/attempts`, token);
+}
+
+export async function dailyStepTts(token: string, sessionId: string, step: DailyStep) {
+  const response = await fetch(`${API_BASE_URL}/api/v1/daily/sessions/${sessionId}/steps/${step}/tts`, { headers: { Authorization: `Bearer ${token}` } });
+  if (!response.ok) throw new Error("Step audio is unavailable. Read the prompt and continue.");
+  return response.blob();
+}
+
+export function submitDailyAttempt(token: string, sessionId: string, step: DailyStep, recording: Blob, durationMs: number) {
+  const body = new FormData();
+  body.set("step", step);
+  body.set("response_duration_ms", String(durationMs));
+  body.set("recording", recording, "daily.webm");
+  return apiFetch<VoiceAttempt>(`/api/v1/daily/sessions/${sessionId}/attempts`, token, { method: "POST", body });
+}
+
+export function retryDailyAttempt(token: string, attemptId: string) {
+  return apiFetch<VoiceAttempt>(`/api/v1/daily/attempts/${attemptId}/retry`, token, { method: "POST" });
 }
 
 export function startQuickReview(token: string, sessionId: string) {

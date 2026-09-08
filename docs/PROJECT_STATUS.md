@@ -4,7 +4,7 @@
 
 - 2026-09-08
 - Branch: `feat/real-daily-learning-loop`
-- HEAD: `d004ef1` (`feat: complete phase 2 gate c voice pipeline`)
+- HEAD: Gate D closeout commit (`feat: complete phase 2 gate d daily loop`)
 
 ## Product
 
@@ -21,15 +21,14 @@ deployment and real-device validation follow the activation gates. No Milestone 
 
 - Phase: Phase 2 — MVP Activation
 - Gate: D — Real Daily Learning Loop
-- Status: IN PROGRESS
-- Objective: validate the real Daily Session plan/content/step/Recap/progress loop and determine
-  the minimum required Daily turn-based voice evidence.
+- Status: COMPLETE
+- Objective achieved: the real Daily Session now records durable turn-based voice evidence,
+  gates ordered progression, and persists Recap rewards/progress.
 
 ## Stable Baseline
 
-Phase 1 stable baseline is tag `m7-hardening` at merge commit `cbfed8f`. Phase 2 Gate A and B local
-checkpoints are `e2615ca` and `d16cbc3`. Phase 2 commits have not been assumed pushed; verify remote
-state before any merge or push.
+Phase 1 stable baseline is tag `m7-hardening` at merge commit `cbfed8f`. Gates A–C are merged and
+pushed on `main`; Gate D is closing on `feat/real-daily-learning-loop`.
 
 ## Implemented
 
@@ -43,31 +42,29 @@ state before any merge or push.
 ## Not Yet Activated / Not Yet Complete
 
 - Gate A–C are COMPLETE.
-- Gate D real Daily Learning Loop is in progress; Gate E cross-session live aha and Gate F local MVP
+- Gate D real Daily Learning Loop is complete; Gate E cross-session live aha and Gate F local MVP
   acceptance are not started.
 - Deployment-host setup and real-device coverage remain future activation work.
 
 ## Current Blockers
 
-No confirmed product defect. Gate D discovery is determining whether the existing Today shell needs
-minimal Daily turn-based voice integration for Build Spec compliance.
+No confirmed Gate D blocker. Known limitations are recorded in `PHASE2_MVP_ACTIVATION.md`.
 
 ## Next Steps
 
-1. Preserve current user changes and confirm local backend/frontend services.
-2. Reach Voice Calibration in the browser with a test account.
-3. Validate three real recordings, TTS/STT, private Storage, persistence, retry, and reconnection.
-4. Run focused bilingual, 375 px, navigation, and console checks; update Gate C documents.
-5. Create a checkpoint and stop for review; do not start Gate D automatically.
+1. Review the Gate D checkpoint.
+2. Do not begin Gate E until explicitly requested.
 
 ## Verification Snapshot
 
-- Backend: 83 passed after Gate C validation.
+- Backend: 87 passed after Gate D validation.
 - Ruff format/check: passed.
 - Frontend ESLint, TypeScript, and production build: passed during M7/Gate B validation.
-- Ten live Supabase migrations and provisioning/RLS/storage/reconnection probes: passed in Gate A.
+- Eleven migrations validate locally; the Gate D constraint migration is applied live.
 - Bailian live text, TTS→STT, and human voice acceptance: passed in Gate B.
 - Gate C real browser microphone/upload/retry validation: complete.
+- Gate D real Daily voice/Attempt/Recap/progress/reconnection and bilingual responsive checks:
+  complete.
 
 ## Source of Truth
 

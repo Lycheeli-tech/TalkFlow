@@ -143,7 +143,7 @@ class VoiceAttempt(BaseModel):
     session_id: UUID
     user_id: UUID
     question: str
-    question_type: CalibrationQuestionType
+    question_type: CalibrationQuestionType | DailyStep
     audio_path: str
     audio_content_type: str
     response_duration_ms: int | None = None
