@@ -237,6 +237,8 @@ class DailySessionResponse(BaseModel):
     completion_ready: bool = False
     plan: DailySessionPlan
     content: DailyLessonContent
+    retrieval_opportunity: "RetrievalOpportunityResponse | None" = None
+    retrieval_result: "RetrievalResult | None" = None
 
 
 class DailySessionCompletion(BaseModel):

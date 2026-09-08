@@ -22,6 +22,9 @@ class RetrievalService:
         now: datetime | None = None,
     ) -> RetrievalOpportunity | None:
         anchor = now or datetime.now(UTC)
+        existing = await self.opportunities.get_for_session(session_id, user_id)
+        if existing is not None:
+            return existing
         due = sorted(
             (
                 item

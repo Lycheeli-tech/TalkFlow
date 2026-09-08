@@ -22,7 +22,7 @@
 - Phase 2 Gate B — Live AI Providers：COMPLETE。
 - Phase 2 Gate C — Real Voice Pipeline：COMPLETE。
 - Phase 2 Gate D — Real Daily Learning Loop：COMPLETE。
-- Phase 2 Gate E — Real Day 1 → Day 2 Cross-Session Aha：NOT STARTED。
+- Phase 2 Gate E — Real Day 1 → Day 2 Cross-Session Aha：COMPLETE。
 - Phase 2 Gate F — Local MVP Acceptance：NOT STARTED。
 - Gate D 完成分支：`feat/real-daily-learning-loop`。
 - Gate D checkpoint：`97bee4f feat: complete phase 2 gate d daily loop`。
@@ -46,9 +46,9 @@
 - Gate D closeout：后端 87 tests、Ruff、TypeScript、ESLint、Next.js build、11 migrations
   均通过；详细证据和限制见 `docs/HANDOFF.md` 与 `docs/PHASE2_MVP_ACTIVATION.md`。
 
-## Gate E 唯一目标
+## Gate E 完成事实
 
-验证真实 Day 1 → Day 2 跨 Session Aha：
+真实 Day 1 → Day 2 跨 Session Aha 已验证：
 
 1. 从前一 Session 已学习/确认的 Expression 产生到期或合适的 RetrievalOpportunity。
 2. 下一 Daily Session 在不泄露目标表达的自然新语境中进行隐藏式提取。
@@ -62,18 +62,14 @@
    回答前暴露目标表达。
 8. 验证刷新/重连、用户隔离、失败恢复、English/简体中文、主路由、约 375px 和 console。
 
-只在全部 Gate E 条件通过后更新状态文档并创建 checkpoint；完成后停止，不自动开始 Gate F。
+全部 Gate E 条件通过；checkpoint 见 `feat/real-cross-session-aha`。完成后停止，不自动开始 Gate F。
 
-## Gate E 开始时的建议检查
+## 下一步
 
-- 先确认 `main` 已包含 Gate D checkpoint，再创建 Gate E 功能分支。
-- 阅读 M4/M5 的现有实现和测试：Memory Gate、RetrievalOpportunity、
-  `VerificationService`、`MemoryApplicationService`、cross-session unit of work、
-  `test_day1_day2_slice.py`。现有 fixture 不是 live Gate E 通过证据。
-- 检查真实测试账号当前位于 Day 2，且有一个进行中的 Day 2 BUILD Session；不要假定该账号
-  的低内容自动化 transcript 是合格学习证据。
-- 在写代码前先盘点现有 Daily Attempt 到 Verification/Memory 的连接缺口，避免复制 M5
-  已有事务和确定性规则。
+- 审查 `feat/real-cross-session-aha` 上的 Gate E checkpoint。
+- 未经明确请求，不要合并、推送或开始 Gate F。
+- Gate E 的详细实现、live evidence 和限制见 `docs/HANDOFF.md` 与
+  `docs/PHASE2_MVP_ACTIVATION.md`。
 
 ## 运行环境
 

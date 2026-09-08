@@ -300,7 +300,7 @@ V2, or new product behavior is authorized in this milestone.
   wiring, secret isolation, and human voice experience passed live validation.
 - Gate C — Real Voice Pipeline: COMPLETE.
 - Gate D — Real Daily Learning Loop: COMPLETE on `feat/real-daily-learning-loop`.
-- Gate E — Real Day 1 → Day 2 Cross-Session Aha: NOT STARTED.
+- Gate E — Real Day 1 → Day 2 Cross-Session Aha: COMPLETE on `feat/real-cross-session-aha`.
 - Gate F — Local MVP Acceptance: NOT STARTED.
 - Deployment configuration and real-device validation remain later activation work.
 
@@ -351,3 +351,20 @@ V2, or new product behavior is authorized in this milestone.
   main routes, approximately 375px layout, and post-fix hydration/console checks passed.
 - Known limits: the live 20-minute plan omits IMITATE by deterministic duration design; its voice
   path is test-covered. Gate E/F, realtime voice, M8, V1.5, and V2 were not started.
+
+### Gate E completion (2026-09-08)
+
+- Day 1 curriculum expressions now enter `LEARNING` with a deterministic next-day review date when
+  the Day 1 Daily Session completes; replay does not duplicate expressions.
+- Starting/resuming a later Daily Session idempotently attaches one due, user-scoped hidden
+  RetrievalOpportunity to its natural Interview prompt without exposing expression text.
+- The live Day 2 Interview produced analyzed Bailian STT/analysis Attempts. Trusted verification
+  accepted only the persisted same-user/same-session Attempt ID and atomically wrote evidence,
+  updated review/mastery state, and consumed the opportunity.
+- A first ASR mismatch correctly recorded failure and scheduled another retrieval; an additive
+  recovery Session preserved the failure evidence, and a second real recording produced a verified
+  transfer, moving the Expression to `TRANSFERRED` without incorrectly marking it `MASTERED`.
+- English and Simplified Chinese Recap Aha, refresh recovery, private audio, reconnection,
+  cross-user rejection, main routes, 375px layout, and clean console passed.
+- Backend 88 tests, Ruff, frontend TypeScript/ESLint/build, and `git diff --check` passed. Gate F,
+  realtime voice, M8, V1.5, and V2 were not started.

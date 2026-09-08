@@ -13,6 +13,9 @@ class RetrievalOpportunityRepository(Protocol):
     async def create(self, opportunity: RetrievalOpportunity) -> RetrievalOpportunity: ...
     async def get(self, opportunity_id: UUID, user_id: UUID) -> RetrievalOpportunity | None: ...
     async def consume(self, opportunity_id: UUID, user_id: UUID) -> RetrievalOpportunity: ...
+    async def get_for_session(
+        self, session_id: UUID, user_id: UUID
+    ) -> RetrievalOpportunity | None: ...
 
 
 class InMemoryRetrievalOpportunityRepository:
@@ -26,6 +29,16 @@ class InMemoryRetrievalOpportunityRepository:
     async def get(self, opportunity_id: UUID, user_id: UUID) -> RetrievalOpportunity | None:
         value = self.items.get(opportunity_id)
         return value if value and value.user_id == user_id else None
+
+    async def get_for_session(self, session_id: UUID, user_id: UUID) -> RetrievalOpportunity | None:
+        return next(
+            (
+                item
+                for item in self.items.values()
+                if item.session_id == session_id and item.user_id == user_id
+            ),
+            None,
+        )
 
     async def consume(self, opportunity_id: UUID, user_id: UUID) -> RetrievalOpportunity:
         value = await self.get(opportunity_id, user_id)
@@ -69,6 +82,17 @@ class SQLRetrievalOpportunityRepository:
                 RetrievalOpportunityRow.id == opportunity_id,
                 RetrievalOpportunityRow.user_id == user_id,
             )
+        )
+        return RetrievalOpportunity.model_validate(row) if row else None
+
+    async def get_for_session(self, session_id: UUID, user_id: UUID) -> RetrievalOpportunity | None:
+        row = await self.session.scalar(
+            select(RetrievalOpportunityRow)
+            .where(
+                RetrievalOpportunityRow.session_id == session_id,
+                RetrievalOpportunityRow.user_id == user_id,
+            )
+            .order_by(RetrievalOpportunityRow.created_at.desc())
         )
         return RetrievalOpportunity.model_validate(row) if row else None
 
