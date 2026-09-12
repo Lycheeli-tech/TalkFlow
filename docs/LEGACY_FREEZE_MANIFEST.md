@@ -4,7 +4,7 @@
 
 - Status: ACTIVE
 - Effective date: 2026-09-12
-- Product authority: `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md`
+- Product authority: `FLUENTLOOP_MVP_BUILD_SPEC_v2.1.md`
 - Superseding decision: `docs/DECISIONS.md` ADR-025
 - Legacy code baseline commit: `8cc986d`
 - Legacy code baseline tag: `legacy-loop-final-baseline`

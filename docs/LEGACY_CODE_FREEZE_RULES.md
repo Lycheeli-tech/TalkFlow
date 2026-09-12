@@ -4,7 +4,7 @@
 
 - Status: ACTIVE
 - Effective date: 2026-09-12
-- Product authority: `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md`
+- Product authority: `FLUENTLOOP_MVP_BUILD_SPEC_v2.1.md`
 - Architecture decision: `docs/DECISIONS.md` ADR-025
 - Frozen inventory: `docs/LEGACY_FREEZE_MANIFEST.md`
 - Baseline tag: `legacy-loop-final-baseline`

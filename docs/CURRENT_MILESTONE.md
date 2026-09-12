@@ -1,5 +1,8 @@
 # Current Milestone
 
+> Historical record only. For the current Course Core V1 stage and execution sequence, read
+> `docs/CURRENT_MILESTONE_V1.md`.
+
 ## Course Core Stage 0 — Specification and Safety Boundaries
 
 **Status:** COMPLETE
@@ -19,7 +22,7 @@ boundaries before any runtime, route, database, or product-code change.
 
 ### Completed
 
-- Activated `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md` as the authoritative Build Spec.
+- Originally activated `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md`; the approved v2.1 amendment now supersedes it.
 - Retained v1.1 as Legacy Loop history.
 - Updated `AGENTS.md` to enforce the Course Core boundaries.
 - Appended ADR-025, which explicitly supersedes the active-product Legacy Loop decisions.
@@ -36,6 +39,14 @@ boundaries before any runtime, route, database, or product-code change.
 - `git diff --check` passes.
 - Existing `frontend/next-env.d.ts` user work was not modified or included in Stage 0.
 - No runtime code, routes, schemas, migrations, prompts, or tests changed.
+
+### Approved Specification Amendment
+
+- Build Spec v2.1 is now authoritative and v2.0 is retained as history.
+- Section 20.3 now contains the product-approved 30 critical acceptance criteria.
+- ADR-026 records the acceptance-gate change.
+- No runtime behavior or Legacy freeze boundary changed.
+- The approved documentation amendment is closed at tag `course-core-stage-0-v2.1`.
 
 ### Next Action
 

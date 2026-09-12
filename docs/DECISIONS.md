@@ -1,6 +1,6 @@
 # Stable Architectural Decisions
 
-`FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md` is authoritative if this summary and the Build Spec ever differ. `FLUENTLOOP_MVP_BUILD_SPEC_v1.1.md` is retained as Legacy Loop history only.
+`FLUENTLOOP_MVP_BUILD_SPEC_v2.1.md` is authoritative if this summary and the Build Spec ever differ. `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md` and `FLUENTLOOP_MVP_BUILD_SPEC_v1.1.md` are retained as history only.
 
 Future decisions should normally be appended rather than silently rewriting historical decisions. If a later decision supersedes an earlier ADR, it must explicitly reference the superseded ADR.
 
@@ -173,3 +173,44 @@ where they do not conflict with Build Spec v2.0.
 - Legacy route shutdown and new App Shell activation require architecture and no-old-write tests.
 - Any exception to the freeze requires an explicit reason, scoped review, and product approval when
   it changes the Build Spec.
+
+### ADR-026 — Thirty Critical Course Core Acceptance Criteria
+
+**Status:** Accepted
+
+**Date:** 2026-09-12
+
+**Authority:** `FLUENTLOOP_MVP_BUILD_SPEC_v2.1.md`
+
+#### Context
+
+Build Spec v2.0 expressed the overall MVP acceptance gate as 50 detailed checks. The product owner
+approved a smaller, explicit set of 30 critical product acceptance criteria so review remains focused
+on the product behaviors that cannot be violated. Detailed requirements elsewhere in the Build Spec
+remain normative and testable; they do not become additional critical-product criteria by default.
+
+The approved list contained an empty item 14. The existing rule that saving an Answer must not
+automatically advance to the follow-up Question or the next Course fills that position. This preserves
+an already approved user-control boundary and does not introduce new behavior.
+
+#### Decision
+
+- Build Spec v2.1 Section 20.3 is the authoritative 30-item critical MVP acceptance list.
+- Acceptance evidence and release reporting must map directly to those 30 numbered criteria.
+- Course questions and answer focus remain static Catalog authority; AI cannot modify either.
+- Course Answers remain repeatable and Question-scoped, with no completion or Mastery state and no
+  automatic progression.
+- Chinese drafts require confirmation; unconfirmed drafts are not retained.
+- Memory saves automatically only with verifiable provenance and remains visible and deletable.
+- Practice uses only the 59 static Course Questions, produces whole-session Feedback only, and keeps
+  no Practice history.
+- New paths cannot create Daily Sessions, update Legacy progress, or import old learning records.
+- User data isolation, saved-Answer durability, and the generic Course engine remain release gates.
+
+#### Consequences
+
+- Test plans must identify each criterion by its v2.1 Section 20.3 number.
+- The earlier 50-item list remains visible only in historical Build Spec v2.0.
+- Requirements removed from the critical list are not silently deleted from their detailed product,
+  architecture, security, or failure-handling sections.
+- Any future change to the 30-item list requires the Build Spec change-control process.

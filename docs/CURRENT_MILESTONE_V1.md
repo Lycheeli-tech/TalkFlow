@@ -1,0 +1,138 @@
+# FluentLoop Course Core V1 当前阶段
+
+## 文档角色
+
+- 本文件是 Course Core V1 阶段执行状态和阶段交接的当前入口。
+- 产品与架构要求以 `FLUENTLOOP_MVP_BUILD_SPEC_v2.1.md` 为准。
+- `docs/CURRENT_MILESTONE.md` 仅保留旧项目和既往里程碑历史，不再作为 Course Core V1 的当前阶段入口。
+- 阶段范围发生变化时，必须先按照 Build Spec 第 26 节完成变更审批，再同步更新本文件。
+
+## 当前状态
+
+| 阶段 | 状态 | 说明 |
+| --- | --- | --- |
+| 阶段 0 | COMPLETE | 全部阶段 0 文档已通过产品负责人审阅；安全 checkpoint 为 `course-core-stage-0-v2.1` |
+| 阶段 1 | 未开始 | 必须获得产品负责人明确授权后启动 |
+| 阶段 2 | 未开始 | 可为阶段 1 的安全重定向先建立路由壳，但不得绕过阶段发布门 |
+| 阶段 3 | 未开始 | 依赖阶段 2 的 App Shell 和 Catalog |
+| 阶段 4 | 未开始 | 依赖新的 Course Core 数据边界 |
+| 阶段 5 | 未开始 | 不建设通用 AI Coach Orchestrator |
+| 阶段 6 | 未开始 | 复用阶段 3 的 Answer、Audio 和 Transcript 基础设施 |
+| 阶段 7 | 未开始 | 所有 Course 必须复用同一通用引擎 |
+| 阶段 8 | 未开始 | 依赖 Catalog、录音、STT 和 Feedback 基础设施 |
+
+## 阶段 0：规格和安全边界
+
+1. 审核并批准本 Build Spec；
+2. 将本文件定版为正式 Build Spec；
+3. 更新 `AGENTS.md`；
+4. 追加 superseding ADR；
+5. 建立 Legacy Freeze Manifest；
+6. 建立 Legacy Code Freeze Rules；
+7. 创建 Git 安全 checkpoint。
+
+阶段 0 必须把第 18 节转化为正式工程约束。
+
+## 阶段 1：停止旧路径运行并封存 Legacy
+
+1. 新登录入口不再进入 Onboarding / Calibration / Today；
+2. 停止默认挂载 Daily、Calibration、Journey、Quick Review；
+3. 将旧页面 URL 重定向；
+4. 标记全部 Legacy 模块；
+5. 禁止 Course Core import 或调用 Legacy；
+6. 限制 Legacy 修改类型；
+7. 加入“新路径不修改旧进度”测试；
+8. 加入“Course Core 不依赖 Legacy”架构测试。
+
+阶段 1 的重定向不得指向不存在的页面。开发时可以先完成阶段 2 路由壳；部署时阶段 1 和 2 必须共同通过发布门。
+
+## 阶段 2：新 App Shell、首页与 Catalog
+
+1. 建立不依赖 Today 的新 App Shell；
+2. 首页显示三个并列入口；
+3. 建立独立路由边界；
+4. 建立 `course_catalog_v1`；
+5. 实现只读 Course 列表；
+6. 完成 30 / 59 确定性校验；
+7. 接入旧 URL 重定向；
+8. 完成登录落点、导航和 Legacy 不挂载 smoke test。
+
+未完成功能的入口在开发中必须通过 feature flag 隔离。
+
+## 阶段 3：Course 11 英文 Answer 最小闭环
+
+1. 创建 Course Answer、Transcript、Feedback schema、RLS 和 Repository；
+2. 建立 Single Course Page；
+3. 实现 Question 自由切换；
+4. 实现 TTS、英文录音和最终 STT；
+5. 实现音频互斥和离页、切题保护；
+6. 保存 Answer 并提供 History；
+7. 从第一次保存起执行最近两条录音；
+8. 实现幂等、失败恢复和 Legacy 写入禁令测试。
+
+阶段结束后，即使没有 About Me、帮助、中文回答或 Practice，Course 11 英文流程也必须独立运行。
+
+## 阶段 4：About Me 与 AI Memory
+
+1. 建立 About Me schema、RLS 和 Repository；
+2. 支持多目标岗位、多份 Resume 和补充资料；
+3. 实现 Memory CREATE / UPDATE / MERGE / IGNORE；
+4. 实现来源验证和事务；
+5. 支持全部 Memory 查看和删除；
+6. 实现 Answer 删除、Audio 清理和多来源 Memory 处理；
+7. 验证 About Me 为空时 Course 仍可用。
+
+## 阶段 5：按需 AI 生成与 Course Feedback
+
+1. 建立 Course Context Builder；
+2. 实现需要提示；
+3. 实现表达素材；
+4. 实现 AI 参考回答；
+5. 实现单次 Answer Feedback；
+6. 完成三栏与移动端抽屉；
+7. 实现每项 AI 能力的失败隔离；
+8. 验证生成能力不能改变页面、Answer 或 Legacy 状态。
+
+不建设通用 AI Coach Orchestrator。
+
+## 阶段 6：中文 Answer 闭环
+
+1. 中文录音和最终 STT；
+2. 中文转英文整理；
+3. 同时展示中文与英文稿；
+4. 用户确认后保存；
+5. 重新回答和放弃 Draft；
+6. 接入最近两条录音；
+7. 验证不补充用户未表达事实。
+
+## 阶段 7：开放其余 29 个 Course
+
+1. 使用同一引擎加载其余 Course；
+2. 验证完整 Catalog；
+3. 验证全部核心问题和追问；
+4. 验证 Course 30 无追问；
+5. 禁止 Course 11 特例；
+6. 完成全部 Course 响应式 smoke test。
+
+## 阶段 8：Practice V2
+
+1. 随机抽取 3 / 5 题；
+2. 逐题语音回答；
+3. 暂停、跳题、返回和重答；
+4. 整场 Feedback；
+5. 鼓励性评分；
+6. 不提供 History；
+7. 不触发 Legacy 状态。
+
+## 阶段更新规则
+
+每次开始、恢复或结束一个阶段时，必须更新：
+
+1. 当前阶段状态；
+2. 已完成范围；
+3. 验证证据；
+4. 已知限制或阻塞；
+5. Git branch、HEAD 和 checkpoint；
+6. 下一项明确动作。
+
+阶段完成前必须对照 Build Spec 中对应阶段要求以及第 20.3 节的相关关键验收标准。未经明确授权，不得自动开始下一阶段。

@@ -8,7 +8,7 @@
 1. `AGENTS.md`
 2. `docs/PROJECT_HANDOFF.md`
 3. `docs/HANDOFF.md`
-4. `docs/CURRENT_MILESTONE.md`
+4. `docs/CURRENT_MILESTONE_V1.md`
 5. `docs/DECISIONS.md`
 6. `docs/PHASE2_MVP_ACTIVATION.md`
 7. Build Spec 中与 Gate F、MVP Acceptance、Daily/Review、跨 Session Retrieval、
@@ -112,7 +112,8 @@
 - `docs/PROJECT_HANDOFF.md`：跨窗口导航入口。
 - `docs/HANDOFF.md`：最近一次 Gate 的具体实现、验证和运行状态。
 - `docs/PHASE2_MVP_ACTIVATION.md`：Gate 状态与 live evidence。
-- `docs/CURRENT_MILESTONE.md`：历史里程碑和当前生命周期。
+- `docs/CURRENT_MILESTONE_V1.md`：当前 Course Core V1 阶段、执行状态和验收状态。
+- `docs/CURRENT_MILESTONE.md`：历史里程碑和旧生命周期记录。
 - `docs/PROJECT_STATUS.md`：精简项目仪表盘。
 - `docs/ISSUES.md`：已知问题、根因、修复和回归证据。
 - `docs/DECISIONS.md`：仅记录稳定架构决策。

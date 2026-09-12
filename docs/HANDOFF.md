@@ -4,13 +4,17 @@
 
 - 2026-09-12
 - Branch: `codex/course-core-stage-0`
-- Checkpoint: Course Core Stage 0 closeout commit, tagged `course-core-stage-0`
+- Checkpoint: Course Core Stage 0 v2.1 documentation closeout, tagged `course-core-stage-0-v2.1`
 
 ## Current State
 
 Course Core Stage 0 — Specification and Safety Boundaries is complete. The product owner approved
-Build Spec v2.0. The new Spec, AGENTS rules, ADR-025, Legacy Freeze Manifest, and Legacy Code Freeze
-Rules are in the Stage 0 checkpoint.
+Build Spec v2.1. The approved v2.1 Spec, AGENTS rules, ADR-025/ADR-026, Legacy Freeze Manifest,
+Legacy Code Freeze Rules, Chinese review translations, and Course Core V1 milestone document are
+included in the `course-core-stage-0-v2.1` checkpoint.
+
+Read `docs/CURRENT_MILESTONE_V1.md` for the current Course Core V1 stage and execution sequence.
+`docs/CURRENT_MILESTONE.md` is historical only.
 
 The Legacy implementation remains unchanged at baseline `8cc986d`, tagged
 `legacy-loop-final-baseline`. The current runtime still serves the Legacy product because Stage 1
@@ -18,7 +22,8 @@ has not started.
 
 ## Stage 0 Result
 
-- `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md` is now authoritative.
+- `FLUENTLOOP_MVP_BUILD_SPEC_v2.1.md` is now authoritative; v2.0 remains as history.
+- Section 20.3 uses the product-approved 30 critical acceptance criteria.
 - v1.1 remains in the repository as Legacy history.
 - ADR-025 explicitly supersedes Legacy product decisions for the active Course Core.
 - The freeze documents cover actual backend/frontend files, endpoints, tables, state fields,
@@ -56,7 +61,7 @@ instruction.
 
 ## Do Not Change
 
-- Do not modify Build Spec v2.0 without a reviewed product proposal.
+- Do not modify Build Spec v2.1 without a reviewed product proposal.
 - Do not begin Stage 1, unmount Legacy routes, or change runtime behavior without explicit approval.
 - Do not import Legacy business modules from new Course Core code.
 - Do not print or commit `.env`/`.env.local`, database URLs, Supabase keys, Bailian keys, tokens,

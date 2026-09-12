@@ -1,15 +1,15 @@
 # FluentLoop Repository Guide
 
-`FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md` is the authoritative product and architecture specification. `FLUENTLOOP_MVP_BUILD_SPEC_v1.1.md` is retained only as the Legacy Loop historical specification. This file is an operating and navigation map for coding agents; do not rely on conversation history as the source of truth.
+`FLUENTLOOP_MVP_BUILD_SPEC_v2.1.md` is the authoritative product and architecture specification. `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md` and `FLUENTLOOP_MVP_BUILD_SPEC_v1.1.md` are retained only as historical specifications. This file is an operating and navigation map for coding agents; do not rely on conversation history as the source of truth.
 
 ## Milestone Reading Protocol
 
 Before starting or resuming any milestone:
 
 1. Read `AGENTS.md`.
-2. Read `docs/CURRENT_MILESTONE.md`.
+2. Read `docs/CURRENT_MILESTONE_V1.md`.
 3. Read `docs/DECISIONS.md`.
-4. Read the sections of `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md` relevant to the current stage.
+4. Read the sections of `FLUENTLOOP_MVP_BUILD_SPEC_v2.1.md` relevant to the current stage.
 5. If the task may affect product behavior, architecture boundaries, data models, memory, mastery, or cross-session behavior, consult the full relevant specification before implementation.
 
 - Implement only the explicitly authorized Course Core stage. Do not infer later-stage or post-MVP scope.
@@ -35,7 +35,7 @@ Before declaring a milestone complete:
 1. Run all milestone-relevant tests and checks.
 2. Compare the implementation against the current stage and MVP acceptance criteria in the Build Spec.
 3. Record known limitations explicitly.
-4. Update `docs/CURRENT_MILESTONE.md` with the current Course Core stage.
+4. Update `docs/CURRENT_MILESTONE_V1.md` with the current Course Core stage.
 5. Update `docs/DECISIONS.md` only if a stable architectural decision was actually made or changed.
 6. Confirm that no later Course Core stage, Legacy behavior, or post-MVP scope was accidentally implemented.
 7. Report Git branch, HEAD, working-tree status, commits, tests/checks, and remaining limitations.
@@ -80,7 +80,8 @@ new evidence.
 
 ### Repository-memory ownership
 
-- `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md`: authoritative product and architecture requirements.
+- `FLUENTLOOP_MVP_BUILD_SPEC_v2.1.md`: authoritative product and architecture requirements.
+- `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md`: previous Course Core specification, retained as history.
 - `FLUENTLOOP_MVP_BUILD_SPEC_v1.1.md`: Legacy Loop historical requirements only.
 - `docs/LEGACY_FREEZE_MANIFEST.md`: frozen files, routes, symbols, tables, and transition seams.
 - `docs/LEGACY_CODE_FREEZE_RULES.md`: allowed and prohibited Legacy changes.
@@ -88,7 +89,8 @@ new evidence.
 - `PROJECT_STATUS.md`: compact project dashboard.
 - `HANDOFF.md`: small, short-lived operational context for the next agent.
 - `ISSUES.md`: debugging continuity and known issue state.
-- `CURRENT_MILESTONE.md` and the current Phase document: execution and acceptance state.
+- `CURRENT_MILESTONE_V1.md`: current Course Core V1 execution and acceptance state.
+- `CURRENT_MILESTONE.md`: historical milestone and lifecycle record only.
 
 Avoid duplicating large content across these files. Keep the system tool-neutral so Codex, Zcode,
 Claude Code, and other agents can use it.
