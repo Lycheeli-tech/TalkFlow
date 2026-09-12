@@ -1,5 +1,5 @@
-import { AppEntry } from "@/components/app-entry";
+import { StageOneEntry } from "@/components/course-core/stage-one-entry";
 
 export default function HomePage() {
-  return <AppEntry />;
+  return <StageOneEntry />;
 }

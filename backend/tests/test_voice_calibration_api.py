@@ -19,29 +19,35 @@ from app.api.dependencies import (
     get_stt_service,
     get_tts_service,
 )
-from app.main import app
 from app.repositories.calibration import InMemoryCalibrationRepository
 from app.repositories.profiles import InMemoryProfileRepository
 from app.schemas import AuthenticatedUser, CandidateProfile
 from app.storage.audio import FakeAudioStorage
 
 
-def configure(user: AuthenticatedUser, profiles: InMemoryProfileRepository) -> None:
+def configure(
+    user: AuthenticatedUser,
+    profiles: InMemoryProfileRepository,
+    legacy_client: TestClient,
+) -> None:
     calibration = InMemoryCalibrationRepository()
     audio = FakeAudioStorage()
-    app.dependency_overrides[get_profile_repository] = lambda: profiles
-    app.dependency_overrides[get_calibration_repository] = lambda: calibration
-    app.dependency_overrides[get_question_generator] = lambda: FakeCalibrationQuestionGenerator()
-    app.dependency_overrides[get_stt_service] = lambda: FakeSpeechToTextService(
+    application = legacy_client.app
+    application.dependency_overrides[get_profile_repository] = lambda: profiles
+    application.dependency_overrides[get_calibration_repository] = lambda: calibration
+    application.dependency_overrides[get_question_generator] = lambda: (
+        FakeCalibrationQuestionGenerator()
+    )
+    application.dependency_overrides[get_stt_service] = lambda: FakeSpeechToTextService(
         "I led the project and clearly explained the measurable result."
     )
-    app.dependency_overrides[get_tts_service] = lambda: FakeTextToSpeechService()
-    app.dependency_overrides[get_answer_analyzer] = lambda: FakeAnswerAnalyzer()
-    app.dependency_overrides[get_audio_storage] = lambda: audio
+    application.dependency_overrides[get_tts_service] = lambda: FakeTextToSpeechService()
+    application.dependency_overrides[get_answer_analyzer] = lambda: FakeAnswerAnalyzer()
+    application.dependency_overrides[get_audio_storage] = lambda: audio
 
 
 def test_calibration_api_fixture_golden_path(
-    client: TestClient,
+    legacy_client: TestClient,
     override_current_user,
 ) -> None:
     user = AuthenticatedUser(id=uuid4(), email="learner@example.com")
@@ -60,9 +66,9 @@ def test_calibration_api_fixture_golden_path(
         )
     )
     override_current_user(user)
-    configure(user, profiles)
+    configure(user, profiles, legacy_client)
 
-    started = client.post("/api/v1/calibration/sessions")
+    started = legacy_client.post("/api/v1/calibration/sessions")
     assert started.status_code == 201
     session = started.json()
     assert [item["category"] for item in session["questions"]] == [
@@ -71,13 +77,15 @@ def test_calibration_api_fixture_golden_path(
         "PROJECT",
     ]
 
-    tts = client.get(f"/api/v1/calibration/sessions/{session['id']}/questions/EXPERIENCE/tts")
+    tts = legacy_client.get(
+        f"/api/v1/calibration/sessions/{session['id']}/questions/EXPERIENCE/tts"
+    )
     assert tts.status_code == 200
     assert tts.content.startswith(b"fake-audio")
 
     attempt_ids = []
     for category in ("EXPERIENCE", "MOTIVATION", "PROJECT"):
-        response = client.post(
+        response = legacy_client.post(
             f"/api/v1/calibration/sessions/{session['id']}/attempts",
             data={"category": category, "response_duration_ms": "9000"},
             files={"recording": ("answer.webm", f"raw-{category}".encode(), "audio/webm")},
@@ -86,7 +94,7 @@ def test_calibration_api_fixture_golden_path(
         assert response.json()["status"] == "ANALYZED"
         attempt_ids.append(response.json()["id"])
 
-    result = client.get(f"/api/v1/calibration/sessions/{session['id']}")
+    result = legacy_client.get(f"/api/v1/calibration/sessions/{session['id']}")
     assert result.status_code == 200
     payload = result.json()
     assert payload["session"]["status"] == "COMPLETED"
@@ -96,12 +104,12 @@ def test_calibration_api_fixture_golden_path(
 
 
 def test_calibration_api_requires_confirmed_profile(
-    client: TestClient,
+    legacy_client: TestClient,
     override_current_user,
 ) -> None:
     user = AuthenticatedUser(id=uuid4())
     override_current_user(user)
-    configure(user, InMemoryProfileRepository())
-    response = client.post("/api/v1/calibration/sessions")
+    configure(user, InMemoryProfileRepository(), legacy_client)
+    response = legacy_client.post("/api/v1/calibration/sessions")
     assert response.status_code == 409
     assert "confirmed profile" in response.json()["detail"].lower()

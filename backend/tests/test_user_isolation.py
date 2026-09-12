@@ -24,7 +24,7 @@ class InMemoryUserRepository:
 
 
 def test_users_me_is_scoped_to_authenticated_user(
-    client: TestClient,
+    legacy_client: TestClient,
     override_current_user: Callable[[AuthenticatedUser], None],
     override_user_repository: Callable[[UserRepository], None],
 ) -> None:
@@ -45,7 +45,7 @@ def test_users_me_is_scoped_to_authenticated_user(
     override_current_user(AuthenticatedUser(id=first_user.id))
     override_user_repository(repository)
 
-    response = client.get("/api/v1/users/me")
+    response = legacy_client.get("/api/v1/users/me")
 
     assert response.status_code == 200
     assert response.json()["id"] == str(first_user.id)
@@ -54,7 +54,7 @@ def test_users_me_is_scoped_to_authenticated_user(
 
 
 def test_user_can_update_only_their_own_onboarding_preferences(
-    client: TestClient,
+    legacy_client: TestClient,
     override_current_user: Callable[[AuthenticatedUser], None],
     override_user_repository: Callable[[UserRepository], None],
 ) -> None:
@@ -64,7 +64,7 @@ def test_user_can_update_only_their_own_onboarding_preferences(
     override_current_user(AuthenticatedUser(id=first_user.id))
     override_user_repository(repository)
 
-    response = client.patch(
+    response = legacy_client.patch(
         "/api/v1/users/me",
         json={
             "interface_language": "zh-CN",

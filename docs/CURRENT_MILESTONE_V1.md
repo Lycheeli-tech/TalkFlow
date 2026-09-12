@@ -12,7 +12,7 @@
 | 阶段 | 状态 | 说明 |
 | --- | --- | --- |
 | 阶段 0 | COMPLETE | 全部阶段 0 文档已通过产品负责人审阅；安全 checkpoint 为 `course-core-stage-0-v2.1` |
-| 阶段 1 | 未开始 | 必须获得产品负责人明确授权后启动 |
+| 阶段 1 | COMPLETE | Legacy 默认 runtime 已停止挂载；安全入口、旧 URL 重定向及隔离测试已完成 |
 | 阶段 2 | 未开始 | 可为阶段 1 的安全重定向先建立路由壳，但不得绕过阶段发布门 |
 | 阶段 3 | 未开始 | 依赖阶段 2 的 App Shell 和 Catalog |
 | 阶段 4 | 未开始 | 依赖新的 Course Core 数据边界 |
@@ -45,6 +45,19 @@
 8. 加入“Course Core 不依赖 Legacy”架构测试。
 
 阶段 1 的重定向不得指向不存在的页面。开发时可以先完成阶段 2 路由壳；部署时阶段 1 和 2 必须共同通过发布门。
+
+### 阶段 1 完成记录
+
+- 状态：COMPLETE；等待产品负责人 review，不自动开始阶段 2。
+- 分支：`codex/course-core-stage-1`；checkpoint tag：`course-core-stage-1`。
+- 默认后端 runtime 仅挂载 `/api/v1/health`；Legacy users、profiles、calibration、daily、memory、practice、journey 和 entry router 仅在历史回归测试的显式 rollback app 中挂载。
+- `/` 使用独立的 Stage 1 Auth 安全入口；登录不查询 Profile、Calibration、Daily Session 或旧进度，也不 import Legacy UI/API client。
+- `/practice`、`/journey`、`/my-english` 均重定向到已存在的 `/`，不再挂载旧页面。
+- `architecture/legacy_freeze_v1.json` 以路径、分类和 SHA-256 标记冻结文件；架构测试校验冻结文件、禁止依赖、默认 router、零产品写入口和旧 URL 重定向。
+- 完整后端测试：94 passed；Ruff check/format：passed；前端 TypeScript、ESLint、production build：passed。
+- Production HTTP smoke：`/` 返回 200；三个旧页面均返回 307 且 Location 为 `/`。
+- 数据库 migration：无变更；未创建或修改 Course、About Me、Practice V2 schema。
+- 已知限制：Stage 1 安全入口有意不显示 P2 的 Courses、Practice、About Me 功能入口；Stage 1 没有新产品写路径，因此当前“不写旧进度”覆盖为默认 runtime 零产品写 endpoint 与静态依赖隔离，后续每个新写路径仍须按第 18.8 节加入前后快照测试。
 
 ## 阶段 2：新 App Shell、首页与 Catalog
 

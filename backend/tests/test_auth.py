@@ -9,8 +9,8 @@ from app.core.config import Settings
 from app.core.security import JWTVerificationError, SupabaseTokenVerifier
 
 
-def test_users_me_requires_bearer_token(client: TestClient) -> None:
-    response = client.get("/api/v1/users/me")
+def test_users_me_requires_bearer_token(legacy_client: TestClient) -> None:
+    response = legacy_client.get("/api/v1/users/me")
 
     assert response.status_code == 401
 

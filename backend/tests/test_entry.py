@@ -9,8 +9,8 @@ from app.repositories.profiles import InMemoryProfileRepository
 from app.schemas import AuthenticatedUser, CalibrationSession, ConfirmedProfile, UserState
 
 
-def test_entry_requires_authentication(client: TestClient) -> None:
-    response = client.get("/api/v1/entry")
+def test_entry_requires_authentication(legacy_client: TestClient) -> None:
+    response = legacy_client.get("/api/v1/entry")
     assert response.status_code == 401
 
 

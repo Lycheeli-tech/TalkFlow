@@ -9,7 +9,6 @@ from app.api.dependencies import (
     get_verification_service,
 )
 from app.api.v1.memory import list_due_retrieval, resolve_retrieval
-from app.main import app
 from app.repositories.memory import InMemoryMemoryRepository
 from app.repositories.retrieval import InMemoryRetrievalOpportunityRepository
 from app.schemas import AuthenticatedUser, Expression, RetrievalResult
@@ -37,7 +36,7 @@ def test_due_retrieval_api_is_registered() -> None:
 
 
 def test_due_opportunity_response_does_not_expose_hidden_expression(
-    client: TestClient, override_current_user
+    legacy_client: TestClient, override_current_user
 ) -> None:
     now, user_id, session_id = datetime.now(UTC), uuid4(), uuid4()
     target = Expression(
@@ -55,10 +54,11 @@ def test_due_opportunity_response_does_not_expose_hidden_expression(
     memory.expressions[target.id] = target
     opportunities = InMemoryRetrievalOpportunityRepository()
     override_current_user(AuthenticatedUser(id=user_id, email="learner@example.com"))
-    app.dependency_overrides[get_memory_repository] = lambda: memory
-    app.dependency_overrides[get_retrieval_opportunity_repository] = lambda: opportunities
+    application = legacy_client.app
+    application.dependency_overrides[get_memory_repository] = lambda: memory
+    application.dependency_overrides[get_retrieval_opportunity_repository] = lambda: opportunities
 
-    response = client.get(
+    response = legacy_client.get(
         "/api/v1/memory/retrieval/due",
         params={
             "session_id": str(session_id),
@@ -75,21 +75,23 @@ def test_due_opportunity_response_does_not_expose_hidden_expression(
 
 
 def test_resolve_api_accepts_only_attempt_identity_and_uses_authenticated_user(
-    client: TestClient, override_current_user
+    legacy_client: TestClient, override_current_user
 ) -> None:
     user_id, opportunity_id, attempt_id = uuid4(), uuid4(), uuid4()
     override_current_user(AuthenticatedUser(id=user_id, email="learner@example.com"))
     unit_of_work = StubUnitOfWork()
-    app.dependency_overrides[get_verification_service] = lambda: VerificationService(unit_of_work)
+    legacy_client.app.dependency_overrides[get_verification_service] = lambda: VerificationService(
+        unit_of_work
+    )
 
-    forged = client.post(
+    forged = legacy_client.post(
         f"/api/v1/memory/retrieval/{opportunity_id}/resolve",
         json={"attempt_id": str(attempt_id), "usage_correct": True},
     )
     assert forged.status_code == 422
     assert unit_of_work.calls == []
 
-    response = client.post(
+    response = legacy_client.post(
         f"/api/v1/memory/retrieval/{opportunity_id}/resolve",
         json={"attempt_id": str(attempt_id)},
     )

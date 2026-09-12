@@ -1,9 +1,5 @@
-"use client";
-
-import { PracticeHub } from "@/components/practice-hub";
-import { AppShell, useAccessToken } from "@/components/app-entry";
+import { redirect } from "next/navigation";
 
 export default function PracticePage() {
-  const token = useAccessToken();
-  return <AppShell><PracticeHub token={token} /></AppShell>;
+  redirect("/");
 }

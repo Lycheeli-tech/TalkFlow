@@ -3,8 +3,8 @@
 ## Last Updated
 
 - 2026-09-12
-- Branch: `codex/course-core-stage-0`
-- HEAD: Course Core Stage 0 v2.1 documentation checkpoint (tag `course-core-stage-0-v2.1`)
+- Branch: `codex/course-core-stage-1`
+- HEAD: Course Core Stage 1 closeout checkpoint (tag `course-core-stage-1`)
 
 ## Product
 
@@ -15,26 +15,25 @@ source-validated Memory to help users express truthful experience in clearer, mo
 ## Current Lifecycle
 
 The v1.1 Legacy Loop implementation and Phase 2 local acceptance are complete at `8cc986d`. Product
-architecture has moved to Build Spec v2.1. Course Core Stage 0 is complete; no Course Core runtime
-implementation has started.
+architecture has moved to Build Spec v2.1. Course Core Stage 1 is complete: the Legacy product is
+preserved for rollback but is no longer mounted by the default runtime.
 
 ## Current Work
 
 - Phase: Course Core
-- Stage: 0 — Specification and Safety Boundaries
+- Stage: 1 — Stop Legacy Runtime and Enforce the Freeze
 - Status: COMPLETE
-- Objective achieved: the approved Course Core Build Spec, superseding ADRs, Legacy Freeze Manifest, and
-  Legacy Code Freeze Rules are established before runtime changes.
-- Build Spec v2.1 replaces the former 50-item overall acceptance list with the product-approved 30
-  critical acceptance criteria; ADR-026 records the change.
-- The v2.1 documentation amendment and Course Core V1 milestone document are approved and included
-  in the `course-core-stage-0-v2.1` checkpoint.
+- Objective achieved: authenticated entry bypasses Onboarding, Calibration, and Today; Legacy API
+  routers and pages are not mounted by default; old page URLs redirect to the safe entry.
+- A machine-readable freeze inventory and architecture tests enforce frozen-file integrity, forbidden
+  Course Core dependencies, no default Legacy routes, and no Stage 1 product write endpoints.
+- Historical API regression coverage uses an explicit rollback-only test app and remains passing.
 
 ## Stable Baseline
 
-The final Legacy code baseline is tag `legacy-loop-final-baseline` at `8cc986d`. Earlier milestone
-tags and branches remain intact. Course Core Stage 0 is isolated on `codex/course-core-stage-0` and
-closed at tag `course-core-stage-0-v2.1`.
+The final Legacy code baseline is tag `legacy-loop-final-baseline` at `8cc986d`. Stage 0 is closed at
+tag `course-core-stage-0-v2.1`; Stage 1 is isolated on `codex/course-core-stage-1` and closed at tag
+`course-core-stage-1`.
 
 ## Legacy Implementation Preserved
 
@@ -47,29 +46,30 @@ closed at tag `course-core-stage-0-v2.1`.
 
 ## Course Core Not Yet Implemented
 
-- Stage 1 Legacy runtime shutdown is not started.
-- New App Shell, Course Catalog, Course Answer data, About Me/Memory, AI support, Chinese flow,
+- Stage 2 App Shell and Course Catalog are not started.
+- Course Answer data, About Me/Memory, AI support, Chinese flow,
   remaining Courses, and Practice V2 are not implemented.
-- The existing runtime still behaves as the Legacy product until Stage 1 and Stage 2 are implemented
-  and approved.
+- The Stage 1 entry is intentionally a safe authenticated transition page, not the Stage 2 homepage.
 
 ## Current Blockers
 
-No Stage 0 blocker. Build Spec Section 25 contains product decisions that must be resolved by their
+No Stage 1 blocker. Build Spec Section 25 contains product decisions that must be resolved by their
 specified implementation deadlines.
 
 ## Next Steps
 
-1. Do not begin Stage 1 without explicit instruction.
-2. Merge or push the approved Stage 0 checkpoint only when explicitly instructed.
+1. Review the Stage 1 checkpoint and runtime shutdown evidence.
+2. Do not begin Stage 2, merge, or push without explicit instruction.
 
-## Stage 0 Verification Snapshot
+## Stage 1 Verification Snapshot
 
-- Build Spec v2.1 is active; v2.0 and v1.1 are explicitly historical.
-- ADR-025 records the supersession boundary.
-- Legacy Manifest covers files, endpoints, tables, fields, prompts, tests, and migration seams.
-- Freeze Rules define prohibited changes, allowed exceptions, and Stage 1 automated enforcement.
-- No runtime code or migration changed.
+- Default backend runtime exposes only `/api/v1/health`; all Legacy product endpoints return 404.
+- Root entry supports sign-in/sign-up without Profile, Calibration, Daily Session, or Legacy API calls.
+- `/practice`, `/journey`, and `/my-english` return 307 redirects to `/` in the production server.
+- Frozen Legacy files match the approved SHA-256 inventory; no freeze exception was required.
+- Backend: 94 passed; Ruff format/check passed.
+- Frontend: TypeScript, ESLint, and production build passed.
+- No database migration or Legacy data changed.
 
 ## Legacy Verification Snapshot
 

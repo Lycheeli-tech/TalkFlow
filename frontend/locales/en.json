@@ -9,6 +9,25 @@
     "statusOnline": "FluentLoop API is online.",
     "statusOffline": "API is offline. Start the backend to connect this screen."
   },
+  "courseCoreStageOne": {
+    "brand": "FluentLoop",
+    "eyebrow": "Course Core · Safe transition",
+    "title": "Practice on your terms.",
+    "description": "Sign in without onboarding, voice calibration, or a daily plan. Course Core features will appear here only after their release gates pass.",
+    "signInTitle": "Sign in to FluentLoop",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signUp": "Create account",
+    "working": "Working…",
+    "confirmationSent": "Check your email to confirm the account, then sign in.",
+    "error": "Authentication failed.",
+    "signedInTitle": "You are signed in.",
+    "signedInCopy": "The Legacy learning loop is no longer active. Your old learning records remain preserved and unchanged while Course Core is enabled in stages.",
+    "status": "Course Core is at its safe transition checkpoint.",
+    "signOut": "Sign out",
+    "languageLabel": "Interface language"
+  },
   "navigation": { "label": "Primary navigation", "today": "Today", "practice": "Practice", "myEnglish": "My English", "journey": "Journey" },
   "calibration": {
     "readyTitle": "Your profile is ready.", "readyCopy": "Next, answer three short questions so FluentLoop can establish a provisional speaking baseline.", "begin": "Begin voice calibration", "working": "Working…", "question": "Question", "listen": "Listen", "record": "Start recording", "stop": "Stop and submit", "processing": "Saving your recording, then transcribing and analyzing it…", "transcript": "Transcript", "readOnly": "Calibration transcripts are read-only so the baseline reflects your original spoken answer.", "retry": "Retry processing", "next": "Next question", "results": "View my baseline", "noCorrection": "Answer naturally. FluentLoop will not interrupt or correct you mid-answer.", "provisional": "Provisional baseline", "assessmentTitle": "Your starting speaking profile", "fluency": "Fluency", "naturalness": "Naturalness", "grammar": "Grammar", "retrieval": "Retrieval", "structure": "Structure", "primaryFocus": "Primary focus", "evolves": "This profile is an initial observation, not a permanent score. It will evolve with evidence from later training.", "ttsFallback": "Audio is unavailable; read the visible question and continue.", "micError": "Microphone access is required to record an answer.", "error": "Something went wrong"
