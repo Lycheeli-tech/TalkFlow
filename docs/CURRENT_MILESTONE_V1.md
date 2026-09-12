@@ -15,8 +15,8 @@
 | 阶段 1 | COMPLETE | 已由产品负责人确认并合并、推送；checkpoint 为 `course-core-stage-1` |
 | 阶段 2 | COMPLETE | 新 App Shell、三入口首页、只读 Catalog 和 30 / 59 确定性校验已完成 |
 | 阶段 3 | COMPLETE | Course 11 英文 Answer 最小闭环已确认、合并并推送；checkpoint 为 `course-core-stage-3` |
-| 阶段 4 | COMPLETE | About Me、来源验证 AI Memory、Answer/Resume 删除与可重试对象清理已完成；等待产品负责人 review |
-| 阶段 5 | 未开始 | 不建设通用 AI Coach Orchestrator |
+| 阶段 4 | COMPLETE | 已由产品负责人确认并合并、推送；checkpoint 为 `course-core-stage-4` |
+| 阶段 5 | IN PROGRESS | 功能与验证已完成；等待产品负责人确认 TBD-003 / TBD-004 后方可关闭 |
 | 阶段 6 | 未开始 | 复用阶段 3 的 Answer、Audio 和 Transcript 基础设施 |
 | 阶段 7 | 未开始 | 所有 Course 必须复用同一通用引擎 |
 | 阶段 8 | 未开始 | 依赖 Catalog、录音、STT 和 Feedback 基础设施 |
@@ -155,6 +155,21 @@
 8. 验证生成能力不能改变页面、Answer 或 Legacy 状态。
 
 不建设通用 AI Coach Orchestrator。
+
+### 阶段 5 当前记录
+
+- 状态：IN PROGRESS；功能实现与技术验证完成，等待产品负责人确认 AI 参考回答入口位置（TBD-003）和 Feedback 面板排列（TBD-004）。
+- 分支：`codex/course-core-stage-5`；尚未创建完成 tag、merge 或 push。
+- Course Context Builder 只按 authenticated user 装配固定 Catalog、当前 Question / 回答重点、少量 About Me / Resume / Memory / 同题 Answer；非当前 Answer 证据总计最多 10,000 字符，Feedback 当前 Transcript 最多 5,000 字符。
+- 已实现独立的提示、表达素材、AI 参考回答 API，以及按 Answer 单行幂等的 Feedback / retry；四份行为 Prompt 均版本化，未建设通用 AI Coach Orchestrator。
+- Feedback 只绑定当前 `SAVED` Answer，提供 1–3 条“精确用户原话 + 修改建议”，禁止评分、Mastery、完成度和来源外数字；失败只将 Feedback 标记为 `FAILED`，Answer 与 Transcript 保持 `SAVED`。
+- 真实 Bailian smoke 暴露并修复了无资料参考回答编造项目、职责和数字的问题：无可信上下文时现在使用代码控制的显式占位符模板；有上下文时 grounded 段必须附带可精确匹配的来源摘录，来源外数字被拒绝。
+- 前端候选布局：提示、表达素材、参考回答、Feedback 和 History 使用同一个互斥右侧辅助面板；桌面为 Questions / Answer / Assistant 三栏，375px 为右侧 fixed 抽屉。面板状态独立于 Recorder，切换面板不停止录音。
+- 后端完整测试：141 passed；Ruff format/check passed。P3/P4/P5 真实 PostgreSQL 集成：7 passed；最终 P5 单项复跑：1 passed。真实 Bailian 回归：passed。
+- 前端 TypeScript、ESLint、production build：passed。认证浏览器：真实提示、安全参考模板、单 Answer Feedback 1–3 条建议、1280px 三栏、375px 抽屉、无横向溢出和 0 console errors 均通过。
+- 数据库 migration：无变更；复用阶段 3 已存在的 `course_feedback` 一对一表、RLS 与 ownership 约束。一次性账号、synthetic Answer / Feedback 和临时浏览器 profile 已清理。
+- Legacy 隔离：P5 真实数据库测试确认 `current_day`、`current_phase`、XP、streak 及 `sessions`、`attempts`、`expressions`、`expression_attempts`、`retrieval_opportunities` 前后完全不变。
+- 尚未实现：中文 Answer、其余 29 个 Course 的 Answer、Practice V2、Course 完成/解锁/自动下一题；这些仍属于阶段 6–8 或明确禁止范围。
 
 ## 阶段 6：中文 Answer 闭环
 

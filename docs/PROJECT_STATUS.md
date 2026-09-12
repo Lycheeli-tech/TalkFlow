@@ -2,9 +2,9 @@
 
 ## Last Updated
 
-- 2026-09-12
-- Branch: `codex/course-core-stage-4`
-- HEAD: Course Core Stage 4 closeout checkpoint (tag `course-core-stage-4`)
+- 2026-09-13
+- Branch: `codex/course-core-stage-5`
+- HEAD: Stage 5 implementation checkpoint candidate; completion tag pending product UI approval
 
 ## Product
 
@@ -15,28 +15,28 @@ source-validated Memory to help users express truthful experience in clearer, mo
 ## Current Lifecycle
 
 The v1.1 Legacy Loop implementation and Phase 2 local acceptance are complete at `8cc986d`. Product
-architecture has moved to Build Spec v2.1. Course Core Stages 1–4 are complete: Legacy remains
+architecture has moved to Build Spec v2.1. Course Core Stages 1–4 are complete and merged: Legacy remains
 preserved for rollback but is not mounted by default; Course 11 has the isolated English Answer loop,
 and About Me plus source-validated AI Memory now use dedicated Course Core boundaries.
 
 ## Current Work
 
 - Phase: Course Core
-- Stage: 4 — About Me and AI Memory
-- Status: COMPLETE
-- Objective achieved: optional About Me supports multiple roles, private Resumes, supplemental facts,
-  visible/deletable source-validated Memory, and deterministic CREATE/UPDATE/MERGE/IGNORE transactions.
-- Answer and Resume deletion remove related sources and use durable retry queues for private-object cleanup.
-- Practice V2, Chinese Answer, AI Course help, and Feedback generation remain disabled.
-- Real PostgreSQL assertions prove ownership/RLS, source invariants, deletion semantics, and zero Legacy mutation.
+- Stage: 5 — On-demand AI support and Course Feedback
+- Status: IN PROGRESS — implementation and verification complete; TBD-003/TBD-004 approval pending.
+- Hints, expression materials, safe reference answers, and Answer-scoped Feedback use a bounded,
+  ownership-filtered Course Context Builder and versioned prompts.
+- Feedback failure remains isolated from saved Answers; deterministic validation checks exact quotes,
+  source-backed reference segments, and unsupported numbers.
+- Chinese Answer, remaining-Course answering, and Practice V2 remain disabled.
 
 ## Stable Baseline
 
 The final Legacy code baseline is tag `legacy-loop-final-baseline` at `8cc986d`. Stage 0 is closed at
 tag `course-core-stage-0-v2.1`; Stage 1 is merged to `main` and closed at tag
 `course-core-stage-1`; Stage 2 is merged to `main` and closed at tag `course-core-stage-2`; Stage 3
-is merged to `main` and closed at tag `course-core-stage-3`; Stage 4 is isolated on
-`codex/course-core-stage-4` and closed at tag `course-core-stage-4`.
+is merged to `main` and closed at tag `course-core-stage-3`; Stage 4 is merged to `main` and closed
+at tag `course-core-stage-4`. Stage 5 is isolated on `codex/course-core-stage-5`.
 
 ## Legacy Implementation Preserved
 
@@ -49,18 +49,17 @@ is merged to `main` and closed at tag `course-core-stage-3`; Stage 4 is isolated
 
 ## Course Core Not Yet Implemented
 
-- AI Course help and Feedback generation, Chinese flow, remaining-Course answering, and Practice V2
-  are not implemented.
+- Chinese flow, remaining-Course answering, and Practice V2 are not implemented.
 
 ## Current Blockers
 
-No Stage 4 blocker. Failed Answer/Draft audio TTL is three days and is recorded in ADR-028. Remaining
-Build Spec Section 25 decisions retain their specified implementation deadlines.
+TBD-003 and TBD-004 require explicit product-owner confirmation before Stage 5 UI can be final and
+the milestone can close. Failed Answer/Draft audio TTL remains three days under ADR-028.
 
 ## Next Steps
 
-1. Review the Stage 4 checkpoint and About Me/Memory evidence.
-2. Do not begin Stage 5, merge, or push Stage 4 without explicit instruction.
+1. Product owner confirms or changes the proposed Stage 5 reference-answer entry and Feedback layout.
+2. After approval, record the stable UI decision, create the Stage 5 checkpoint, and stop for review.
 
 ## Stage 4 Verification Snapshot
 

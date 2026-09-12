@@ -3,10 +3,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from app.api.core_dependencies import get_course_current_user
-from app.api.course_dependencies import get_course_answer_service
+from app.api.course_dependencies import get_course_answer_service, get_course_support_service
 from app.core.auth import AuthenticatedUser
 from app.course.answer_schemas import CourseAnswerView
 from app.course.answer_service import CourseAnswerService
+from app.course.support_service import CourseSupportService
 
 router = APIRouter()
 
@@ -34,6 +35,22 @@ async def retry_answer(
     try:
         return CourseAnswerView.from_aggregate(
             await service.retry(user_id=current_user.id, answer_id=answer_id)
+        )
+    except LookupError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
+
+
+@router.post("/{answer_id}/feedback/retry", response_model=CourseAnswerView)
+async def retry_feedback(
+    answer_id: UUID,
+    current_user: AuthenticatedUser = Depends(get_course_current_user),
+    service: CourseSupportService = Depends(get_course_support_service),
+) -> CourseAnswerView:
+    try:
+        return CourseAnswerView.from_aggregate(
+            await service.generate_for_answer(user_id=current_user.id, answer_id=answer_id)
         )
     except LookupError as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error

@@ -34,6 +34,7 @@ class CourseAnswerRepository(Protocol):
     async def list_history(
         self, user_id: UUID, question_id: str
     ) -> list[CourseAnswerAggregate]: ...
+    async def save_feedback(self, feedback: CourseFeedback) -> CourseAnswerAggregate: ...
     async def list_pending_audio_cleanup(
         self, *, now: datetime, limit: int
     ) -> list[PendingAudioCleanup]: ...
@@ -167,6 +168,20 @@ class SQLCourseAnswerRepository:
             )
         ).all()
         return [await self._aggregate(row) for row in rows]
+
+    async def save_feedback(self, feedback: CourseFeedback) -> CourseAnswerAggregate:
+        answer = await self._owned_row(feedback.user_id, feedback.answer_id)
+        row = await self._session.get(CourseFeedbackRow, feedback.answer_id)
+        values = feedback.model_dump(exclude={"answer_id", "user_id", "created_at"})
+        if row is None:
+            row = CourseFeedbackRow(**feedback.model_dump())
+            self._session.add(row)
+        else:
+            for key, value in values.items():
+                setattr(row, key, value)
+        await self._session.commit()
+        await self._session.refresh(answer)
+        return await self._aggregate(answer)
 
     async def list_pending_audio_cleanup(
         self, *, now: datetime, limit: int
@@ -435,6 +450,13 @@ class InMemoryCourseAnswerRepository:
             reverse=True,
         )
         return [self._aggregate(answer) for answer in answers]
+
+    async def save_feedback(self, feedback: CourseFeedback) -> CourseAnswerAggregate:
+        aggregate = await self.get(feedback.user_id, feedback.answer_id)
+        if aggregate is None:
+            raise LookupError("Course Answer was not found.")
+        self.feedback[feedback.answer_id] = feedback
+        return self._aggregate(aggregate.answer)
 
     async def list_pending_audio_cleanup(
         self, *, now: datetime, limit: int

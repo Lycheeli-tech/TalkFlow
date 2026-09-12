@@ -7,13 +7,20 @@ import { useInterfaceLocale } from "@/components/interface-locale-provider";
 import { getStoredAccessToken } from "@/lib/auth-session";
 import {
   CourseAnswer,
+  CourseExpressionMaterials,
+  CourseHints,
+  CourseReferenceAnswer,
   deleteCourseAnswer,
   CourseCatalogItem,
   CourseQuestion,
+  generateCourseExpressionMaterials,
+  generateCourseHints,
+  generateCourseReferenceAnswer,
   getCourseAnswerAudio,
   getCourseHistory,
   getQuestionAudio,
   retryCourseAnswer,
+  retryCourseFeedback,
   submitCourseAnswer,
 } from "@/lib/course-api";
 import { getMessages } from "@/lib/i18n";
@@ -34,6 +41,8 @@ type PendingSubmission = {
   idempotencyKey: string;
 };
 
+type AuxiliaryPanel = "NONE" | "HINTS" | "EXPRESSION_MATERIALS" | "REFERENCE_ANSWER" | "FEEDBACK" | "HISTORY";
+
 function formatDuration(durationMs: number | null): string {
   if (durationMs === null) return "—";
   const seconds = Math.max(0, Math.round(durationMs / 1000));
@@ -50,8 +59,13 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
   const [question, setQuestion] = useState(questions[0]);
   const [state, setState] = useState<WorkspaceState>("PREPARING");
   const [history, setHistory] = useState<Record<string, CourseAnswer[]>>({});
-  const [historyOpen, setHistoryOpen] = useState(false);
+  const [auxiliaryPanel, setAuxiliaryPanel] = useState<AuxiliaryPanel>("NONE");
   const [questionsOpen, setQuestionsOpen] = useState(false);
+  const [hints, setHints] = useState<CourseHints | null>(null);
+  const [materials, setMaterials] = useState<CourseExpressionMaterials | null>(null);
+  const [referenceAnswer, setReferenceAnswer] = useState<CourseReferenceAnswer | null>(null);
+  const [supportLoading, setSupportLoading] = useState(false);
+  const [supportError, setSupportError] = useState("");
   const [answer, setAnswer] = useState<CourseAnswer | null>(null);
   const [error, setError] = useState("");
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -70,6 +84,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
   const stopAudio = useCallback(() => {
     audioRef.current?.pause();
     audioRef.current = null;
+    window.speechSynthesis?.cancel();
     if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
     audioUrlRef.current = null;
   }, []);
@@ -272,6 +287,11 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
     setAnswer(null);
     setError("");
     setState("PREPARING");
+    setAuxiliaryPanel("NONE");
+    setHints(null);
+    setMaterials(null);
+    setReferenceAnswer(null);
+    setSupportError("");
     setQuestionsOpen(false);
   }
 
@@ -295,6 +315,60 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
     }
   }
 
+  async function openSupport(panel: Exclude<AuxiliaryPanel, "NONE" | "FEEDBACK" | "HISTORY">) {
+    setAuxiliaryPanel(panel);
+    setSupportError("");
+    const token = getStoredAccessToken();
+    if (
+      (panel === "HINTS" && hints) ||
+      (panel === "EXPRESSION_MATERIALS" && materials) ||
+      (panel === "REFERENCE_ANSWER" && referenceAnswer)
+    ) return;
+    setSupportLoading(true);
+    try {
+      if (panel === "HINTS") setHints(await generateCourseHints(token, course.id, question.id));
+      if (panel === "EXPRESSION_MATERIALS") {
+        setMaterials(await generateCourseExpressionMaterials(token, course.id, question.id));
+      }
+      if (panel === "REFERENCE_ANSWER") {
+        setReferenceAnswer(await generateCourseReferenceAnswer(token, course.id, question.id));
+      }
+    } catch {
+      setSupportError(copy.supportError);
+    } finally {
+      setSupportLoading(false);
+    }
+  }
+
+  function openFeedback(item: CourseAnswer) {
+    setAnswer(item);
+    setAuxiliaryPanel("FEEDBACK");
+    setSupportError("");
+  }
+
+  async function retryFeedback() {
+    if (!answer) return;
+    setSupportLoading(true);
+    setSupportError("");
+    try {
+      const updated = await retryCourseFeedback(getStoredAccessToken(), answer.id);
+      setAnswer(updated);
+      await loadHistory(question.id);
+    } catch {
+      setSupportError(copy.feedbackError);
+    } finally {
+      setSupportLoading(false);
+    }
+  }
+
+  function playReferenceAnswer() {
+    if (!referenceAnswer || recording) return;
+    stopAudio();
+    const utterance = new SpeechSynthesisUtterance(referenceAnswer.answer);
+    utterance.lang = "en-US";
+    window.speechSynthesis.speak(utterance);
+  }
+
   return (
     <CourseCoreAppShell navigationBlocked={recording}>
       <div className={styles.workspaceToolbar}>
@@ -310,7 +384,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
         <button type="button" onClick={() => setQuestionsOpen(true)}>
           {copy.openQuestions}
         </button>
-        <button type="button" onClick={() => setHistoryOpen(true)}>
+        <button type="button" onClick={() => setAuxiliaryPanel("HISTORY")}>
           {copy.history} · {selectedHistory.length}
         </button>
       </div>
@@ -347,6 +421,18 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
             {question.kind === "CORE" ? copy.coreQuestion : copy.followUpQuestion}
           </p>
           <h2 className={styles.activeQuestion}>{question.text}</h2>
+
+          <div className={styles.supportActions} aria-label={copy.aiSupport}>
+            <button type="button" onClick={() => void openSupport("HINTS")}>
+              {copy.hints}
+            </button>
+            <button type="button" onClick={() => void openSupport("EXPRESSION_MATERIALS")}>
+              {copy.expressionMaterials}
+            </button>
+            <button type="button" onClick={() => void openSupport("REFERENCE_ANSWER")}>
+              {copy.referenceAnswer}
+            </button>
+          </div>
 
           {state === "PREPARING" && (
             <div className={styles.answerActions}>
@@ -421,10 +507,13 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
                   <p>{answer.transcript.transcript}</p>
                 </section>
               )}
-              <section className={styles.feedbackNotice}>
-                <strong>{copy.feedback}</strong>
-                <p>{copy.feedbackStage5}</p>
-              </section>
+              <button
+                className={styles.feedbackButton}
+                type="button"
+                onClick={() => openFeedback(answer)}
+              >
+                {answer.feedback?.status === "READY" ? copy.viewFeedback : copy.feedback}
+              </button>
               <div className={styles.answerActions}>
                 <button className={styles.secondaryButton} type="button" onClick={resetAnswer}>
                   {copy.returnQuestion}
@@ -442,55 +531,103 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
             </p>
           )}
         </article>
-      </div>
 
-      {historyOpen && (
-        <div className={styles.drawerBackdrop} onClick={() => setHistoryOpen(false)}>
-          <aside
-            className={styles.historyDrawer}
-            aria-label={copy.history}
-            onClick={(event) => event.stopPropagation()}
-          >
+        {auxiliaryPanel !== "NONE" && (
+          <aside className={styles.auxiliaryPanel} aria-label={copy.aiSupport}>
             <div className={styles.drawerHeading}>
-              <h2>{copy.history}</h2>
-              <button type="button" onClick={() => setHistoryOpen(false)}>
+              <h2>
+                {auxiliaryPanel === "HINTS" && copy.hints}
+                {auxiliaryPanel === "EXPRESSION_MATERIALS" && copy.expressionMaterials}
+                {auxiliaryPanel === "REFERENCE_ANSWER" && copy.referenceAnswer}
+                {auxiliaryPanel === "FEEDBACK" && copy.feedback}
+                {auxiliaryPanel === "HISTORY" && copy.history}
+              </h2>
+              <button type="button" onClick={() => setAuxiliaryPanel("NONE")}>
                 {copy.close}
               </button>
             </div>
-            {selectedHistory.length === 0 && <p>{copy.noHistory}</p>}
-            {selectedHistory.map((item) => (
-              <article className={styles.historyItem} key={item.id}>
-                <time>{item.saved_at ? new Date(item.saved_at).toLocaleString(locale) : ""}</time>
-                <p>{item.transcript?.transcript}</p>
-                <small>
-                  {copy.duration}: {formatDuration(item.response_duration_ms)}
-                </small>
-                {item.audio_available ? (
-                  <button
-                    disabled={recording}
-                    type="button"
-                    onClick={() =>
-                      void playBlob(() => getCourseAnswerAudio(getStoredAccessToken(), item.id))
-                    }
-                  >
-                    {copy.playAnswer}
-                  </button>
-                ) : (
-                  <span>{copy.audioExpired}</span>
-                )}
-                <button
-                  className={styles.dangerButton}
-                  disabled={recording}
-                  type="button"
-                  onClick={() => void removeAnswer(item.id)}
-                >
-                  {copy.deleteAnswer}
+
+            {supportLoading && <p className={styles.processing}>{copy.generating}</p>}
+            {supportError && <p className={styles.error}>{supportError}</p>}
+
+            {auxiliaryPanel === "HINTS" && hints && !supportLoading && (
+              <div className={styles.supportContent}>
+                <section>
+                  <strong>{copy.answerFocus}</strong>
+                  <p>{hints.static_answer_focus}</p>
+                </section>
+                <section><strong>{copy.keywords}</strong><ul>{hints.keywords.map((item) => <li key={item}>{item}</li>)}</ul></section>
+                <section><strong>{copy.phrases}</strong><ul>{hints.phrases.map((item) => <li key={item}>{item}</li>)}</ul></section>
+                <section><strong>{copy.sentenceFrames}</strong><ul>{hints.sentence_frames.map((item) => <li key={item}>{item}</li>)}</ul></section>
+                {hints.personalization_note && <small>{hints.personalization_note}</small>}
+              </div>
+            )}
+
+            {auxiliaryPanel === "EXPRESSION_MATERIALS" && materials && !supportLoading && (
+              <div className={styles.supportContent}>
+                {materials.materials.map((item, index) => (
+                  <section key={`${item.kind}-${index}`}>
+                    <small>{copy.materialKinds[item.kind]}</small>
+                    <p>{item.text}</p>
+                  </section>
+                ))}
+                {materials.personalization_note && <small>{materials.personalization_note}</small>}
+              </div>
+            )}
+
+            {auxiliaryPanel === "REFERENCE_ANSWER" && referenceAnswer && !supportLoading && (
+              <div className={styles.supportContent}>
+                <p>{referenceAnswer.answer}</p>
+                <button disabled={recording} type="button" onClick={playReferenceAnswer}>
+                  {copy.playReference}
                 </button>
-              </article>
-            ))}
+                {referenceAnswer.personalization_note && <small>{referenceAnswer.personalization_note}</small>}
+              </div>
+            )}
+
+            {auxiliaryPanel === "FEEDBACK" && answer && !supportLoading && (
+              <div className={styles.supportContent}>
+                {answer.feedback?.status === "READY" ? (
+                  <>
+                    <p className={styles.feedbackSummary}>{answer.feedback.summary}</p>
+                    {(answer.feedback.priority_changes ?? []).map((change, index) => (
+                      <section key={index}>
+                        <strong>{copy.originalQuote}</strong>
+                        <blockquote>{String(change.original_quote ?? "")}</blockquote>
+                        <strong>{copy.suggestion}</strong>
+                        <p>{String(change.suggestion ?? "")}</p>
+                      </section>
+                    ))}
+                  </>
+                ) : (
+                  <div>
+                    <p>{answer.feedback?.status === "PENDING" ? copy.feedbackPending : copy.feedbackFailed}</p>
+                    <button type="button" onClick={() => void retryFeedback()}>{copy.retryFeedback}</button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {auxiliaryPanel === "HISTORY" && (
+              <div>
+                {selectedHistory.length === 0 && <p>{copy.noHistory}</p>}
+                {selectedHistory.map((item) => (
+                  <article className={styles.historyItem} key={item.id}>
+                    <time>{item.saved_at ? new Date(item.saved_at).toLocaleString(locale) : ""}</time>
+                    <p>{item.transcript?.transcript}</p>
+                    <small>{copy.duration}: {formatDuration(item.response_duration_ms)}</small>
+                    {item.audio_available ? (
+                      <button disabled={recording} type="button" onClick={() => void playBlob(() => getCourseAnswerAudio(getStoredAccessToken(), item.id))}>{copy.playAnswer}</button>
+                    ) : <span>{copy.audioExpired}</span>}
+                    <button type="button" onClick={() => openFeedback(item)}>{copy.viewFeedback}</button>
+                    <button className={styles.dangerButton} disabled={recording} type="button" onClick={() => void removeAnswer(item.id)}>{copy.deleteAnswer}</button>
+                  </article>
+                ))}
+              </div>
+            )}
           </aside>
-        </div>
-      )}
+        )}
+      </div>
     </CourseCoreAppShell>
   );
 }

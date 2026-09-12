@@ -61,6 +61,37 @@ export type CourseHistory = {
   answers: CourseAnswer[];
 };
 
+export type CourseHints = {
+  static_answer_focus: string;
+  keywords: string[];
+  phrases: string[];
+  sentence_frames: string[];
+  personalization_note: string | null;
+  prompt_version: string;
+  provider_name: string;
+  model_name: string | null;
+};
+
+export type CourseExpressionMaterials = {
+  materials: {
+    kind: "PHRASE" | "SENTENCE_FRAME" | "NATURAL_EXPRESSION" | "FACT_BASED_SENTENCE";
+    text: string;
+    source_excerpt: string | null;
+  }[];
+  personalization_note: string | null;
+  prompt_version: string;
+  provider_name: string;
+  model_name: string | null;
+};
+
+export type CourseReferenceAnswer = {
+  answer: string;
+  personalization_note: string | null;
+  prompt_version: string;
+  provider_name: string;
+  model_name: string | null;
+};
+
 async function catalogFetch<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`);
   if (!response.ok) {
@@ -122,10 +153,55 @@ export function submitCourseAnswer(
   );
 }
 
+function postQuestionSupport<T>(
+  token: string,
+  courseId: string,
+  questionId: string,
+  operation: "hints" | "expression-materials" | "reference-answer",
+): Promise<T> {
+  return authenticatedFetch<T>(
+    token,
+    `/api/v1/courses/${encodeURIComponent(courseId)}/questions/${encodeURIComponent(questionId)}/${operation}`,
+    { method: "POST" },
+  );
+}
+
+export function generateCourseHints(
+  token: string,
+  courseId: string,
+  questionId: string,
+): Promise<CourseHints> {
+  return postQuestionSupport(token, courseId, questionId, "hints");
+}
+
+export function generateCourseExpressionMaterials(
+  token: string,
+  courseId: string,
+  questionId: string,
+): Promise<CourseExpressionMaterials> {
+  return postQuestionSupport(token, courseId, questionId, "expression-materials");
+}
+
+export function generateCourseReferenceAnswer(
+  token: string,
+  courseId: string,
+  questionId: string,
+): Promise<CourseReferenceAnswer> {
+  return postQuestionSupport(token, courseId, questionId, "reference-answer");
+}
+
 export function retryCourseAnswer(token: string, answerId: string): Promise<CourseAnswer> {
   return authenticatedFetch<CourseAnswer>(
     token,
     `/api/v1/course-answers/${encodeURIComponent(answerId)}/retry`,
+    { method: "POST" },
+  );
+}
+
+export function retryCourseFeedback(token: string, answerId: string): Promise<CourseAnswer> {
+  return authenticatedFetch<CourseAnswer>(
+    token,
+    `/api/v1/course-answers/${encodeURIComponent(answerId)}/feedback/retry`,
     { method: "POST" },
   );
 }

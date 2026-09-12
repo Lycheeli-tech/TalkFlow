@@ -3,13 +3,19 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile, status
 
 from app.api.core_dependencies import get_course_current_user
-from app.api.course_dependencies import get_course_answer_service
+from app.api.course_dependencies import get_course_answer_service, get_course_support_service
 from app.core.auth import AuthenticatedUser
 from app.core.config import get_settings
 from app.course.answer_schemas import CourseAnswerView, CourseHistoryResponse
 from app.course.answer_service import CourseAnswerService
 from app.course.catalog_v1 import COURSE_CATALOG_V1, COURSES_BY_ID
 from app.course.schemas import CourseCatalogItem, CourseCatalogResponse
+from app.course.support_entities import (
+    CourseExpressionMaterials,
+    CourseHints,
+    CourseReferenceAnswer,
+)
+from app.course.support_service import CourseSupportService
 
 router = APIRouter()
 
@@ -27,6 +33,66 @@ def get_course(course_id: str) -> CourseCatalogItem:
     if course is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Course not found.")
     return CourseCatalogItem.from_definition(course)
+
+
+async def _support_call(operation):
+    try:
+        return await operation
+    except LookupError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    except PermissionError as error:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
+    except Exception as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="AI Course support is temporarily unavailable.",
+        ) from error
+
+
+@router.post("/{course_id}/questions/{question_id}/hints", response_model=CourseHints)
+async def generate_hints(
+    course_id: str,
+    question_id: str,
+    current_user: AuthenticatedUser = Depends(get_course_current_user),
+    service: CourseSupportService = Depends(get_course_support_service),
+) -> CourseHints:
+    return await _support_call(
+        service.hints(user_id=current_user.id, course_id=course_id, question_id=question_id)
+    )
+
+
+@router.post(
+    "/{course_id}/questions/{question_id}/expression-materials",
+    response_model=CourseExpressionMaterials,
+)
+async def generate_expression_materials(
+    course_id: str,
+    question_id: str,
+    current_user: AuthenticatedUser = Depends(get_course_current_user),
+    service: CourseSupportService = Depends(get_course_support_service),
+) -> CourseExpressionMaterials:
+    return await _support_call(
+        service.expression_materials(
+            user_id=current_user.id, course_id=course_id, question_id=question_id
+        )
+    )
+
+
+@router.post(
+    "/{course_id}/questions/{question_id}/reference-answer",
+    response_model=CourseReferenceAnswer,
+)
+async def generate_reference_answer(
+    course_id: str,
+    question_id: str,
+    current_user: AuthenticatedUser = Depends(get_course_current_user),
+    service: CourseSupportService = Depends(get_course_support_service),
+) -> CourseReferenceAnswer:
+    return await _support_call(
+        service.reference_answer(
+            user_id=current_user.id, course_id=course_id, question_id=question_id
+        )
+    )
 
 
 @router.get("/{course_id}/questions/{question_id}/history", response_model=CourseHistoryResponse)

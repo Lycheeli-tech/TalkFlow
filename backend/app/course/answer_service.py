@@ -16,6 +16,12 @@ class CourseAnswerMemoryCapture:
     ) -> None: ...
 
 
+class CourseAnswerFeedbackGenerator:
+    async def generate_for_answer(
+        self, *, user_id: UUID, answer_id: UUID
+    ) -> CourseAnswerAggregate: ...
+
+
 FAILED_AUDIO_TTL = timedelta(days=3)
 
 
@@ -28,12 +34,14 @@ class CourseAnswerService:
         tts: TextToSpeechService,
         audio: CourseAudioStorage,
         memory_capture: CourseAnswerMemoryCapture | None = None,
+        feedback_generator: CourseAnswerFeedbackGenerator | None = None,
     ) -> None:
         self._repository = repository
         self._stt = stt
         self._tts = tts
         self._audio = audio
         self._memory_capture = memory_capture
+        self._feedback_generator = feedback_generator
 
     async def synthesize_question(
         self, *, course_id: str, question_id: str, voice: str = "default"
@@ -191,6 +199,14 @@ class CourseAnswerService:
                 pass
         for pending in pending_cleanup:
             await self._cleanup_one(pending.user_id, pending.answer_id, pending.audio_path)
+        if self._feedback_generator is not None:
+            try:
+                aggregate = await self._feedback_generator.generate_for_answer(
+                    user_id=answer.user_id, answer_id=answer.id
+                )
+            except Exception:
+                # Feedback is optional and can never roll back a safely saved Answer.
+                pass
         return aggregate
 
     async def _cleanup_one(self, user_id: UUID, answer_id: UUID, path: str) -> bool:

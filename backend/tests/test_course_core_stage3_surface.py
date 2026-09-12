@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
@@ -27,8 +28,9 @@ def test_course_workspace_has_required_p3_states_and_no_later_stage_mechanisms()
         "RECOVERABLE_FAILURE",
     ):
         assert state in workspace
-    for mechanism in ("automaticNext", "current_day", "current_phase", "mastery", "streak", "XP"):
+    for mechanism in ("automaticNext", "current_day", "current_phase", "mastery", "streak"):
         assert mechanism not in workspace
+    assert re.search(r"\bXP\b", workspace) is None
 
 
 def test_recording_guard_audio_exclusion_and_final_transcript_are_explicit() -> None:
@@ -41,10 +43,10 @@ def test_recording_guard_audio_exclusion_and_final_transcript_are_explicit() -> 
     assert "answer.transcript.transcript" in workspace
 
 
-def test_stage_three_does_not_enable_chinese_feedback_or_other_courses() -> None:
+def test_stage_five_keeps_chinese_and_other_course_rollout_disabled() -> None:
     workspace = source("frontend/components/course-core/course-workspace.tsx")
     flags = source("frontend/lib/course-core-flags.ts")
     assert "answerInChinese" in workspace
     assert "disabled" in workspace
-    assert "feedbackStage5" in workspace
+    assert "retryCourseFeedback" in workspace
     assert "practice: false" in flags
