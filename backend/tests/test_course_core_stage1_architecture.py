@@ -55,7 +55,11 @@ def test_default_runtime_mounts_no_legacy_product_routes(client: TestClient) -> 
         if path.startswith("/api/v1")
     }
 
-    assert api_paths == {"/api/v1/health": frozenset({"get"})}
+    assert api_paths == {
+        "/api/v1/health": frozenset({"get"}),
+        "/api/v1/courses": frozenset({"get"}),
+        "/api/v1/courses/{course_id}": frozenset({"get"}),
+    }
     for prefix in legacy_prefixes:
         assert client.get(prefix).status_code == 404
 
@@ -127,22 +131,27 @@ def test_new_frontend_modules_cannot_import_legacy_components_or_client() -> Non
     )
 
 
-def test_stage_one_entry_bypasses_legacy_gates_and_old_pages_redirect() -> None:
+def test_course_core_entry_bypasses_legacy_gates_and_old_pages_redirect() -> None:
     home = (REPOSITORY_ROOT / "frontend/app/page.tsx").read_text(encoding="utf-8")
+    course_core_home = (
+        REPOSITORY_ROOT / "frontend/components/course-core/course-core-home.tsx"
+    ).read_text(encoding="utf-8")
     entry = (REPOSITORY_ROOT / "frontend/components/course-core/stage-one-entry.tsx").read_text(
         encoding="utf-8"
     )
 
-    assert "StageOneEntry" in home
+    assert "CourseCoreHome" in home
+    for entry_name in ("courses", "practice", "about-me"):
+        assert entry_name in course_core_home
     assert "getApplicationEntry" not in entry
     assert "@/lib/api" not in entry
     assert "fetch(" not in entry
     for legacy_name in ("OnboardingFlow", "VoiceCalibration", "TodaySession"):
         assert legacy_name not in home
+        assert legacy_name not in course_core_home
         assert legacy_name not in entry
 
     for relative_path in (
-        "frontend/app/practice/page.tsx",
         "frontend/app/journey/page.tsx",
         "frontend/app/my-english/page.tsx",
     ):

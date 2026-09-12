@@ -12,8 +12,8 @@
 | 阶段 | 状态 | 说明 |
 | --- | --- | --- |
 | 阶段 0 | COMPLETE | 全部阶段 0 文档已通过产品负责人审阅；安全 checkpoint 为 `course-core-stage-0-v2.1` |
-| 阶段 1 | COMPLETE | Legacy 默认 runtime 已停止挂载；安全入口、旧 URL 重定向及隔离测试已完成 |
-| 阶段 2 | 未开始 | 可为阶段 1 的安全重定向先建立路由壳，但不得绕过阶段发布门 |
+| 阶段 1 | COMPLETE | 已由产品负责人确认并合并、推送；checkpoint 为 `course-core-stage-1` |
+| 阶段 2 | COMPLETE | 新 App Shell、三入口首页、只读 Catalog 和 30 / 59 确定性校验已完成 |
 | 阶段 3 | 未开始 | 依赖阶段 2 的 App Shell 和 Catalog |
 | 阶段 4 | 未开始 | 依赖新的 Course Core 数据边界 |
 | 阶段 5 | 未开始 | 不建设通用 AI Coach Orchestrator |
@@ -48,7 +48,7 @@
 
 ### 阶段 1 完成记录
 
-- 状态：COMPLETE；等待产品负责人 review，不自动开始阶段 2。
+- 状态：COMPLETE；已由产品负责人确认并合并、推送后开始阶段 2。
 - 分支：`codex/course-core-stage-1`；checkpoint tag：`course-core-stage-1`。
 - 默认后端 runtime 仅挂载 `/api/v1/health`；Legacy users、profiles、calibration、daily、memory、practice、journey 和 entry router 仅在历史回归测试的显式 rollback app 中挂载。
 - `/` 使用独立的 Stage 1 Auth 安全入口；登录不查询 Profile、Calibration、Daily Session 或旧进度，也不 import Legacy UI/API client。
@@ -71,6 +71,22 @@
 8. 完成登录落点、导航和 Legacy 不挂载 smoke test。
 
 未完成功能的入口在开发中必须通过 feature flag 隔离。
+
+### 阶段 2 完成记录
+
+- 状态：COMPLETE；等待产品负责人 review，不自动开始阶段 3。
+- 分支：`codex/course-core-stage-2`；checkpoint tag：`course-core-stage-2`。
+- `/` 在认证后进入不依赖 Today 的新 App Shell；桌面端和移动端均提供 Courses、Practice、About Me 三个并列入口。
+- Courses 已启用；尚未进入实施阶段的 Practice V2 和 About Me 通过显式 feature flag 禁用，直达路由显示安全占位，不挂载 Legacy。
+- 建立独立只读 Course API 与前端 client；`course_catalog_v1` 固定 30 个 Course、59 个 Question、稳定顺序、稳定 ID、固定问题文案与中英文名称/回答重点。
+- 产品负责人批准将现有中文定稿忠实翻译为英文定稿，不增加或改变语义；稳定决定记录于 ADR-027。
+- Course 列表与单 Course 只读页面已完成；Answer、History、录音、Feedback、自动下一题等阶段 3+ 能力均未实现。
+- `/journey`、`/my-english` 继续重定向到 `/`；Legacy API 仍未在默认 runtime 挂载。
+- 后端完整测试：102 passed；Ruff check/format：passed；前端 TypeScript、ESLint、production build：passed。
+- HTTP smoke：Catalog 返回 30 / 59，Course 30 无追问；新路由返回 200，两个旧 URL 返回 307 到 `/`，Legacy API 返回 404。
+- 浏览器 smoke：未登录入口和 `/courses` 认证边界正常；`/journey` 实际落到 `/`，未出现 Today、Calibration、Daily、Journey 或 Quick Review UI。因未使用个人凭据，认证后落点与导航由静态架构/界面契约测试覆盖。
+- 数据库 migration：无变更；阶段 2 仅提供静态只读 Catalog，不创建 Course Answer、About Me 或 Practice V2 schema。
+- 已知限制：Practice 和 About Me 有意保持禁用；Course 页面仅只读；认证 session 仍沿用 Stage 1 的 sessionStorage 生命周期；Stage 3 的 Answer 写路径上线时必须加入 Legacy 字段及表数量前后快照集成测试。
 
 ## 阶段 3：Course 11 英文 Answer 最小闭环
 

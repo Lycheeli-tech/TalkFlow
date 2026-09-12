@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState, useSyncExternalStore } from "react";
+import { FormEvent, ReactNode, useState, useSyncExternalStore } from "react";
 
 import { useInterfaceLocale } from "@/components/interface-locale-provider";
 import { signIn, signUp } from "@/lib/auth";
@@ -27,7 +27,7 @@ function useAccessToken(): string {
   return useSyncExternalStore(subscribeToAccessToken, getStoredAccessToken, () => "");
 }
 
-export function StageOneEntry() {
+export function StageOneEntry({ children }: { children?: ReactNode }) {
   const accessToken = useAccessToken();
   const { locale, setLocale } = useInterfaceLocale();
   const copy = getMessages(locale).courseCoreStageOne;
@@ -59,6 +59,8 @@ export function StageOneEntry() {
       setBusy(false);
     }
   }
+
+  if (accessToken && children) return children;
 
   return (
     <main className={styles.page}>

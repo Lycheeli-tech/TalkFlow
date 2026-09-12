@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { FeatureGatePage } from "@/components/course-core/feature-gate-page";
 
 export default function PracticePage() {
-  redirect("/");
+  return <FeatureGatePage feature="practice" />;
 }

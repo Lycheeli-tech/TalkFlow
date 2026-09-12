@@ -214,3 +214,36 @@ an already approved user-control boundary and does not introduce new behavior.
 - Requirements removed from the critical list are not silently deleted from their detailed product,
   architecture, security, or failure-handling sections.
 - Any future change to the 30-item list requires the Build Spec change-control process.
+
+### ADR-027 — Approved English Catalog Copy for `course_catalog_v1`
+
+**Status:** Accepted
+
+**Date:** 2026-09-12
+
+**Authority:** Build Spec v2.1 TBD-001/TBD-002 and explicit product-owner approval
+
+#### Context
+
+Build Spec v2.1 fixes the Chinese Course names, English Questions, and Chinese answer focus, while
+TBD-001 and TBD-002 require fixed English Course names and answer-focus copy before the Stage 2
+English interface opens. The product owner explicitly approved a faithful English translation that
+does not add to or change the meaning of the approved Chinese content.
+
+#### Decision
+
+- `backend/app/course/catalog_v1.py` is the versioned runtime representation of the approved bilingual
+  Catalog content.
+- English Course names and answer focus are faithful translations of the corresponding approved
+  Chinese fields; they may clarify grammar but may not add product guidance or factual claims.
+- English Questions remain exactly the English Questions approved in Build Spec v2.1 Section 5.4.
+- The bilingual fields, Course order, Question order, and `null` Course 30 follow-up are immutable
+  within `course_catalog_v1` and protected by a deterministic content digest.
+- The frontend selects approved static copy by interface locale. Runtime AI translation is forbidden.
+
+#### Consequences
+
+- TBD-001 and TBD-002 are resolved for Stage 2 implementation.
+- Any behavioral rewording requires product review and a new Catalog version.
+- The Chinese Build Spec content remains unchanged; this decision fills its explicitly reserved
+  localization input without changing Course scope, Questions, or answer-focus meaning.

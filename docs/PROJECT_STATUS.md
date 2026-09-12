@@ -3,8 +3,8 @@
 ## Last Updated
 
 - 2026-09-12
-- Branch: `codex/course-core-stage-1`
-- HEAD: Course Core Stage 1 closeout checkpoint (tag `course-core-stage-1`)
+- Branch: `codex/course-core-stage-2`
+- HEAD: Course Core Stage 2 closeout checkpoint (tag `course-core-stage-2`)
 
 ## Product
 
@@ -15,25 +15,27 @@ source-validated Memory to help users express truthful experience in clearer, mo
 ## Current Lifecycle
 
 The v1.1 Legacy Loop implementation and Phase 2 local acceptance are complete at `8cc986d`. Product
-architecture has moved to Build Spec v2.1. Course Core Stage 1 is complete: the Legacy product is
-preserved for rollback but is no longer mounted by the default runtime.
+architecture has moved to Build Spec v2.1. Course Core Stages 1 and 2 are complete: the Legacy
+product is preserved for rollback but is no longer mounted by the default runtime, and the new
+read-only Course Catalog surface is available behind the independent Auth boundary.
 
 ## Current Work
 
 - Phase: Course Core
-- Stage: 1 — Stop Legacy Runtime and Enforce the Freeze
+- Stage: 2 — New App Shell, Home, and Course Catalog
 - Status: COMPLETE
-- Objective achieved: authenticated entry bypasses Onboarding, Calibration, and Today; Legacy API
-  routers and pages are not mounted by default; old page URLs redirect to the safe entry.
-- A machine-readable freeze inventory and architecture tests enforce frozen-file integrity, forbidden
-  Course Core dependencies, no default Legacy routes, and no Stage 1 product write endpoints.
-- Historical API regression coverage uses an explicit rollback-only test app and remains passing.
+- Objective achieved: the authenticated landing surface uses a new App Shell with three equal entry
+  points, an immutable 30-Course/59-Question catalog, and read-only list/detail routes.
+- Practice V2 and About Me remain explicitly feature-gated; direct routes do not mount Legacy UI.
+- Dedicated Course Core API/client boundaries and architecture tests enforce read-only behavior,
+  stable catalog content, route isolation, and the continuing Legacy freeze.
 
 ## Stable Baseline
 
 The final Legacy code baseline is tag `legacy-loop-final-baseline` at `8cc986d`. Stage 0 is closed at
-tag `course-core-stage-0-v2.1`; Stage 1 is isolated on `codex/course-core-stage-1` and closed at tag
-`course-core-stage-1`.
+tag `course-core-stage-0-v2.1`; Stage 1 is merged to `main` and closed at tag
+`course-core-stage-1`; Stage 2 is isolated on `codex/course-core-stage-2` and closed at tag
+`course-core-stage-2`.
 
 ## Legacy Implementation Preserved
 
@@ -46,28 +48,32 @@ tag `course-core-stage-0-v2.1`; Stage 1 is isolated on `codex/course-core-stage-
 
 ## Course Core Not Yet Implemented
 
-- Stage 2 App Shell and Course Catalog are not started.
-- Course Answer data, About Me/Memory, AI support, Chinese flow,
+- Course Answer data and History, About Me/Memory, AI support, Chinese flow,
   remaining Courses, and Practice V2 are not implemented.
-- The Stage 1 entry is intentionally a safe authenticated transition page, not the Stage 2 homepage.
+- The catalog is read-only; answering begins only in Stage 3.
 
 ## Current Blockers
 
-No Stage 1 blocker. Build Spec Section 25 contains product decisions that must be resolved by their
-specified implementation deadlines.
+No Stage 2 blocker. The English catalog copy decision required for Stage 2 was approved and recorded
+in ADR-027. Remaining Build Spec Section 25 decisions retain their specified implementation deadlines.
 
 ## Next Steps
 
-1. Review the Stage 1 checkpoint and runtime shutdown evidence.
-2. Do not begin Stage 2, merge, or push without explicit instruction.
+1. Review the Stage 2 checkpoint and read-only catalog evidence.
+2. Do not begin Stage 3, merge, or push Stage 2 without explicit instruction.
 
-## Stage 1 Verification Snapshot
+## Stage 2 Verification Snapshot
 
-- Default backend runtime exposes only `/api/v1/health`; all Legacy product endpoints return 404.
-- Root entry supports sign-in/sign-up without Profile, Calibration, Daily Session, or Legacy API calls.
-- `/practice`, `/journey`, and `/my-english` return 307 redirects to `/` in the production server.
+- Default backend runtime exposes health plus read-only Course list/detail endpoints; Legacy product
+  endpoints still return 404 and no product write endpoint exists.
+- `course_catalog_v1` deterministically contains 30 Courses and 59 Questions; Course 30 has no
+  follow-up question.
+- Root authenticated landing, three equal entries, route boundaries, feature gates, and dedicated
+  non-Legacy Course client are covered by Stage 2 contract tests.
+- `/journey` and `/my-english` return 307 redirects to `/`; `/practice` and `/about-me` are safe,
+  disabled Stage 2 route shells.
 - Frozen Legacy files match the approved SHA-256 inventory; no freeze exception was required.
-- Backend: 94 passed; Ruff format/check passed.
+- Backend: 102 passed; Ruff format/check passed.
 - Frontend: TypeScript, ESLint, and production build passed.
 - No database migration or Legacy data changed.
 

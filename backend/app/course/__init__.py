@@ -1,0 +1,1 @@
+"""Course Core domain package."""

@@ -1,5 +1,5 @@
-import { StageOneEntry } from "@/components/course-core/stage-one-entry";
+import { CourseCoreHome } from "@/components/course-core/course-core-home";
 
 export default function HomePage() {
-  return <StageOneEntry />;
+  return <CourseCoreHome />;
 }
