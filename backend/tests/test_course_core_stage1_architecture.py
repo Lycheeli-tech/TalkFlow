@@ -59,12 +59,18 @@ def test_default_runtime_mounts_no_legacy_product_routes(client: TestClient) -> 
         "/api/v1/health": frozenset({"get"}),
         "/api/v1/courses": frozenset({"get"}),
         "/api/v1/courses/{course_id}": frozenset({"get"}),
+        "/api/v1/courses/{course_id}/questions/{question_id}/history": frozenset({"get"}),
+        "/api/v1/courses/{course_id}/questions/{question_id}/answers": frozenset({"post"}),
+        "/api/v1/courses/{course_id}/questions/{question_id}/tts": frozenset({"get"}),
+        "/api/v1/course-answers/{answer_id}": frozenset({"get"}),
+        "/api/v1/course-answers/{answer_id}/retry": frozenset({"post"}),
+        "/api/v1/course-answers/{answer_id}/audio": frozenset({"get"}),
     }
     for prefix in legacy_prefixes:
         assert client.get(prefix).status_code == 404
 
 
-def test_stage_one_runtime_exposes_no_product_write_path() -> None:
+def test_default_runtime_exposes_only_approved_stage_three_product_write_paths() -> None:
     write_methods = {"POST", "PUT", "PATCH", "DELETE"}
     product_writes = [
         (path, method.upper())
@@ -74,7 +80,10 @@ def test_stage_one_runtime_exposes_no_product_write_path() -> None:
         if method.upper() in write_methods
     ]
 
-    assert product_writes == []
+    assert product_writes == [
+        ("/api/v1/courses/{course_id}/questions/{question_id}/answers", "POST"),
+        ("/api/v1/course-answers/{answer_id}/retry", "POST"),
+    ]
 
 
 def test_frozen_legacy_files_match_the_approved_baseline() -> None:
@@ -100,6 +109,9 @@ def test_new_backend_modules_cannot_import_legacy_business_modules() -> None:
     roots.extend(
         [
             "backend/app/api/v1/courses.py",
+            "backend/app/api/v1/course_answers.py",
+            "backend/app/api/course_dependencies.py",
+            "backend/app/api/core_dependencies.py",
             "backend/app/api/v1/about_me.py",
             "backend/app/api/v1/practice_v2.py",
         ]

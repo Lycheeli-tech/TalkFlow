@@ -3,8 +3,8 @@
 ## Last Updated
 
 - 2026-09-12
-- Branch: `codex/course-core-stage-2`
-- HEAD: Course Core Stage 2 closeout checkpoint (tag `course-core-stage-2`)
+- Branch: `codex/course-core-stage-3`
+- HEAD: Course Core Stage 3 closeout checkpoint (tag `course-core-stage-3`)
 
 ## Product
 
@@ -15,27 +15,27 @@ source-validated Memory to help users express truthful experience in clearer, mo
 ## Current Lifecycle
 
 The v1.1 Legacy Loop implementation and Phase 2 local acceptance are complete at `8cc986d`. Product
-architecture has moved to Build Spec v2.1. Course Core Stages 1 and 2 are complete: the Legacy
-product is preserved for rollback but is no longer mounted by the default runtime, and the new
-read-only Course Catalog surface is available behind the independent Auth boundary.
+architecture has moved to Build Spec v2.1. Course Core Stages 1–3 are complete: Legacy remains
+preserved for rollback but is not mounted by default, and Course 11 now has the isolated English
+Answer minimum loop on top of the immutable Course Catalog.
 
 ## Current Work
 
 - Phase: Course Core
-- Stage: 2 — New App Shell, Home, and Course Catalog
+- Stage: 3 — Course 11 English Answer minimum loop
 - Status: COMPLETE
-- Objective achieved: the authenticated landing surface uses a new App Shell with three equal entry
-  points, an immutable 30-Course/59-Question catalog, and read-only list/detail routes.
-- Practice V2 and About Me remain explicitly feature-gated; direct routes do not mount Legacy UI.
-- Dedicated Course Core API/client boundaries and architecture tests enforce read-only behavior,
-  stable catalog content, route isolation, and the continuing Legacy freeze.
+- Objective achieved: Course 11 supports user-selected core/follow-up questions, exact Catalog TTS,
+  English recording, original-audio-first storage, final STT, saved transcripts, History, retry, and
+  newest-two audio retention through dedicated Course Core data and API boundaries.
+- Practice V2, About Me, Chinese Answer, AI support, and Feedback generation remain disabled.
+- Real PostgreSQL assertions prove ownership/RLS and zero Legacy progress/table mutation.
 
 ## Stable Baseline
 
 The final Legacy code baseline is tag `legacy-loop-final-baseline` at `8cc986d`. Stage 0 is closed at
 tag `course-core-stage-0-v2.1`; Stage 1 is merged to `main` and closed at tag
-`course-core-stage-1`; Stage 2 is isolated on `codex/course-core-stage-2` and closed at tag
-`course-core-stage-2`.
+`course-core-stage-1`; Stage 2 is merged to `main` and closed at tag `course-core-stage-2`; Stage 3
+is isolated on `codex/course-core-stage-3` and closed at tag `course-core-stage-3`.
 
 ## Legacy Implementation Preserved
 
@@ -48,34 +48,31 @@ tag `course-core-stage-0-v2.1`; Stage 1 is merged to `main` and closed at tag
 
 ## Course Core Not Yet Implemented
 
-- Course Answer data and History, About Me/Memory, AI support, Chinese flow,
-  remaining Courses, and Practice V2 are not implemented.
-- The catalog is read-only; answering begins only in Stage 3.
+- About Me/Memory, AI support and Feedback generation, Chinese flow, Answer deletion,
+  remaining-Course answering, and Practice V2 are not implemented.
 
 ## Current Blockers
 
-No Stage 2 blocker. The English catalog copy decision required for Stage 2 was approved and recorded
-in ADR-027. Remaining Build Spec Section 25 decisions retain their specified implementation deadlines.
+No Stage 3 blocker. Failed Answer/Draft audio TTL is three days and is recorded in ADR-028. Remaining
+Build Spec Section 25 decisions retain their specified implementation deadlines.
 
 ## Next Steps
 
-1. Review the Stage 2 checkpoint and read-only catalog evidence.
-2. Do not begin Stage 3, merge, or push Stage 2 without explicit instruction.
+1. Review the Stage 3 checkpoint and English Answer evidence.
+2. Do not begin Stage 4, merge, or push Stage 3 without explicit instruction.
 
-## Stage 2 Verification Snapshot
+## Stage 3 Verification Snapshot
 
-- Default backend runtime exposes health plus read-only Course list/detail endpoints; Legacy product
-  endpoints still return 404 and no product write endpoint exists.
-- `course_catalog_v1` deterministically contains 30 Courses and 59 Questions; Course 30 has no
-  follow-up question.
-- Root authenticated landing, three equal entries, route boundaries, feature gates, and dedicated
-  non-Legacy Course client are covered by Stage 2 contract tests.
-- `/journey` and `/my-english` return 307 redirects to `/`; `/practice` and `/about-me` are safe,
-  disabled Stage 2 route shells.
-- Frozen Legacy files match the approved SHA-256 inventory; no freeze exception was required.
-- Backend: 102 passed; Ruff format/check passed.
+- Dedicated Course tables, RLS, repository/service/API/client and Course 11 UI are implemented without
+  Legacy business imports; authenticated clients cannot write tables directly.
+- Backend: 121 passed with 2 opt-in real PostgreSQL tests also passed; Ruff check passed.
 - Frontend: TypeScript, ESLint, and production build passed.
-- No database migration or Legacy data changed.
+- Real TTS → private audio → final STT → saved Answer → History/replay passed. Three-save retention
+  kept the latest two audio objects and retained the oldest transcript.
+- Desktop and 375px authenticated browser checks passed; device microphone permission was not
+  auto-approved, so the physical microphone button path remains a documented manual smoke item.
+- Both Stage 3 migrations are applied and registered in the configured test database; Legacy fields,
+  tables, schema, and data were unchanged. Disposable browser test data was removed.
 
 ## Legacy Verification Snapshot
 

@@ -14,7 +14,7 @@
 | 阶段 0 | COMPLETE | 全部阶段 0 文档已通过产品负责人审阅；安全 checkpoint 为 `course-core-stage-0-v2.1` |
 | 阶段 1 | COMPLETE | 已由产品负责人确认并合并、推送；checkpoint 为 `course-core-stage-1` |
 | 阶段 2 | COMPLETE | 新 App Shell、三入口首页、只读 Catalog 和 30 / 59 确定性校验已完成 |
-| 阶段 3 | 未开始 | 依赖阶段 2 的 App Shell 和 Catalog |
+| 阶段 3 | COMPLETE | Course 11 英文 Answer 最小闭环完成；等待产品负责人 review，不自动开始阶段 4 |
 | 阶段 4 | 未开始 | 依赖新的 Course Core 数据边界 |
 | 阶段 5 | 未开始 | 不建设通用 AI Coach Orchestrator |
 | 阶段 6 | 未开始 | 复用阶段 3 的 Answer、Audio 和 Transcript 基础设施 |
@@ -100,6 +100,22 @@
 8. 实现幂等、失败恢复和 Legacy 写入禁令测试。
 
 阶段结束后，即使没有 About Me、帮助、中文回答或 Practice，Course 11 英文流程也必须独立运行。
+
+### 阶段 3 完成记录
+
+- 状态：COMPLETE；等待产品负责人 review，不自动开始阶段 4。
+- 分支：`codex/course-core-stage-3`；checkpoint tag：`course-core-stage-3`。
+- 新增独立 Course Answer、Transcript、Feedback schema、RLS、Repository、Service、API 和前端 client；authenticated 只能通过 RLS 读取自己的数据，不能绕过 API 直接写入。
+- Course 11 使用通用 Answer 引擎开放英文流程：核心问题与追问自由切换、Catalog 原文 TTS、turn-based 录音、先保存私有原始音频、最终 STT、只读 Transcript、History 和录音回放；其余 29 个 Course 继续只读。
+- 录音时锁定 Question、返回 Courses、App Shell 导航和退出；浏览器后退、刷新、关闭触发保护；History 面板可继续开关但录音期间禁止播放，所有音频播放互斥。
+- 幂等键按用户唯一；中断在音频已归属后可对同一 Answer 重试；STT 失败保留同一音频和 Answer。失败音频在最近一次处理失败 3 天后到期并自动清理，稳定决定记录于 ADR-028。
+- 同一 `user_id + question_id + answer_language` 只保留最新两条已保存录音；第三条保存成功后清理最旧对象，保留 Answer、Transcript 和 History；清理失败不会回滚新 Answer，并保留可重试状态。
+- 后端完整测试：121 passed、2 个真实 PostgreSQL 集成测试按显式环境门单独 passed；Ruff check：passed；前端 TypeScript、ESLint、production build：passed。
+- 数据库集成：真实 RLS 两用户隔离、authenticated 无直写权限，以及 Course Service 写入前后 `current_day`、`current_phase`、XP、streak 和 Legacy 五张表计数完全不变；测试数据已回滚或删除。
+- 真实服务 smoke：Catalog TTS、Supabase 私有音频、Bailian 最终 STT、保存、History 和回放通过；连续保存三条后音频状态为 `[RETAINED, RETAINED, EXPIRED]`，最旧 Transcript 仍保留。
+- 浏览器 smoke：认证后 Course 11、自由切题、History/回放、桌面端和 375px 布局通过，375px 无横向溢出；一次性账号、三条 Answer/Transcript 和剩余音频对象已删除。
+- 数据库 migration：`202609120012_course_answers.sql` 和 `202609120013_course_answer_write_boundary.sql` 已应用并登记到当前配置的测试库；无 Legacy schema 或数据变更。
+- 已知限制：浏览器设备麦克风授权出现后未由自动化代替用户批准，因此真实设备的按钮录音未纳入本次自动 smoke；录音状态机、互斥和导航守卫由 TypeScript/ESLint/build、静态界面契约和真实上传闭环共同覆盖。Practice、About Me、中文 Answer、AI 帮助与 Feedback 生成仍按阶段 4–8 禁用；Feedback 阶段 3 仅建立 schema。
 
 ## 阶段 4：About Me 与 AI Memory
 

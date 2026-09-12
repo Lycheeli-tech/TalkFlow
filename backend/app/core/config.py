@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     tts_provider: str = "fake"
     audio_storage_provider: str = "fake"
     max_audio_bytes: int = 20 * 1024 * 1024
+    course_audio_cleanup_interval_seconds: int = 60 * 60
     max_resume_bytes: int = 5 * 1024 * 1024
     document_storage_provider: str = "fake"
 

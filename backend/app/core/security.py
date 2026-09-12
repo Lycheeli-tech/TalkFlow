@@ -4,8 +4,8 @@ from uuid import UUID
 import jwt
 from jwt import PyJWKClient
 
+from app.core.auth import AuthenticatedUser
 from app.core.config import Settings, get_settings
-from app.schemas import AuthenticatedUser
 
 
 class JWTVerificationError(Exception):

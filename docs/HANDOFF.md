@@ -3,71 +3,68 @@
 ## Updated
 
 - 2026-09-12
-- Branch: `codex/course-core-stage-2`
-- Checkpoint: Course Core Stage 2 App Shell and Catalog closeout, tagged `course-core-stage-2`
+- Branch: `codex/course-core-stage-3`
+- Checkpoint: Course Core Stage 3 English Answer closeout, tagged `course-core-stage-3`
 
 ## Current State
 
-Course Core Stage 2 — New App Shell, Home, and Catalog is complete. The default backend mounts health
-and the read-only Course catalog API; the frontend has an independent authenticated App Shell,
-three equal entry points, and read-only Course list/detail routes. Frozen Legacy code and data remain
-preserved for rollback and historical inspection.
+Course Core Stage 3 is complete and waiting for product-owner review. Course 11 alone is enabled for
+the English Answer minimum loop; all other Courses remain read-only. Do not merge, push, or begin
+Stage 4 without explicit instruction.
 
-Read `docs/CURRENT_MILESTONE_V1.md` for the current Course Core V1 stage and execution sequence.
-`docs/CURRENT_MILESTONE.md` is historical only.
+Legacy remains frozen at `8cc986d` and unmounted from the default runtime. Historical regressions use
+the explicit rollback test app only. `docs/CURRENT_MILESTONE_V1.md` contains full stage evidence.
 
-The Legacy implementation remains unchanged at baseline `8cc986d`, tagged
-`legacy-loop-final-baseline`. Historical API regressions explicitly mount a rollback-only test app;
-that app is not used by the default runtime.
+## Stage 3 Result
 
-## Stage 2 Result
-
-- `backend/app/course/catalog_v1.py` is the immutable 30-Course/59-Question product catalog with
-  stable IDs, order, fixed English questions, and approved bilingual names/answer focus.
-- `GET /api/v1/courses` and `GET /api/v1/courses/{course_id}` are the only new APIs and are read-only.
-- `/` uses the new App Shell after authentication. Courses is enabled; Practice V2 and About Me are
-  visible but disabled through explicit feature flags and safe route shells.
-- `/courses` and `/courses/[courseId]` provide read-only catalog/list/detail views through a dedicated
-  Course Core client that has no Legacy dependency.
-- `/journey` and `/my-english` continue to redirect to `/`; default runtime still excludes all Legacy
-  product routers.
-- ADR-027 records the product-owner approval of faithful English catalog translations.
-- No frozen business file, schema, migration, table, prompt, or data changed.
+- Dedicated Course Answer, Transcript, and Feedback models/tables/RLS/repository/service/API/client
+  exist outside Legacy. Course authentication and AI provider dependencies no longer import the
+  Legacy dependency graph.
+- Authenticated database clients can RLS-read only their own Course data and cannot bypass API state
+  transitions with direct inserts, updates, or deletes.
+- Course 11 supports free core/follow-up selection, exact Catalog TTS, turn-based English recording,
+  original-audio-first persistence, final STT, immutable transcript display, History, replay,
+  idempotent submission, and same-Answer recovery.
+- Recording blocks question/global navigation and browser leave; History remains openable but audio
+  playback is disabled while recording. Playback sources are mutually exclusive.
+- Saved audio retention is newest two per user/question/language. Failed audio expires three days
+  after the most recent processing failure (ADR-028), with retryable cleanup state.
+- No About Me, Memory, Chinese Answer, AI help/Feedback generation, remaining-Course answering,
+  completion, unlocking, auto-next, mastery, XP/streak, Daily, or Practice V2 behavior was added.
 
 ## Verification Evidence
 
-- Backend: 102 tests passed; Ruff format/check passed.
-- Frontend: TypeScript, ESLint, and production build passed.
-- HTTP smoke: Catalog returned 30 Courses/59 Questions; Course 30 had no follow-up; new routes returned
-  200, old URLs redirected to `/`, and Legacy APIs returned 404.
-- Browser smoke used a disposable confirmed test account to verify direct authenticated landing,
-  all three peer entries, the 30-Course list, an arbitrary Course detail, bilingual switching,
-  Practice/About Me feature gates, and real Legacy URL redirects without mounting Legacy UI. The
-  disposable account was signed out and deleted after verification.
-- Default OpenAPI contains only health and the two Course GET routes; there are no product write endpoints.
-- All machine-marked frozen files match their approved SHA-256 values.
-- Migrations: unchanged; no database command was required.
+- Backend: 121 passed, 2 opt-in real PostgreSQL tests passed separately; Ruff check passed.
+- Frontend: TypeScript, ESLint, production build passed.
+- Real database: two-user RLS isolation, no authenticated direct writes, and before/after equality for
+  `current_day`, `current_phase`, XP, streak, `sessions`, `attempts`, `expressions`,
+  `expression_attempts`, and `retrieval_opportunities`.
+- Real service smoke: Catalog TTS, Supabase private storage, Bailian STT, Answer save, History, replay,
+  and three-save `[RETAINED, RETAINED, EXPIRED]` behavior passed; expired audio retained transcript.
+- Browser: authenticated desktop and 375px layouts, free question switching, History/replay, left/right
+  drawers, and no horizontal overflow passed. Automated device microphone approval was intentionally
+  not granted; the physical microphone button path remains a manual smoke item.
+- Disposable account, three Answers/transcripts, and two remaining private audio objects were deleted.
+
+## Database State
+
+- `202609120012_course_answers.sql` and `202609120013_course_answer_write_boundary.sql` are applied and
+  recorded in the configured test database.
+- The first migration was applied during an attempted rollback-only DDL test because raw asyncpg DDL
+  bypassed the SQLAlchemy transaction. It succeeded fully; migration metadata was repaired immediately.
+- The integration test now requires pre-applied migrations and uses an explicit driver transaction for
+  RLS checks. It no longer executes DDL.
+- No Course test rows or private test audio remain. No Legacy migration or data changed.
 
 ## Known Limitations
 
-- Stage 2 intentionally keeps Practice and About Me disabled and Course pages read-only.
-- Because Stage 2 introduces no product data write path, no-old-write coverage still proves the
-  default API has zero product write endpoints. Stage 3 Answer writes must add before/after Legacy
-  field and table-count integration assertions.
-- The Auth safety entry retains the existing sessionStorage token lifecycle; refresh-token work is
-  outside Stage 2.
-- One known Starlette/httpx deprecation warning remains in backend tests.
+- Physical microphone capture still needs a user-approved manual browser smoke; unit/static contracts
+  and the real audio-upload pipeline cover the remaining recording flow.
+- Feedback is schema-only in Stage 3; generation belongs to Stage 5. About Me/Memory is Stage 4,
+  Chinese Answer is Stage 6, other Courses are Stage 7, and Practice V2 is Stage 8.
+- Auth session lifecycle remains sessionStorage-based. One existing Starlette/httpx warning remains.
+- Preserve the unrelated user change in `frontend/next-env.d.ts`; it is not part of Stage 3.
 
 ## Next Action
 
-Stop after the Stage 2 checkpoint. Do not merge, push, or begin Stage 3 without explicit
-product-owner instruction.
-
-## Do Not Change
-
-- Do not modify Build Spec v2.1 without a reviewed product proposal.
-- Do not begin Stage 3 or enable unfinished Practice/About Me entries without explicit approval.
-- Do not import Legacy business modules from new Course Core code.
-- Do not print or commit `.env`/`.env.local`, database URLs, Supabase keys, Bailian keys, tokens,
-  user identifiers, private object paths, or audio content.
-- Preserve unrelated user work, especially `frontend/next-env.d.ts`.
+Review Stage 3. Do not merge, push, or start Stage 4 without explicit product-owner instruction.

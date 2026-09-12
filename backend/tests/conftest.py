@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from fastapi.testclient import TestClient
 
 from app.ai.interfaces import ProfileExtractor
+from app.api.core_dependencies import get_course_current_user
 from app.api.dependencies import (
     get_current_user,
     get_profile_extractor,
@@ -55,6 +56,7 @@ def legacy_client() -> TestClient:
 def override_current_user() -> Callable[[AuthenticatedUser], None]:
     def apply(user: AuthenticatedUser) -> None:
         app.dependency_overrides[get_current_user] = lambda: user
+        app.dependency_overrides[get_course_current_user] = lambda: user
         legacy_test_app.dependency_overrides[get_current_user] = lambda: user
 
     return apply

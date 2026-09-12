@@ -4,10 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-class AuthenticatedUser(BaseModel):
-    id: UUID
-    email: str | None = None
+from app.core.auth import AuthenticatedUser as AuthenticatedUser
 
 
 class ApplicationEntry(BaseModel):

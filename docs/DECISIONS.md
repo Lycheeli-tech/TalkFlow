@@ -247,3 +247,28 @@ does not add to or change the meaning of the approved Chinese content.
 - Any behavioral rewording requires product review and a new Catalog version.
 - The Chinese Build Spec content remains unchanged; this decision fills its explicitly reserved
   localization input without changing Course scope, Questions, or answer-focus meaning.
+
+### ADR-028 — Three-Day Failed Answer Audio Retention
+
+**Status:** Accepted
+
+**Date:** 2026-09-12
+
+**Authority:** Build Spec v2.1 TBD-009 and explicit product-owner approval
+
+#### Decision
+
+- Audio for a Course Answer or Draft that remains in a recoverable processing-failure state expires
+  three days after its most recent processing failure.
+- A retry within that window reuses the same Answer Attempt and audio object. Another processing
+  failure starts a new three-day window for that same Attempt.
+- Successful saved-answer audio follows the separate newest-two retention rule keyed by user,
+  Question, and answer language.
+- Expiration or cleanup never promotes a failed Attempt into History and never deletes a saved
+  Transcript.
+
+#### Consequences
+
+- TBD-009 is resolved for the Stage 3 storage policy and the later Chinese Draft implementation.
+- Cleanup execution must be idempotent and must not expose or reuse another user's private path.
+- A future behavior change to this duration requires the Build Spec change-control process.

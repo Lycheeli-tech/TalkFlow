@@ -44,7 +44,7 @@ def test_stage_two_route_boundaries_and_legacy_redirects_exist() -> None:
         assert 'redirect("/")' in source(route)
 
 
-def test_course_frontend_uses_only_the_dedicated_read_only_catalog_client() -> None:
+def test_course_frontend_uses_dedicated_client_and_catalog_views_remain_read_only() -> None:
     catalog = source("frontend/components/course-core/course-catalog.tsx")
     detail = source("frontend/components/course-core/course-detail.tsx")
     client = source("frontend/lib/course-api.ts")
@@ -53,4 +53,8 @@ def test_course_frontend_uses_only_the_dedicated_read_only_catalog_client() -> N
     assert "@/lib/course-api" in detail
     assert "@/lib/api" not in catalog + detail + client
     for write_method in ('method: "POST"', 'method: "PATCH"', 'method: "DELETE"'):
-        assert write_method not in client
+        assert write_method not in catalog + detail
+
+    read_only_client = client.split("export function submitCourseAnswer", maxsplit=1)[0]
+    for write_method in ('method: "POST"', 'method: "PATCH"', 'method: "DELETE"'):
+        assert write_method not in read_only_client

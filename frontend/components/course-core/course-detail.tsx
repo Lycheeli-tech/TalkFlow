@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 
 import { useInterfaceLocale } from "@/components/interface-locale-provider";
 import { CourseCatalogItem, getCourse } from "@/lib/course-api";
+import { ENGLISH_ANSWER_ENABLED_COURSE_IDS } from "@/lib/course-core-flags";
 import { getMessages } from "@/lib/i18n";
 
 import { CourseCoreAppShell } from "./app-shell";
 import styles from "./course-core.module.css";
+import { CourseWorkspace } from "./course-workspace";
 import { StageOneEntry } from "./stage-one-entry";
 
 export function CourseDetailPage({ courseId }: { courseId: string }) {
@@ -26,19 +28,43 @@ export function CourseDetailPage({ courseId }: { courseId: string }) {
       .catch(() => setError(copy.courseNotFound));
   }, [copy.courseNotFound, courseId]);
 
+  if (course && ENGLISH_ANSWER_ENABLED_COURSE_IDS.has(course.id)) {
+    return (
+      <StageOneEntry>
+        <CourseWorkspace course={course} />
+      </StageOneEntry>
+    );
+  }
+
   return (
     <StageOneEntry>
       <CourseCoreAppShell>
-        <Link className={styles.backLink} href="/courses">← {copy.backToCourses}</Link>
-        {!course && !error && <p className={styles.status} role="status">{copy.loading}</p>}
-        {error && <p className={styles.error} role="alert">{error}</p>}
+        <Link className={styles.backLink} href="/courses">
+          ← {copy.backToCourses}
+        </Link>
+        {!course && !error && (
+          <p className={styles.status} role="status">
+            {copy.loading}
+          </p>
+        )}
+        {error && (
+          <p className={styles.error} role="alert">
+            {error}
+          </p>
+        )}
         {course && (
           <article className={styles.detail}>
-            <p className={styles.eyebrow}>{copy.course} {String(course.order).padStart(2, "0")}</p>
+            <p className={styles.eyebrow}>
+              {copy.course} {String(course.order).padStart(2, "0")}
+            </p>
             <h1>{locale === "zh-CN" ? course.name_zh_cn : course.name_en}</h1>
             <section className={styles.focus}>
               <span>{copy.answerFocus}</span>
-              <p>{locale === "zh-CN" ? course.answer_focus_zh_cn : course.answer_focus_en}</p>
+              <p>
+                {locale === "zh-CN"
+                  ? course.answer_focus_zh_cn
+                  : course.answer_focus_en}
+              </p>
             </section>
             <div className={styles.questionList}>
               <section>
