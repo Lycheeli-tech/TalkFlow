@@ -84,7 +84,7 @@
 - `/journey`、`/my-english` 继续重定向到 `/`；Legacy API 仍未在默认 runtime 挂载。
 - 后端完整测试：102 passed；Ruff check/format：passed；前端 TypeScript、ESLint、production build：passed。
 - HTTP smoke：Catalog 返回 30 / 59，Course 30 无追问；新路由返回 200，两个旧 URL 返回 307 到 `/`，Legacy API 返回 404。
-- 浏览器 smoke：未登录入口和 `/courses` 认证边界正常；`/journey` 实际落到 `/`，未出现 Today、Calibration、Daily、Journey 或 Quick Review UI。因未使用个人凭据，认证后落点与导航由静态架构/界面契约测试覆盖。
+- 浏览器 smoke：使用一次性已确认测试账号验证登录后直接进入新首页、三个同级入口、30 门 Course 列表、任意 Course 详情、中英文切换、Practice/About Me feature gate，以及 `/journey`、`/my-english` 重定向；未出现 Today、Calibration、Daily、Journey 或 Quick Review UI。测试后已退出并删除一次性账号。
 - 数据库 migration：无变更；阶段 2 仅提供静态只读 Catalog，不创建 Course Answer、About Me 或 Practice V2 schema。
 - 已知限制：Practice 和 About Me 有意保持禁用；Course 页面仅只读；认证 session 仍沿用 Stage 1 的 sessionStorage 生命周期；Stage 3 的 Answer 写路径上线时必须加入 Legacy 字段及表数量前后快照集成测试。
 

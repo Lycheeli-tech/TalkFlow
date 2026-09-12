@@ -40,9 +40,10 @@ that app is not used by the default runtime.
 - Frontend: TypeScript, ESLint, and production build passed.
 - HTTP smoke: Catalog returned 30 Courses/59 Questions; Course 30 had no follow-up; new routes returned
   200, old URLs redirected to `/`, and Legacy APIs returned 404.
-- Browser smoke verified the unauthenticated boundary, protected `/courses`, and real `/journey` to
-  `/` redirect without mounting Legacy UI. Authenticated landing/navigation remains covered by static
-  architecture and UI contract tests because no personal/test credential was used.
+- Browser smoke used a disposable confirmed test account to verify direct authenticated landing,
+  all three peer entries, the 30-Course list, an arbitrary Course detail, bilingual switching,
+  Practice/About Me feature gates, and real Legacy URL redirects without mounting Legacy UI. The
+  disposable account was signed out and deleted after verification.
 - Default OpenAPI contains only health and the two Course GET routes; there are no product write endpoints.
 - All machine-marked frozen files match their approved SHA-256 values.
 - Migrations: unchanged; no database command was required.
