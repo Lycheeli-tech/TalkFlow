@@ -2,35 +2,36 @@
 
 ## Last Updated
 
-- 2026-09-09
-- Branch: `chore/phase2-gate-f-local-mvp-acceptance`
-- HEAD: Gate F closeout checkpoint (`docs: complete phase 2 gate f acceptance`)
+- 2026-09-12
+- Branch: `codex/course-core-stage-0`
+- HEAD: Course Core Stage 0 checkpoint (tag `course-core-stage-0`)
 
 ## Product
 
-FluentLoop (repository: TalkFlow) turns a learner's real experience into spoken English interview
-practice. The MVP proves a Recall → Learn → Imitate → Retrieve → Transfer → Interview → Recap loop
-with durable, evidence-based progress.
+FluentLoop (repository: TalkFlow) is an AI Course and interview-practice product. Users freely choose
+from 30 fixed Courses and 59 fixed Questions; AI uses real profile data, prior Course Answers, and
+source-validated Memory to help users express truthful experience in clearer, more natural English.
 
 ## Current Lifecycle
 
-M0–M7 implementation is complete. The project is now in Phase 2 MVP Activation / Live Integration;
-deployment and real-device validation follow the activation gates. No Milestone 8 exists.
+The v1.1 Legacy Loop implementation and Phase 2 local acceptance are complete at `8cc986d`. Product
+architecture has moved to Build Spec v2.0. Course Core Stage 0 is complete; no Course Core runtime
+implementation has started.
 
 ## Current Work
 
-- Phase: Phase 2 — MVP Activation
-- Gate: F — Local MVP Acceptance
+- Phase: Course Core
+- Stage: 0 — Specification and Safety Boundaries
 - Status: COMPLETE
-- Objective achieved: all 24 Build Spec MVP acceptance criteria and the critical cross-session path
-  are covered by automated, live-provider, real-browser, and durable-state evidence.
+- Objective achieved: the approved v2.0 Build Spec, superseding ADR, Legacy Freeze Manifest, and
+  Legacy Code Freeze Rules are established before runtime changes.
 
 ## Stable Baseline
 
-Phase 1 stable baseline is tag `m7-hardening` at merge commit `cbfed8f`. Gates A–E are merged and
-pushed on `main`; Gate F is complete on `chore/phase2-gate-f-local-mvp-acceptance` pending review.
+The final Legacy code baseline is tag `legacy-loop-final-baseline` at `8cc986d`. Earlier milestone
+tags and branches remain intact. Course Core Stage 0 is isolated on `codex/course-core-stage-0`.
 
-## Implemented
+## Legacy Implementation Preserved
 
 - Onboarding/Profile, confirmed-profile Memory Gate, structured memory/mastery/review/error rules.
 - Turn-based Voice Calibration with raw audio, transcript, analysis, assessment, and retry semantics.
@@ -39,21 +40,33 @@ pushed on `main`; Gate F is complete on `chore/phase2-gate-f-local-mvp-acceptanc
 - Supabase PostgreSQL/Auth/Storage runtime validation and RLS/user isolation.
 - Bailian text, Qwen3-ASR, and Qwen3-TTS runtime adapters behind provider interfaces.
 
-## Not Yet Activated / Not Yet Complete
+## Course Core Not Yet Implemented
 
-- Gates A–F are COMPLETE locally.
-- Deployment-host setup and real-device coverage remain future activation work.
+- Stage 1 Legacy runtime shutdown is not started.
+- New App Shell, Course Catalog, Course Answer data, About Me/Memory, AI support, Chinese flow,
+  remaining Courses, and Practice V2 are not implemented.
+- The existing runtime still behaves as the Legacy product until Stage 1 and Stage 2 are implemented
+  and approved.
 
 ## Current Blockers
 
-No confirmed Gate F blocker. Known limitations are recorded in `PHASE2_MVP_ACTIVATION.md`.
+No Stage 0 blocker. Build Spec Section 25 contains product decisions that must be resolved by their
+specified implementation deadlines.
 
 ## Next Steps
 
-1. Review the Gate F checkpoint.
-2. Do not merge or push without explicit instruction; do not begin later scope implicitly.
+1. Review the Course Core Stage 0 checkpoint.
+2. Do not merge, push, or begin Stage 1 without explicit instruction.
 
-## Verification Snapshot
+## Stage 0 Verification Snapshot
+
+- Build Spec v2.0 is active and v1.1 is explicitly historical.
+- ADR-025 records the supersession boundary.
+- Legacy Manifest covers files, endpoints, tables, fields, prompts, tests, and migration seams.
+- Freeze Rules define prohibited changes, allowed exceptions, and Stage 1 automated enforcement.
+- No runtime code or migration changed.
+
+## Legacy Verification Snapshot
 
 - Backend: 88 passed after Gate E validation.
 - Ruff format/check: passed.
@@ -71,7 +84,9 @@ No confirmed Gate F blocker. Known limitations are recorded in `PHASE2_MVP_ACTIV
 
 ## Source of Truth
 
-- Build Spec: authoritative product/architecture specification.
+- `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md`: authoritative product/architecture specification.
+- `FLUENTLOOP_MVP_BUILD_SPEC_v1.1.md`: Legacy Loop historical specification.
+- `docs/LEGACY_FREEZE_MANIFEST.md` and `docs/LEGACY_CODE_FREEZE_RULES.md`: frozen boundary.
 - `DECISIONS.md`: stable architecture decisions.
 - `PHASE2_MVP_ACTIVATION.md`: execution gates and acceptance state.
 - `PROJECT_STATUS.md`: compact project dashboard.

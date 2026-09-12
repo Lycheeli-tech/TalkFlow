@@ -1,5 +1,49 @@
 # Current Milestone
 
+## Course Core Stage 0 — Specification and Safety Boundaries
+
+**Status:** COMPLETE
+
+**Date:** 2026-09-12
+
+**Branch:** `codex/course-core-stage-0`
+
+**Legacy baseline:** `legacy-loop-final-baseline` at `8cc986d`
+
+**Stage checkpoint:** the Stage 0 closeout commit tagged `course-core-stage-0`
+
+### Objective
+
+Activate the product-approved Course Core Build Spec and establish enforceable Legacy freeze
+boundaries before any runtime, route, database, or product-code change.
+
+### Completed
+
+- Activated `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md` as the authoritative Build Spec.
+- Retained v1.1 as Legacy Loop history.
+- Updated `AGENTS.md` to enforce the Course Core boundaries.
+- Appended ADR-025, which explicitly supersedes the active-product Legacy Loop decisions.
+- Added `docs/LEGACY_FREEZE_MANIFEST.md`.
+- Added `docs/LEGACY_CODE_FREEZE_RULES.md`.
+- Recorded the immutable Legacy baseline tag at `8cc986d`.
+- Defined Stage 1 architecture, no-old-write, runtime-mount, and frozen-diff test requirements.
+
+### Verification
+
+- Documentation links and required files validated.
+- Build Spec contains 30 Course rows and all nine stages, 0 through 8.
+- Markdown code fences are balanced.
+- `git diff --check` passes.
+- Existing `frontend/next-env.d.ts` user work was not modified or included in Stage 0.
+- No runtime code, routes, schemas, migrations, prompts, or tests changed.
+
+### Next Action
+
+Stop for review at the Stage 0 checkpoint. Do not begin Stage 1 until the product owner explicitly
+authorizes it.
+
+---
+
 ## Milestone 1 — Onboarding & Profile
 
 **Status:** COMPLETE  

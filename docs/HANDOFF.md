@@ -2,29 +2,29 @@
 
 ## Updated
 
-- 2026-09-09
-- Branch: `chore/phase2-gate-f-local-mvp-acceptance`
-- Gate F closeout checkpoint: this document's commit (`docs: complete phase 2 gate f acceptance`)
+- 2026-09-12
+- Branch: `codex/course-core-stage-0`
+- Checkpoint: Course Core Stage 0 closeout commit, tagged `course-core-stage-0`
 
 ## Current State
 
-Phase 2 Gate F — Local MVP Acceptance is complete. Gates A–E are merged on `main`. All 24 Build
-Spec MVP acceptance criteria and the critical cross-session path have evidence. Do not create M8
-or begin deployment, V1.5, V2, or any later scope implicitly.
+Course Core Stage 0 — Specification and Safety Boundaries is complete. The product owner approved
+Build Spec v2.0. The new Spec, AGENTS rules, ADR-025, Legacy Freeze Manifest, and Legacy Code Freeze
+Rules are in the Stage 0 checkpoint.
 
-The local frontend is available at `http://localhost:3000`. The backend is running from the
-existing virtual environment at port 8000 with live Supabase/Bailian network access. Secrets remain
-only in ignored environment files and were not printed or staged.
+The Legacy implementation remains unchanged at baseline `8cc986d`, tagged
+`legacy-loop-final-baseline`. The current runtime still serves the Legacy product because Stage 1
+has not started.
 
-## Gate F Acceptance
+## Stage 0 Result
 
-- The 24 criteria in Build Spec Section 21 were traced to Gates A–E evidence and rechecked as one
-  local configured MVP: onboarding/profile/calibration, duration plans and full learning loop,
-  durable Attempts/memory/retrieval, deterministic mastery/error rules, projections, interview,
-  rewards, failure retention, bilingual state, and restart persistence.
-- The critical Day 1 → later-session hidden retrieval path remains verified with real voice evidence
-  and a deterministic atomic memory/mastery/review update.
-- No product-code, schema, prompt, or architectural change was required for Gate F.
+- `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md` is now authoritative.
+- v1.1 remains in the repository as Legacy history.
+- ADR-025 explicitly supersedes Legacy product decisions for the active Course Core.
+- The freeze documents cover actual backend/frontend files, endpoints, tables, state fields,
+  prompts, tests, migration seams, and exception procedure.
+- Stage 1 must add import-boundary, no-old-write, runtime-mount, redirect, and frozen-diff tests.
+- No runtime code, schema, migration, prompt, or test changed in Stage 0.
 
 ## Verification Evidence
 
@@ -51,13 +51,14 @@ only in ignored environment files and were not printed or staged.
 
 ## Next Action
 
-Stop after the Gate F checkpoint and report for review. Do not merge, push, or begin later scope
-without an explicit user request.
+Stop after the Stage 0 checkpoint. Do not merge, push, or begin Stage 1 without explicit product-owner
+instruction.
 
 ## Do Not Change
 
-- Do not edit the Build Spec, create M8, implement realtime voice, or begin deployment, V1.5, V2,
-  or any later scope.
+- Do not modify Build Spec v2.0 without a reviewed product proposal.
+- Do not begin Stage 1, unmount Legacy routes, or change runtime behavior without explicit approval.
+- Do not import Legacy business modules from new Course Core code.
 - Do not print or commit `.env`/`.env.local`, database URLs, Supabase keys, Bailian keys, tokens,
   user identifiers, private object paths, or audio content.
 - Preserve unrelated user work, especially `frontend/next-env.d.ts`.

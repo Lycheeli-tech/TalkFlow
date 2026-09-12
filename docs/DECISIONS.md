@@ -1,6 +1,6 @@
 # Stable Architectural Decisions
 
-The Build Spec remains authoritative if this summary and `FLUENTLOOP_MVP_BUILD_SPEC_v1.1.md` ever differ.
+`FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md` is authoritative if this summary and the Build Spec ever differ. `FLUENTLOOP_MVP_BUILD_SPEC_v1.1.md` is retained as Legacy Loop history only.
 
 Future decisions should normally be appended rather than silently rewriting historical decisions. If a later decision supersedes an earlier ADR, it must explicitly reference the superseded ADR.
 
@@ -110,3 +110,66 @@ Phase 2 live activation uses Alibaba Cloud Model Studio (Bailian), China (Beijin
 speech-to-text, and text-to-speech services. Provider abstractions remain intact and deterministic
 domain rules remain outside model control. Runtime OpenAI adapters and credentials are removed;
 fake providers remain available for deterministic tests and local fallback.
+
+### ADR-025 — Course Core Supersedes the Legacy Daily Loop
+
+**Status:** Accepted
+
+**Date:** 2026-09-12
+
+**Authority:** `FLUENTLOOP_MVP_BUILD_SPEC_v2.0.md`
+
+#### Context
+
+The completed v1.1 product centers on Today, a 30-day Daily Session, BUILD/TRANSFER/PERFORM phases,
+the seven-step learning loop, Voice Calibration, confirmation-gated memory, cross-session mastery,
+XP, streak, Quick Review, and Journey. Product review replaced that model with a user-directed
+Course product.
+
+#### Decision
+
+- The active product has three equal entries: Courses, Practice, and About Me.
+- A versioned static catalog of 30 Courses and 59 Questions is the learning-content backbone.
+- Users choose any Course and Question; Course has no unlocking, completion, mastery, or automatic
+  progression.
+- New Course Answer, Transcript, Feedback, History, About Me, Memory, and Practice V2 modules use
+  new domain models, repositories, services, APIs, and frontend state.
+- Existing Auth, database connectivity, private file/audio storage, Resume/text parsing, and
+  provider-abstracted LLM/STT/TTS remain reusable infrastructure.
+- The Legacy Loop remains in the repository for rollback and historical inspection but is not
+  mounted as the new product runtime and cannot be imported by new Course Core modules.
+- New AI Memory saves automatically after deterministic source, ownership, action, and target
+  validation. AI decides only whether information is worth retaining and whether the action is
+  CREATE, UPDATE, MERGE, or IGNORE.
+- Hints, expression materials, reference answers, Chinese-to-English organization, and feedback are
+  AI-generated content, not authority to change product state.
+- Course 11 is the first vertical slice but must use the same generic engine as every Course.
+
+#### Supersession
+
+For the active Course Core, this ADR supersedes:
+
+- ADR-004 only where it requires user confirmation before durable Memory; structured provenance
+  remains required;
+- ADR-005 for Coach/Interviewer as primary product-control roles;
+- ADR-006 for active-product Mastery; the deterministic engine remains frozen Legacy behavior;
+- ADR-009 fixed curriculum plus adaptive review;
+- ADR-012 through ADR-015 Voice Calibration and calibration-question rules;
+- ADR-017 bounded Daily planning;
+- ADR-018 confirmation-gated Legacy Memory writes;
+- ADR-019 atomic cross-session retrieval resolution;
+- ADR-020 through ADR-023 rewards, streak, Daily completion, and Day progression.
+
+The superseded ADRs remain historically valid descriptions of the frozen Legacy implementation.
+
+ADR-001, ADR-002, ADR-003, ADR-007, ADR-008, ADR-010, ADR-011, ADR-016, and ADR-024 remain active
+where they do not conflict with Build Spec v2.0.
+
+#### Consequences
+
+- The repository must maintain a concrete Legacy Freeze Manifest and Legacy Code Freeze Rules.
+- New code must not add Course semantics to Legacy Session or Attempt.
+- New routes must not read or write Legacy progress, Reward, Mastery, or Retrieval state.
+- Legacy route shutdown and new App Shell activation require architecture and no-old-write tests.
+- Any exception to the freeze requires an explicit reason, scoped review, and product approval when
+  it changes the Build Spec.
