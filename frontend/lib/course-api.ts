@@ -67,6 +67,7 @@ async function catalogFetch<T>(path: string): Promise<T> {
     const payload = (await response.json().catch(() => null)) as { detail?: string } | null;
     throw new Error(payload?.detail ?? `Request failed with status ${response.status}.`);
   }
+  if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
 }
 
@@ -150,4 +151,10 @@ export function getQuestionAudio(token: string, courseId: string, questionId: st
 
 export function getCourseAnswerAudio(token: string, answerId: string): Promise<Blob> {
   return authenticatedAudio(token, `/api/v1/course-answers/${encodeURIComponent(answerId)}/audio`);
+}
+
+export function deleteCourseAnswer(token: string, answerId: string): Promise<void> {
+  return authenticatedFetch<void>(token, `/api/v1/course-answers/${encodeURIComponent(answerId)}`, {
+    method: "DELETE",
+  });
 }

@@ -1,5 +1,5 @@
-import { FeatureGatePage } from "@/components/course-core/feature-gate-page";
+import { AboutMePage as AboutMeSurface } from "@/components/course-core/about-me-page";
 
 export default function AboutMePage() {
-  return <FeatureGatePage feature="aboutMe" />;
+  return <AboutMeSurface />;
 }

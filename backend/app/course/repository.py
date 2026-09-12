@@ -39,6 +39,7 @@ class CourseAnswerRepository(Protocol):
     ) -> list[PendingAudioCleanup]: ...
     async def mark_cleanup_complete(self, user_id: UUID, answer_id: UUID) -> None: ...
     async def mark_cleanup_failed(self, user_id: UUID, answer_id: UUID) -> None: ...
+    async def delete(self, user_id: UUID, answer_id: UUID) -> PendingAudioCleanup | None: ...
 
 
 class SQLCourseAnswerRepository:
@@ -187,13 +188,41 @@ class SQLCourseAnswerRepository:
                 .limit(limit)
             )
         ).all()
-        return [
+        pending = [
             PendingAudioCleanup(answer_id=row.id, user_id=row.user_id, audio_path=row.audio_path)
             for row in rows
             if row.audio_path is not None
         ]
+        remaining = max(0, limit - len(pending))
+        if remaining:
+            jobs = (
+                (
+                    await self._session.execute(
+                        text(
+                            "select answer_id, user_id, audio_path "
+                            "from public.course_audio_cleanup_jobs "
+                            "order by created_at limit :limit"
+                        ),
+                        {"limit": remaining},
+                    )
+                )
+                .mappings()
+                .all()
+            )
+            pending.extend(PendingAudioCleanup(**dict(job)) for job in jobs)
+        return pending
 
     async def mark_cleanup_complete(self, user_id: UUID, answer_id: UUID) -> None:
+        deleted = await self._session.execute(
+            text(
+                "delete from public.course_audio_cleanup_jobs "
+                "where answer_id = :answer_id and user_id = :user_id"
+            ),
+            {"answer_id": answer_id, "user_id": user_id},
+        )
+        if deleted.rowcount:
+            await self._session.commit()
+            return
         row = await self._owned_row(user_id, answer_id)
         row.audio_path = None
         row.audio_content_type = None
@@ -203,11 +232,65 @@ class SQLCourseAnswerRepository:
         await self._session.commit()
 
     async def mark_cleanup_failed(self, user_id: UUID, answer_id: UUID) -> None:
+        updated = await self._session.execute(
+            text(
+                "update public.course_audio_cleanup_jobs "
+                "set attempts = attempts + 1, last_error_at = now() "
+                "where answer_id = :answer_id and user_id = :user_id"
+            ),
+            {"answer_id": answer_id, "user_id": user_id},
+        )
+        if updated.rowcount:
+            await self._session.commit()
+            return
         row = await self._owned_row(user_id, answer_id)
         row.audio_retention_status = "CLEANUP_FAILED"
         row.audio_cleanup_pending = True
         row.updated_at = datetime.now(row.updated_at.tzinfo)
         await self._session.commit()
+
+    async def delete(self, user_id: UUID, answer_id: UUID) -> PendingAudioCleanup | None:
+        row = await self._session.scalar(
+            select(CourseAnswerRow)
+            .where(CourseAnswerRow.id == answer_id, CourseAnswerRow.user_id == user_id)
+            .with_for_update()
+        )
+        if row is None:
+            raise LookupError("Course Answer was not found.")
+        pending = None
+        if row.audio_path:
+            pending = PendingAudioCleanup(
+                answer_id=row.id, user_id=row.user_id, audio_path=row.audio_path
+            )
+            await self._session.execute(
+                text(
+                    "insert into public.course_audio_cleanup_jobs "
+                    "(answer_id, user_id, audio_path) values (:answer_id, :user_id, :audio_path) "
+                    "on conflict (answer_id) do update set audio_path = excluded.audio_path"
+                ),
+                {
+                    "answer_id": row.id,
+                    "user_id": row.user_id,
+                    "audio_path": row.audio_path,
+                },
+            )
+        await self._session.execute(
+            text(
+                "delete from public.memory_sources where user_id = :user_id "
+                "and source_type = 'COURSE_ANSWER' and source_id = :answer_id"
+            ),
+            {"user_id": user_id, "answer_id": answer_id},
+        )
+        await self._session.execute(
+            text(
+                "delete from public.memory_items m where m.user_id = :user_id "
+                "and not exists (select 1 from public.memory_sources s where s.memory_id = m.id)"
+            ),
+            {"user_id": user_id},
+        )
+        await self._session.delete(row)
+        await self._session.commit()
+        return pending
 
     async def _owned_row(self, user_id: UUID, answer_id: UUID) -> CourseAnswerRow:
         row = await self._session.scalar(
@@ -235,6 +318,7 @@ class InMemoryCourseAnswerRepository:
         self.transcripts: dict[UUID, CourseTranscript] = {}
         self.feedback: dict[UUID, CourseFeedback] = {}
         self._saved_sequence = 0
+        self.cleanup_jobs: dict[UUID, PendingAudioCleanup] = {}
 
     async def get_by_idempotency(self, user_id: UUID, key: str) -> CourseAnswerAggregate | None:
         answer = next(
@@ -371,14 +455,18 @@ class InMemoryCourseAnswerRepository:
             ),
             key=lambda item: item.failure_expires_at or now,
         )[:limit]
-        return [
+        pending = [
             PendingAudioCleanup(
                 answer_id=item.id, user_id=item.user_id, audio_path=item.audio_path or ""
             )
             for item in expired
         ]
+        return (pending + list(self.cleanup_jobs.values()))[:limit]
 
     async def mark_cleanup_complete(self, user_id: UUID, answer_id: UUID) -> None:
+        if answer_id in self.cleanup_jobs:
+            self.cleanup_jobs.pop(answer_id)
+            return
         aggregate = await self.get(user_id, answer_id)
         if aggregate is None:
             raise LookupError("Course Answer was not found.")
@@ -392,12 +480,30 @@ class InMemoryCourseAnswerRepository:
         )
 
     async def mark_cleanup_failed(self, user_id: UUID, answer_id: UUID) -> None:
+        if answer_id in self.cleanup_jobs:
+            return
         aggregate = await self.get(user_id, answer_id)
         if aggregate is None:
             raise LookupError("Course Answer was not found.")
         self.answers[answer_id] = aggregate.answer.model_copy(
             update={"audio_retention_status": "CLEANUP_FAILED", "audio_cleanup_pending": True}
         )
+
+    async def delete(self, user_id: UUID, answer_id: UUID) -> PendingAudioCleanup | None:
+        aggregate = await self.get(user_id, answer_id)
+        if aggregate is None:
+            raise LookupError("Course Answer was not found.")
+        answer = aggregate.answer
+        pending = None
+        if answer.audio_path:
+            pending = PendingAudioCleanup(
+                answer_id=answer.id, user_id=answer.user_id, audio_path=answer.audio_path
+            )
+            self.cleanup_jobs[answer.id] = pending
+        self.answers.pop(answer_id, None)
+        self.transcripts.pop(answer_id, None)
+        self.feedback.pop(answer_id, None)
+        return pending
 
     def _aggregate(self, answer: CourseAnswer) -> CourseAnswerAggregate:
         return CourseAnswerAggregate(

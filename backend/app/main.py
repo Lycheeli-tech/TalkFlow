@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
+from app.about_me.cleanup import run_about_me_document_cleanup_loop, stop_about_me_document_cleanup
 from app.api.v1.router import api_router
 from app.core.config import get_settings
 from app.course.cleanup import run_course_audio_cleanup_loop, stop_course_audio_cleanup
@@ -13,10 +14,12 @@ from app.course.cleanup import run_course_audio_cleanup_loop, stop_course_audio_
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     cleanup_task = asyncio.create_task(run_course_audio_cleanup_loop())
+    document_cleanup_task = asyncio.create_task(run_about_me_document_cleanup_loop())
     try:
         yield
     finally:
         await stop_course_audio_cleanup(cleanup_task)
+        await stop_about_me_document_cleanup(document_cleanup_task)
 
 
 def create_app() -> FastAPI:

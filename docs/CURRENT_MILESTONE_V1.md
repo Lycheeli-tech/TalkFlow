@@ -14,8 +14,8 @@
 | 阶段 0 | COMPLETE | 全部阶段 0 文档已通过产品负责人审阅；安全 checkpoint 为 `course-core-stage-0-v2.1` |
 | 阶段 1 | COMPLETE | 已由产品负责人确认并合并、推送；checkpoint 为 `course-core-stage-1` |
 | 阶段 2 | COMPLETE | 新 App Shell、三入口首页、只读 Catalog 和 30 / 59 确定性校验已完成 |
-| 阶段 3 | COMPLETE | Course 11 英文 Answer 最小闭环完成；等待产品负责人 review，不自动开始阶段 4 |
-| 阶段 4 | 未开始 | 依赖新的 Course Core 数据边界 |
+| 阶段 3 | COMPLETE | Course 11 英文 Answer 最小闭环已确认、合并并推送；checkpoint 为 `course-core-stage-3` |
+| 阶段 4 | COMPLETE | About Me、来源验证 AI Memory、Answer/Resume 删除与可重试对象清理已完成；等待产品负责人 review |
 | 阶段 5 | 未开始 | 不建设通用 AI Coach Orchestrator |
 | 阶段 6 | 未开始 | 复用阶段 3 的 Answer、Audio 和 Transcript 基础设施 |
 | 阶段 7 | 未开始 | 所有 Course 必须复用同一通用引擎 |
@@ -126,6 +126,22 @@
 5. 支持全部 Memory 查看和删除；
 6. 实现 Answer 删除、Audio 清理和多来源 Memory 处理；
 7. 验证 About Me 为空时 Course 仍可用。
+
+### 阶段 4 完成记录
+
+- 状态：COMPLETE；等待产品负责人 review，不自动开始阶段 5。
+- 分支：`codex/course-core-stage-4`；checkpoint tag：`course-core-stage-4`。
+- 新增独立 `about_me_profiles`、`target_roles`、`memory_items`、`memory_sources` schema、RLS、Repository、Service、API 与前端 client；About Me 支持多个目标岗位、多份独立私有 Resume、补充资料，以及全部 Memory 的查看和删除。
+- About Me 为空不构成 gate；认证后可直接打开任意 Course，未增加 Onboarding、Calibration、完成度或自动进度行为。Practice V2 仍由 feature flag 禁用。
+- 新 `memory_decision_v1` 只允许 AI 提议 CREATE / UPDATE / MERGE / IGNORE；应用层在事务中验证用户所有权、来源类型、来源 ID、字段路径、逐字可核对摘录和目标 Memory，数据库使用延迟约束禁止无来源 Memory。AI 不持有数据库执行权，失败不回滚已保存 Source 或 Answer。
+- Memory 支持多来源；删除 Resume、目标岗位、补充资料或 Course Answer 时只移除对应来源，仍有其他来源则保留 Memory，最后一个来源消失时在同一事务中删除 Memory。
+- Course History 新增 Answer 删除确认；Answer、Transcript、Feedback 级联删除，相关 Memory 来源/孤儿同步清理。Answer 音频和 Resume 对象均先登记持久 cleanup job，再尝试对象删除；失败不恢复产品数据，由后台任务幂等重试。
+- 后端完整测试：130 passed；6 个真实 PostgreSQL 集成测试按显式环境门单独 passed；Ruff format/check：passed。前端 TypeScript、ESLint、production build：passed。
+- 真实数据库验证：CREATE / UPDATE / MERGE / IGNORE、四种来源、伪造摘录拒绝、无来源提交拒绝、两用户 RLS、authenticated 无直写权限、多来源删除、Resume cleanup job 与 P3 回归均通过；`current_day`、`current_phase`、XP、streak 和 Legacy 五张表前后完全不变。
+- 真实服务 smoke：Bailian 对完全合成 Course Answer 返回 CREATE，经来源验证后自动保存；两份合成 PDF 使用 Supabase 私有存储完成解析、独立列出、逐份删除，数据库与对象 cleanup job 均归零；账号级联删除已验证。
+- 浏览器 smoke：一次性认证账号验证 About Me 空态、两个目标岗位、来源聚合 Memory、补充资料、双语切换、Courses 仍可直接打开，以及 375px `scrollWidth <= innerWidth`；控制台无 error，测试账号和数据已删除。
+- 数据库 migration：`202609120014` 至 `202609120019` 已应用并登记到当前配置的测试库；其中 `015` 建立延迟无来源约束，`016`–`018`按不可变迁移历史修复触发器跨表记录解析、删号级联和 Auth 执行权限，`019` 增加 Resume cleanup job。无 Legacy schema 或数据变更。
+- 已知限制：About Me 当前只显示 Memory 的来源类型与摘录，不提供来源对象详情跳转；AI Memory 没有公开 action endpoint；Practice、AI 帮助/Feedback、中文 Answer 和其余 Course 回答仍按阶段 5–8 禁用。
 
 ## 阶段 5：按需 AI 生成与 Course Feedback
 

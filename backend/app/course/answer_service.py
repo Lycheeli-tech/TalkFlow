@@ -9,6 +9,13 @@ from app.course.repository import CourseAnswerRepository
 from app.course.rollout import english_answer_is_enabled
 from app.course.storage import CourseAudioStorage
 
+
+class CourseAnswerMemoryCapture:
+    async def capture_course_answer(
+        self, *, user_id: UUID, answer_id: UUID, transcript: str
+    ) -> None: ...
+
+
 FAILED_AUDIO_TTL = timedelta(days=3)
 
 
@@ -20,11 +27,13 @@ class CourseAnswerService:
         stt: SpeechToTextService,
         tts: TextToSpeechService,
         audio: CourseAudioStorage,
+        memory_capture: CourseAnswerMemoryCapture | None = None,
     ) -> None:
         self._repository = repository
         self._stt = stt
         self._tts = tts
         self._audio = audio
+        self._memory_capture = memory_capture
 
     async def synthesize_question(
         self, *, course_id: str, question_id: str, voice: str = "default"
@@ -136,6 +145,11 @@ class CourseAnswerService:
             answer.audio_content_type or "application/octet-stream"
         )
 
+    async def delete(self, *, user_id: UUID, answer_id: UUID) -> None:
+        pending = await self._repository.delete(user_id, answer_id)
+        if pending is not None:
+            await self._cleanup_one(pending.user_id, pending.answer_id, pending.audio_path)
+
     async def cleanup_expired_failed_audio(self, *, limit: int = 50) -> int:
         return await cleanup_course_audio_batch(
             repository=self._repository,
@@ -165,6 +179,16 @@ class CourseAnswerService:
             updated_at=now,
         )
         aggregate, pending_cleanup = await self._repository.save_transcript(answer, transcript)
+        if self._memory_capture is not None:
+            try:
+                await self._memory_capture.capture_course_answer(
+                    user_id=answer.user_id,
+                    answer_id=answer.id,
+                    transcript=transcript_text,
+                )
+            except Exception:
+                # A saved Answer is never rolled back or hidden by optional AI Memory extraction.
+                pass
         for pending in pending_cleanup:
             await self._cleanup_one(pending.user_id, pending.answer_id, pending.audio_path)
         return aggregate

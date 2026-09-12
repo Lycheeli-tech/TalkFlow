@@ -7,6 +7,7 @@ import { useInterfaceLocale } from "@/components/interface-locale-provider";
 import { getStoredAccessToken } from "@/lib/auth-session";
 import {
   CourseAnswer,
+  deleteCourseAnswer,
   CourseCatalogItem,
   CourseQuestion,
   getCourseAnswerAudio,
@@ -281,6 +282,19 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
     setState("PREPARING");
   }
 
+  async function removeAnswer(answerId: string) {
+    if (!window.confirm(copy.deleteAnswerConfirm)) return;
+    setError("");
+    try {
+      await deleteCourseAnswer(getStoredAccessToken(), answerId);
+      stopAudio();
+      if (answer?.id === answerId) resetAnswer();
+      await loadHistory(question.id);
+    } catch {
+      setError(copy.deleteAnswerError);
+    }
+  }
+
   return (
     <CourseCoreAppShell navigationBlocked={recording}>
       <div className={styles.workspaceToolbar}>
@@ -464,6 +478,14 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
                 ) : (
                   <span>{copy.audioExpired}</span>
                 )}
+                <button
+                  className={styles.dangerButton}
+                  disabled={recording}
+                  type="button"
+                  onClick={() => void removeAnswer(item.id)}
+                >
+                  {copy.deleteAnswer}
+                </button>
               </article>
             ))}
           </aside>

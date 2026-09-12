@@ -38,7 +38,7 @@ def test_course_answer_api_requires_authentication(client: TestClient) -> None:
 def test_submit_history_detail_audio_and_retry_contracts(
     client: TestClient, override_current_user
 ) -> None:
-    configure_course_service(client, override_current_user)
+    _, _, audio = configure_course_service(client, override_current_user)
     response = client.post(
         "/api/v1/courses/course-11/questions/course-11.core/answers",
         data={"idempotency_key": "api-answer-1", "response_duration_ms": "2200"},
@@ -69,6 +69,11 @@ def test_submit_history_detail_audio_and_retry_contracts(
     assert replay.status_code == 201
     assert replay.json()["id"] == answer_id
     assert client.post(f"/api/v1/course-answers/{answer_id}/retry").json()["id"] == answer_id
+
+    deleted = client.delete(f"/api/v1/course-answers/{answer_id}")
+    assert deleted.status_code == 204
+    assert client.get(f"/api/v1/course-answers/{answer_id}").status_code == 404
+    assert audio.objects == {}
 
 
 def test_course_answer_api_validates_media_question_and_rollout(

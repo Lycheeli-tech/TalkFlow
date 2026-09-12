@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     course_audio_cleanup_interval_seconds: int = 60 * 60
     max_resume_bytes: int = 5 * 1024 * 1024
     document_storage_provider: str = "fake"
+    memory_provider: str | None = None
 
     @property
     def cors_origin_list(self) -> list[str]:

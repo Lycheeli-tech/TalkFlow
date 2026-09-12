@@ -272,3 +272,31 @@ does not add to or change the meaning of the approved Chinese content.
 - TBD-009 is resolved for the Stage 3 storage policy and the later Chinese Draft implementation.
 - Cleanup execution must be idempotent and must not expose or reuse another user's private path.
 - A future behavior change to this duration requires the Build Spec change-control process.
+
+### ADR-029 — Source-Validated AI Memory and Durable Deletion Cleanup
+
+**Status:** Accepted
+
+**Date:** 2026-09-12
+
+**Authority:** Build Spec v2.1 Sections 13, 14, 18, 19, and Stage 4 execution
+
+#### Decision
+
+- AI Memory uses dedicated `memory_items` and `memory_sources`; it never reuses the Legacy Memory Gate.
+- AI may propose only CREATE, UPDATE, MERGE, or IGNORE. Application code validates the authenticated
+  owner, action shape, target ownership, source type/ID/field path, and an exact excerpt before any write.
+- A Memory may have multiple sources. Source removal and orphan deletion are one database transaction;
+  a deferred database constraint prevents a committed source-less Memory.
+- AI failure cannot roll back or corrupt the authoritative Resume, About Me field, or saved Course Answer.
+- Answer audio and Resume objects use durable cleanup jobs. Product records and source relationships are
+  deleted transactionally first; object-store deletion is idempotent and retried independently.
+- The invariant trigger is `SECURITY DEFINER` with an empty search path so Supabase Auth account deletion
+  can safely cascade while authenticated product clients still have no direct write or function access.
+
+#### Consequences
+
+- There is no public endpoint that accepts an AI Memory action or arbitrary source citation.
+- Deleting one source does not delete a Memory that still has another valid source.
+- Object-storage outages do not resurrect deleted Answers or Resumes and do not strand cleanup silently.
+- New source types or action semantics require an explicit schema/prompt version and deterministic validator.

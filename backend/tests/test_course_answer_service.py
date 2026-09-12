@@ -253,6 +253,30 @@ async def test_audio_cleanup_failure_does_not_undo_saved_answer_or_transcript() 
 
 
 @pytest.mark.asyncio
+async def test_answer_delete_is_final_while_failed_audio_cleanup_remains_retryable() -> None:
+    user_id = uuid4()
+    repository, audio, service = build_service()
+    saved = await service.submit_english(
+        user_id=user_id,
+        course_id="course-11",
+        question_id="course-11.core",
+        idempotency_key="delete-cleanup-failure",
+        audio=b"delete-me",
+        content_type="audio/webm",
+        duration_ms=900,
+    )
+    audio.fail_deletes = True
+    await service.delete(user_id=user_id, answer_id=saved.answer.id)
+    assert await repository.get(user_id, saved.answer.id) is None
+    assert saved.answer.id in repository.cleanup_jobs
+
+    audio.fail_deletes = False
+    assert await service.cleanup_expired_failed_audio() == 1
+    assert repository.cleanup_jobs == {}
+    assert audio.objects == {}
+
+
+@pytest.mark.asyncio
 async def test_user_ownership_and_stage_three_rollout_are_enforced() -> None:
     owner_id, other_user_id = uuid4(), uuid4()
     _, _, service = build_service()

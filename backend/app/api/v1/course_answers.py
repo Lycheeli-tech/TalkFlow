@@ -52,3 +52,16 @@ async def get_answer_audio(
     except LookupError as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
     return Response(audio, media_type=content_type)
+
+
+@router.delete("/{answer_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_answer(
+    answer_id: UUID,
+    current_user: AuthenticatedUser = Depends(get_course_current_user),
+    service: CourseAnswerService = Depends(get_course_answer_service),
+) -> Response:
+    try:
+        await service.delete(user_id=current_user.id, answer_id=answer_id)
+    except LookupError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

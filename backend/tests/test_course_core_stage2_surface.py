@@ -20,14 +20,14 @@ def test_new_app_shell_exposes_three_equal_entries_without_legacy_navigation() -
         assert legacy_label not in shell
 
 
-def test_unfinished_entries_are_isolated_by_explicit_feature_flags() -> None:
+def test_stage_gated_entries_are_isolated_by_explicit_feature_flags() -> None:
     flags = source("frontend/lib/course-core-flags.ts")
     assert "courses: true" in flags
     assert "practice: false" in flags
-    assert "aboutMe: false" in flags
+    assert "aboutMe: true" in flags
 
     assert 'feature="practice"' in source("frontend/app/practice/page.tsx")
-    assert 'feature="aboutMe"' in source("frontend/app/about-me/page.tsx")
+    assert "AboutMeSurface" in source("frontend/app/about-me/page.tsx")
 
 
 def test_stage_two_route_boundaries_and_legacy_redirects_exist() -> None:

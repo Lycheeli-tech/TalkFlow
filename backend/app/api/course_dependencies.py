@@ -4,7 +4,9 @@ from functools import lru_cache
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.about_me.service import AboutMeService
 from app.ai.interfaces import SpeechToTextService, TextToSpeechService
+from app.api.about_me_dependencies import get_about_me_service
 from app.api.core_dependencies import get_course_stt_service, get_course_tts_service
 from app.course.answer_service import CourseAnswerService
 from app.course.repository import CourseAnswerRepository, SQLCourseAnswerRepository
@@ -31,5 +33,12 @@ def get_course_answer_service(
     stt: SpeechToTextService = Depends(get_course_stt_service),
     tts: TextToSpeechService = Depends(get_course_tts_service),
     audio: CourseAudioStorage = Depends(get_course_audio_storage),
+    memory_capture: AboutMeService = Depends(get_about_me_service),
 ) -> CourseAnswerService:
-    return CourseAnswerService(repository=repository, stt=stt, tts=tts, audio=audio)
+    return CourseAnswerService(
+        repository=repository,
+        stt=stt,
+        tts=tts,
+        audio=audio,
+        memory_capture=memory_capture,
+    )

@@ -95,7 +95,11 @@
     "historyError": "暂时无法加载回答历史。",
     "leaveBlocked": "切换问题或离开前，请先结束或放弃录音。",
     "discardConfirm": "确认放弃本次录音？录音不会保存。",
-    "readOnlyTranscript": "最终转写 · 不可编辑"
+    "readOnlyTranscript": "最终转写 · 不可编辑",
+    "deleteAnswer": "删除回答", "deleteAnswerConfirm": "确认删除这条回答、转写、录音及相关 Memory 来源？", "deleteAnswerError": "暂时无法删除这条回答。",
+    "aboutMePage": {
+      "eyebrow": "FluentLoop · 关于我", "title": "你的事实，由你掌控。", "description": "只添加真实背景资料。“关于我”完全可选，不会阻止你使用 Course。", "loading": "正在加载“关于我”……", "loadError": "暂时无法加载“关于我”。", "saveError": "暂时无法保存更改。", "roles": "目标岗位", "rolesHelp": "求职方向不同时，可以同时保留多个岗位。", "rolePlaceholder": "例如：产品经理", "add": "添加岗位", "emptyRoles": "尚未添加目标岗位。", "resumes": "简历", "resumesHelp": "每份 PDF 都作为独立的私有来源保存。", "upload": "上传 PDF", "emptyResumes": "尚未上传简历。", "facts": "补充资料", "factsHelp": "每行填写一条真实事实，之后可随时修改或删除。", "factsPlaceholder": "负责过……迁移项目", "save": "保存资料", "memories": "AI Memory", "memoriesHelp": "只有来源验证通过的持久事实才会保存，你可以删除任何 Memory。", "emptyMemories": "尚无通过验证的 Memory。Course 仍可正常使用。", "delete": "删除", "deleteMemory": "删除 Memory", "deleteConfirm": "确认删除？相关来源链接也会一并移除。"
+    }
   },
   "navigation": { "label": "主导航", "today": "今日", "practice": "练习", "myEnglish": "我的英语", "journey": "旅程" },
   "calibration": {

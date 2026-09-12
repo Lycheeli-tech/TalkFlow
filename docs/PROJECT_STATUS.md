@@ -3,8 +3,8 @@
 ## Last Updated
 
 - 2026-09-12
-- Branch: `codex/course-core-stage-3`
-- HEAD: Course Core Stage 3 closeout checkpoint (tag `course-core-stage-3`)
+- Branch: `codex/course-core-stage-4`
+- HEAD: Course Core Stage 4 closeout checkpoint (tag `course-core-stage-4`)
 
 ## Product
 
@@ -15,27 +15,28 @@ source-validated Memory to help users express truthful experience in clearer, mo
 ## Current Lifecycle
 
 The v1.1 Legacy Loop implementation and Phase 2 local acceptance are complete at `8cc986d`. Product
-architecture has moved to Build Spec v2.1. Course Core Stages 1–3 are complete: Legacy remains
-preserved for rollback but is not mounted by default, and Course 11 now has the isolated English
-Answer minimum loop on top of the immutable Course Catalog.
+architecture has moved to Build Spec v2.1. Course Core Stages 1–4 are complete: Legacy remains
+preserved for rollback but is not mounted by default; Course 11 has the isolated English Answer loop,
+and About Me plus source-validated AI Memory now use dedicated Course Core boundaries.
 
 ## Current Work
 
 - Phase: Course Core
-- Stage: 3 — Course 11 English Answer minimum loop
+- Stage: 4 — About Me and AI Memory
 - Status: COMPLETE
-- Objective achieved: Course 11 supports user-selected core/follow-up questions, exact Catalog TTS,
-  English recording, original-audio-first storage, final STT, saved transcripts, History, retry, and
-  newest-two audio retention through dedicated Course Core data and API boundaries.
-- Practice V2, About Me, Chinese Answer, AI support, and Feedback generation remain disabled.
-- Real PostgreSQL assertions prove ownership/RLS and zero Legacy progress/table mutation.
+- Objective achieved: optional About Me supports multiple roles, private Resumes, supplemental facts,
+  visible/deletable source-validated Memory, and deterministic CREATE/UPDATE/MERGE/IGNORE transactions.
+- Answer and Resume deletion remove related sources and use durable retry queues for private-object cleanup.
+- Practice V2, Chinese Answer, AI Course help, and Feedback generation remain disabled.
+- Real PostgreSQL assertions prove ownership/RLS, source invariants, deletion semantics, and zero Legacy mutation.
 
 ## Stable Baseline
 
 The final Legacy code baseline is tag `legacy-loop-final-baseline` at `8cc986d`. Stage 0 is closed at
 tag `course-core-stage-0-v2.1`; Stage 1 is merged to `main` and closed at tag
 `course-core-stage-1`; Stage 2 is merged to `main` and closed at tag `course-core-stage-2`; Stage 3
-is isolated on `codex/course-core-stage-3` and closed at tag `course-core-stage-3`.
+is merged to `main` and closed at tag `course-core-stage-3`; Stage 4 is isolated on
+`codex/course-core-stage-4` and closed at tag `course-core-stage-4`.
 
 ## Legacy Implementation Preserved
 
@@ -48,31 +49,32 @@ is isolated on `codex/course-core-stage-3` and closed at tag `course-core-stage-
 
 ## Course Core Not Yet Implemented
 
-- About Me/Memory, AI support and Feedback generation, Chinese flow, Answer deletion,
-  remaining-Course answering, and Practice V2 are not implemented.
+- AI Course help and Feedback generation, Chinese flow, remaining-Course answering, and Practice V2
+  are not implemented.
 
 ## Current Blockers
 
-No Stage 3 blocker. Failed Answer/Draft audio TTL is three days and is recorded in ADR-028. Remaining
+No Stage 4 blocker. Failed Answer/Draft audio TTL is three days and is recorded in ADR-028. Remaining
 Build Spec Section 25 decisions retain their specified implementation deadlines.
 
 ## Next Steps
 
-1. Review the Stage 3 checkpoint and English Answer evidence.
-2. Do not begin Stage 4, merge, or push Stage 3 without explicit instruction.
+1. Review the Stage 4 checkpoint and About Me/Memory evidence.
+2. Do not begin Stage 5, merge, or push Stage 4 without explicit instruction.
 
-## Stage 3 Verification Snapshot
+## Stage 4 Verification Snapshot
 
-- Dedicated Course tables, RLS, repository/service/API/client and Course 11 UI are implemented without
-  Legacy business imports; authenticated clients cannot write tables directly.
-- Backend: 121 passed with 2 opt-in real PostgreSQL tests also passed; Ruff check passed.
+- Dedicated About Me/Memory tables, RLS, repository/service/API/client and responsive UI are implemented
+  without Legacy business imports; authenticated clients cannot write the new tables directly.
+- Backend: 130 passed with 6 opt-in real PostgreSQL tests also passed; Ruff format/check passed.
 - Frontend: TypeScript, ESLint, and production build passed.
-- Real TTS → private audio → final STT → saved Answer → History/replay passed. Three-save retention
-  kept the latest two audio objects and retained the oldest transcript.
-- Desktop and 375px authenticated browser checks passed; device microphone permission was not
-  auto-approved, so the physical microphone button path remains a documented manual smoke item.
-- Both Stage 3 migrations are applied and registered in the configured test database; Legacy fields,
-  tables, schema, and data were unchanged. Disposable browser test data was removed.
+- Real Bailian CREATE, source/excerpt validation, all four actions, all four source types, multi-source
+  deletion, source-less rejection, two-user RLS, and Auth account cascade passed.
+- Two synthetic PDFs completed private Supabase upload/parse/list/delete with no remaining cleanup jobs.
+- Authenticated desktop and 375px About Me checks passed with no console errors or horizontal overflow;
+  empty About Me did not block the 30-Course Catalog. Disposable accounts/data were removed.
+- P4 migrations `202609120014`–`202609120019` are applied and registered in the configured test database;
+  Legacy fields, tables, schema, and data were unchanged.
 
 ## Legacy Verification Snapshot
 

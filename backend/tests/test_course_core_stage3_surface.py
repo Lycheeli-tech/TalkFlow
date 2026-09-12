@@ -48,4 +48,3 @@ def test_stage_three_does_not_enable_chinese_feedback_or_other_courses() -> None
     assert "disabled" in workspace
     assert "feedbackStage5" in workspace
     assert "practice: false" in flags
-    assert "aboutMe: false" in flags
