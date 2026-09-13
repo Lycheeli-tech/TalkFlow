@@ -128,6 +128,7 @@
     "readOnlyTranscript": "Final transcript · read-only",
     "deleteAnswer": "Delete answer", "deleteAnswerConfirm": "Delete this Answer, its transcript, audio, and related Memory sources?", "deleteAnswerError": "The Answer could not be deleted.",
     "aboutMePage": {
+      "factsSaving": "Saving facts…", "factsSaved": "Your facts have been saved.",
       "eyebrow": "FluentLoop · About Me", "title": "Your facts, under your control.", "description": "Add only real background information. About Me is optional and never blocks a Course.", "loading": "Loading About Me…", "loadError": "About Me is unavailable right now.", "saveError": "The change could not be saved.", "roles": "Target roles", "rolesHelp": "Keep more than one role when your search spans different directions.", "rolePlaceholder": "e.g. Product manager", "add": "Add role", "emptyRoles": "No target roles yet.", "resumes": "Resumes", "resumesHelp": "Each PDF remains an independent private source.", "upload": "Upload PDF", "emptyResumes": "No resumes yet.", "facts": "Supplemental facts", "factsHelp": "One truthful fact per line. You can revise or remove these at any time.", "factsPlaceholder": "Led the migration of…", "save": "Save facts", "memories": "AI Memory", "memoriesHelp": "Durable facts saved only from validated sources. You can delete any Memory.", "emptyMemories": "No validated Memory yet. Courses still work normally.", "delete": "Delete", "deleteMemory": "Delete Memory", "deleteConfirm": "Delete this item? Related source links will also be removed."
     }
   },

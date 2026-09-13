@@ -26,6 +26,7 @@ export function AboutMePage() {
   const [facts, setFacts] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [factsStatus, setFactsStatus] = useState<"idle" | "saving" | "saved">("idle");
 
   const refresh = useCallback(async () => {
     const result = await getAboutMe(getStoredAccessToken());
@@ -48,8 +49,10 @@ export function AboutMePage() {
     try {
       await operation();
       await refresh();
+      return true;
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : copy.saveError);
+      return false;
     } finally {
       setBusy(false);
     }
@@ -61,6 +64,12 @@ export function AboutMePage() {
       await addTargetRole(getStoredAccessToken(), role);
       setRole("");
     });
+  }
+
+  async function saveFacts() {
+    setFactsStatus("saving");
+    const saved = await run(() => updateSupplementalFacts(getStoredAccessToken(), facts.split("\n")));
+    setFactsStatus(saved ? "saved" : "idle");
   }
 
   function confirmDelete(path: string) {
@@ -96,8 +105,9 @@ export function AboutMePage() {
             </section>
             <section className={`${styles.aboutCard} ${styles.aboutWide}`}>
               <h2>{copy.facts}</h2><p>{copy.factsHelp}</p>
-              <textarea rows={7} value={facts} onChange={(event) => setFacts(event.target.value)} placeholder={copy.factsPlaceholder} />
-              <button disabled={busy} onClick={() => void run(() => updateSupplementalFacts(getStoredAccessToken(), facts.split("\n")))}>{copy.save}</button>
+              <textarea rows={7} disabled={busy} value={facts} onChange={(event) => { setFacts(event.target.value); setFactsStatus("idle"); }} placeholder={copy.factsPlaceholder} />
+              <button disabled={busy} onClick={() => void saveFacts()}>{factsStatus === "saving" ? copy.factsSaving : copy.save}</button>
+              {factsStatus !== "idle" && <p role="status" className={styles.status}>{factsStatus === "saving" ? copy.factsSaving : copy.factsSaved}</p>}
             </section>
             <section className={`${styles.aboutCard} ${styles.aboutWide}`}>
               <h2>{copy.memories}</h2><p>{copy.memoriesHelp}</p>

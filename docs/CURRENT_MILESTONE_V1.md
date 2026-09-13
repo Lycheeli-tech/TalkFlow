@@ -270,6 +270,14 @@
   Ruff check/format passed。后端已重启，About Me 已刷新，原文件可直接重传。
 - 修复作为 P8 后续本地 checkpoint；完成标签 `course-core-stage-8` / `04fbfce` 保持不变，仍待 review。
 
+### Review 修复：补充资料保存状态
+
+- ABOUT-10：两次保存 PATCH/GET 均 200，owner-scoped 数据库核对确认资料已保存；原页面没有
+  进度或成功提示，造成“保存不了”的误解。新增“正在保存资料/资料已保存”、编辑清除旧成功
+  提示和处理中输入保护，错误仍显示 alert。后端、Memory、schema 和既有用户资料不变。
+- 前端 ESLint、TypeScript、production build passed；浏览器正在保存→资料已保存、重复输入保护
+  和无错误恢复通过，既有填写内容保留；ABOUT-10 CLOSED。
+
 ## 阶段更新规则
 
 每次开始、恢复或结束一个阶段时，必须更新：

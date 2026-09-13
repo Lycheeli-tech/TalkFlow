@@ -1,5 +1,19 @@
 # FluentLoop Issues
 
+## ABOUT-10: Supplemental facts save had no visible progress or confirmation
+
+Status: CLOSED — TypeScript/ESLint/build passed; browser saving/saved states verified.
+
+- User perceived the save button as ineffective. Logs showed two PATCH 200 / GET 200 pairs;
+  owner-scoped read-only database verification found one saved 19-character fact. No request,
+  validation or persistence failure was present, and the UI had neither progress nor success status.
+- About Me now displays saving/saved feedback next to the facts button. Success requires the save
+  and reload requests to finish; errors retain their alert without showing success. Editing clears
+  the old saved message; textarea/buttons are disabled while an operation is pending.
+- Backend, Memory decisions, schema and existing facts are unchanged. Frontend ESLint, TypeScript
+  and production build passed; browser showed saving status with repeated-input protection.
+  The same existing facts completed with saved status, no error and editable input restored.
+
 ## RESUME-09: Chinese display filename caused upload Failed to fetch
 
 Status: CLOSED — real Chinese PDF upload/parse/list/delete passed; 298 backend tests passed.
