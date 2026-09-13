@@ -19,7 +19,7 @@
 | 阶段 5 | COMPLETE | 功能与验证已完成；产品负责人已确认 TBD-003 / TBD-004 并授权 merge/push；checkpoint 为 `course-core-stage-5` |
 | 阶段 6 | COMPLETE | 中文 Answer 闭环与用户设备录音验收通过；产品负责人已授权合并、推送 |
 | 阶段 7 | COMPLETE | 全部 30 Course / 59 Question 使用同一通用引擎，待 review |
-| 阶段 8 | 未开始 | 依赖 Catalog、录音、STT 和 Feedback 基础设施 |
+| 阶段 8 | IN PROGRESS | 已授权 Practice V2；TTL 已批准（ADR-032） |
 
 ## 阶段 0：规格和安全边界
 
@@ -231,10 +231,10 @@
 
 ## 阶段 8：Practice V2
 
-- 2026-09-13 产品负责人授权在 P7 merge/push 完成后开始 P8；当前已 merge，push 尚未成功，依照该顺序暂不开始实现。
-- 已阅读 Practice 选题、语音过程、整场 Feedback、临时数据/API 和 Legacy 边界要求；TBD-007 尚无批准记录。
-- 待确认方案：进行中 Run 从创建起保留 24 小时；完成/放弃立即撤销读取并删除临时文本与 Feedback，私有音频进入幂等清理；过期 Run 使用相同清理路径，失败任务仅保留清理所需信息并重试。不提供已完成 Practice History。该方案是提案，未设置生产默认值或定稿 schema。
-- 下一步：恢复 GitHub 连接，推送并核对 P7 refs；产品负责人确认 TBD-007 后在 `codex/course-core-stage-8` 开始独立 Practice V2 实现。
+- 2026-09-13 P7 main `66de471`、分支及 `course-core-stage-7` / `ac360dd` 已 atomic push 并核对远程 refs；开始 P8，分支 `codex/course-core-stage-8`。
+- 已阅读 Practice 选题、语音过程、整场 Feedback、临时数据/API 和 Legacy 边界要求；TBD-007 已批准，见 ADR-032。
+- 已批准：进行中 Run 从创建起保留 24 小时；完成/放弃立即删除临时文本，音频进入幂等清理；无已完成 History。
+- 下一步：独立 Practice V2 schema/repository、确定性选题、语音状态机和整场 Feedback 实现及验收。
 
 1. 随机抽取 3 / 5 题；
 2. 逐题语音回答；

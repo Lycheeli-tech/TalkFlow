@@ -337,3 +337,19 @@ does not add to or change the meaning of the approved Chinese content.
 - Processing failures retain the same audio and Chinese Transcript for retry under ADR-028; successful
   pending Drafts remain recoverable until the owner confirms or discards them, with no invented Draft TTL.
 - Confirmation is idempotent and stores both immutable Chinese Transcript and organized English.
+
+### ADR-032 — Ephemeral Practice V2 Runs
+
+**Status:** Accepted
+
+**Date:** 2026-09-13
+
+**Authority:** Build Spec v2.1 TBD-007 and explicit product-owner approval (「批准方案」).
+
+- In-progress Practice Runs expire 24 hours after creation; pausing does not extend expiry.
+- Completion/abandonment immediately revoke access and delete temporary transcripts/Feedback.
+  Whole-run Feedback is returned for the current page only, never a saved Practice history.
+- Private audio deletion is idempotent and retryable; only owner/path cleanup metadata survives
+  Run deletion. Expired Runs follow the same cleanup path.
+- Practice has separate models/repositories and cannot create Course Answers, Memory sources or
+  Legacy Sessions/Attempts/progress. Deterministic sampling uses the fixed 59-Question Catalog.
