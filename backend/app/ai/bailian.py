@@ -140,10 +140,11 @@ class BailianAnswerAnalyzer:
 class BailianSpeechToTextService:
     provider_name = "bailian"
 
-    def __init__(self, *, api_key: str, base_url: str, model: str) -> None:
+    def __init__(self, *, api_key: str, base_url: str, model: str, language: str = "en") -> None:
         self._api_key = api_key
         self._base_url = base_url.rstrip("/")
         self._model = model
+        self._language = language
 
     async def transcribe(self, *, audio: bytes, content_type: str) -> str:
         data_uri = f"data:{content_type};base64,{base64.b64encode(audio).decode('ascii')}"
@@ -156,7 +157,7 @@ class BailianSpeechToTextService:
                 }
             ],
             "stream": False,
-            "asr_options": {"language": "en", "enable_itn": True},
+            "asr_options": {"language": self._language, "enable_itn": True},
         }
         async with httpx.AsyncClient(
             base_url=self._base_url,

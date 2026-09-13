@@ -158,3 +158,12 @@ async def test_bailian_speech_providers_use_configured_endpoints(monkeypatch) ->
     tts_body = json.loads(requests[1].content)
     assert tts_body["input"]["voice"] == "Cherry"
     assert tts_body["input"]["language_type"] == "English"
+
+    chinese = await BailianSpeechToTextService(
+        api_key="test-key",
+        base_url="https://workspace.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+        model="qwen3-asr-flash",
+        language="zh",
+    ).transcribe(audio=b"chinese-audio", content_type="audio/wav")
+    assert chinese == "Hello"
+    assert json.loads(requests[-1].content)["asr_options"] == {"language": "zh", "enable_itn": True}

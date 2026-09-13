@@ -42,8 +42,8 @@ the explicit rollback test app only. `docs/CURRENT_MILESTONE_V1.md` contains ful
 - No Stage 5 migration is required; `course_feedback` was intentionally created in Stage 3.
 - Integration tests confirmed single-row Feedback retry and no Legacy field/table mutation.
 - No Stage 5 test rows or test accounts remain; no Legacy migration or data changed.
-- P6 migration `202609130020` passed local full-sequence validation and real transactional tests;
-  all P6 DDL/data were rolled back. It has NOT been persistently applied/registered.
+- P6 migration `202609130020` is persistently applied/registered in the authorized test database;
+  migration Legacy progress/field snapshots were unchanged.
 
 ## Stage 6 Checkpoint
 
@@ -54,7 +54,15 @@ the explicit rollback test app only. `docs/CURRENT_MILESTONE_V1.md` contains ful
 - Backend 151 passed, Ruff check/format passed. Real PostgreSQL + Bailian first run: 2 passed.
 - Frontend TypeScript/lint/build passed including microphone-unmount safety. Final dual-text migration
   constraint rerun: 1 passed. The last fidelity Prompt tracking column still needs real-database recheck.
-- Real Chinese audio/browser release gates and persistent test-environment migration rollout remain.
+- Real synthetic Chinese TTS→ASR→organizer/fidelity→Draft→confirmation passed with immutable dual texts.
+- Desktop 1280px refresh/resume/confirm and 375px dual texts/History/discard/reanswer passed.
+- Shared STT defaults remain English; Chinese runtime now explicitly uses zh. Supabase exact-prefix
+  deletion and late cleanup failure protection were corrected; oldest audio EXPIRED, latest two RETAINED.
+- Final backend 153 passed; combined real integrations 9 passed; frontend lint/typecheck/build passed.
+- Device microphone gate remains: user authorized localhost microphone and Chrome fallback, but IAB
+  getUserMedia does not return and the browser tool reports Chrome unavailable. See COURSE-06.
+- Disposable Auth user/Answers/private audio/local credentials were removed; persisted Answer and
+  Storage object counts are zero. New late-cleanup guard real PostgreSQL rerun: 1 passed.
 
 ## Known Limitations
 
@@ -65,7 +73,6 @@ the explicit rollback test app only. `docs/CURRENT_MILESTONE_V1.md` contains ful
 
 ## Next Action
 
-Resume P6 from its implementation checkpoint: verify final patches, exercise real Chinese audio upload,
-organization, confirmation/discard and refresh recovery, then authenticated desktop/375px recording smoke.
-Apply/register the new migration only in the configured test environment with a reviewed rollout gate.
+Resume only the actual-device browser microphone gate once an operational browser surface is available.
+Do not repeat the completed audio, responsive Draft or migration gates without new evidence.
 Record final acceptance evidence before creating a P6 completion tag; do not start P7.

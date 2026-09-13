@@ -42,6 +42,7 @@ class CourseAnswerService:
         memory_capture: CourseAnswerMemoryCapture | None = None,
         feedback_generator: CourseAnswerFeedbackGenerator | None = None,
         chinese_organizer: ChineseAnswerOrganizer | None = None,
+        chinese_stt: SpeechToTextService | None = None,
     ) -> None:
         self._repository = repository
         self._stt = stt
@@ -50,6 +51,7 @@ class CourseAnswerService:
         self._memory_capture = memory_capture
         self._feedback_generator = feedback_generator
         self._chinese_organizer = chinese_organizer
+        self._chinese_stt = chinese_stt or stt
 
     async def synthesize_question(
         self, *, course_id: str, question_id: str, voice: str = "default"
@@ -254,7 +256,8 @@ class CourseAnswerService:
         if answer.answer_language == "CHINESE" and current.transcript is not None:
             return await self._organize(current)
         try:
-            transcript_text = await self._stt.transcribe(
+            recognizer = self._chinese_stt if answer.answer_language == "CHINESE" else self._stt
+            transcript_text = await recognizer.transcribe(
                 audio=audio, content_type=answer.audio_content_type or "application/octet-stream"
             )
         except Exception:
@@ -268,7 +271,7 @@ class CourseAnswerService:
             user_id=answer.user_id,
             source_language=answer.answer_language,
             transcript=transcript_text,
-            stt_provider=self._stt.provider_name,
+            stt_provider=recognizer.provider_name,
             created_at=now,
             updated_at=now,
         )

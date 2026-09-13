@@ -190,10 +190,13 @@
 - 状态：IN PROGRESS；实现 checkpoint，未关闭发布门、未创建完成 tag、未 merge/push。
 - 已实现：中文录音/最终 STT、独立组织 Prompt 与忠实度检查、持久 Draft 列表/恢复、双稿只读展示、确认幂等、放弃/重新回答、确认后 Feedback/Memory 与按语言最近两条录音。
 - 整理只接收当前中文 Transcript；逐段来源摘录和来源外数字由代码验证，语义忠实度由独立结构化检查过滤。不使用 About Me、Resume、Memory 或历史补全中文事实。
-- 新迁移：`202609130020_chinese_answer_drafts.sql`；新增待确认状态、确认约束、双稿延迟约束和 organizer 追踪字段。20 个迁移本地顺序验证通过；真实数据库只在事务内验证并回滚，尚未持久应用/登记 P6 迁移。
-- 后端：151 passed、10 opt-in skipped；Ruff check/format passed。真实 PostgreSQL Draft/确认/RLS/Legacy 快照及 Bailian 忠实翻译/编造拒绝首轮：2 passed。
-- 前端：TypeScript、ESLint、production build passed，包括最终麦克风卸载安全补丁。真实 PostgreSQL 最终双稿/确认约束复跑：1 passed；末尾新增忠实度 Prompt 追踪字段尚需下一轮真实库复核。
-- 剩余发布门：最终 Prompt 追踪字段真实库复核、真实中文音频 STT→整理→确认/放弃闭环、认证后桌面与 375px 浏览器录音/恢复 smoke，以及迁移应用与登记。
+- 新迁移：`202609130020_chinese_answer_drafts.sql` 已获授权持久应用并登记于配置的测试库；迁移前后 Legacy 全用户进度字段及五张表计数不变。最终 fidelity Prompt 字段真实库回归通过。
+- 后端：153 passed、10 opt-in skipped；Ruff check/format passed。组合真实 PostgreSQL/中文 Bailian 回归：9 passed；新增晚到清理失败保护真实库复跑：1 passed。
+- 前端：TypeScript、ESLint、production build passed。中文 STT 使用独立 zh 配置，英文默认 en 不变；P6 放弃/重新回答使用页内二次确认。
+- 真实服务：一次性账号、合成中文 TTS 音频经实际上传→中文 ASR→忠实整理→待确认→确认保存，重复确认幂等；双稿与 fidelity Prompt 版本实际落库。三个同题同语言确认 Answer 的最旧音频 EXPIRED，最近两条 RETAINED；真实服务操作前后 Legacy 快照不变。
+- 浏览器：认证后桌面 1280px 恢复双稿、刷新再恢复、确认及 History 通过；375px 双稿、History 抽屉、放弃和重新回答进入中文引导通过，无横向溢出或最终页面控制台错误。
+- 剩余发布门仅为真实设备麦克风录音 smoke：用户已批准 localhost 麦克风及改用 Chrome，但内置浏览器 getUserMedia 请求不返回，当前浏览器工具报告 Chrome 不可用。没有伪造录音或将合成音频测试等同于设备录音；P6 保持 IN PROGRESS，不创建完成 tag。
+- 清理：一次性 Auth 账号、Answer/Feedback/Memory、私有音频及本地凭据/合成音频已删除；持久 Answer 与 Storage 对象残留计数为零。
 - 已知限制：Auth 仍为 sessionStorage 生命周期；未上传设备录音不能跨刷新恢复，只有已归属服务端的 Draft 可恢复；忠实度语义检查依赖模型，不能把精确摘录当作完整语义证明。
 - 范围：仍只有 Course 11 可回答；P7/P8 未开始；Legacy 保持冻结。
 

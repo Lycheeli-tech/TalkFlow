@@ -321,6 +321,11 @@ class SQLCourseAnswerRepository:
             await self._session.commit()
             return
         row = await self._owned_row(user_id, answer_id)
+        if row.audio_path is None:
+            # A concurrent worker already completed cleanup. A late failure must not
+            # downgrade EXPIRED or create an unprocessable null-path retry.
+            await self._session.commit()
+            return
         row.audio_retention_status = "CLEANUP_FAILED"
         row.audio_cleanup_pending = True
         row.updated_at = datetime.now(row.updated_at.tzinfo)
@@ -619,6 +624,8 @@ class InMemoryCourseAnswerRepository:
         aggregate = await self.get(user_id, answer_id)
         if aggregate is None:
             raise LookupError("Course Answer was not found.")
+        if aggregate.answer.audio_path is None:
+            return
         self.answers[answer_id] = aggregate.answer.model_copy(
             update={"audio_retention_status": "CLEANUP_FAILED", "audio_cleanup_pending": True}
         )

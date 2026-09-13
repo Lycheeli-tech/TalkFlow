@@ -51,6 +51,21 @@ def get_course_stt_service() -> SpeechToTextService:
 
 
 @lru_cache
+def get_course_chinese_stt_service() -> SpeechToTextService:
+    settings = get_settings()
+    if settings.stt_provider == "bailian":
+        if not settings.bailian_api_key:
+            raise RuntimeError("BAILIAN_API_KEY is required for Chinese Answer STT.")
+        return BailianSpeechToTextService(
+            api_key=settings.bailian_api_key,
+            base_url=settings.bailian_compatible_base_url,
+            model=settings.bailian_stt_model,
+            language="zh",
+        )
+    return FakeSpeechToTextService("我负责测试。")
+
+
+@lru_cache
 def get_course_tts_service() -> TextToSpeechService:
     settings = get_settings()
     if settings.tts_provider == "bailian":

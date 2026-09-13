@@ -8,7 +8,11 @@ from app.about_me.repository import AboutMeRepository
 from app.about_me.service import AboutMeService
 from app.ai.interfaces import SpeechToTextService, TextToSpeechService
 from app.api.about_me_dependencies import get_about_me_repository, get_about_me_service
-from app.api.core_dependencies import get_course_stt_service, get_course_tts_service
+from app.api.core_dependencies import (
+    get_course_chinese_stt_service,
+    get_course_stt_service,
+    get_course_tts_service,
+)
 from app.core.config import get_settings
 from app.course.answer_service import CourseAnswerService
 from app.course.chinese_organizer import (
@@ -90,6 +94,7 @@ def get_course_answer_service(
     memory_capture: AboutMeService = Depends(get_about_me_service),
     feedback_generator: CourseSupportService = Depends(get_course_support_service),
     chinese_organizer: ChineseAnswerOrganizer = Depends(get_chinese_answer_organizer),
+    chinese_stt: SpeechToTextService = Depends(get_course_chinese_stt_service),
 ) -> CourseAnswerService:
     return CourseAnswerService(
         repository=repository,
@@ -99,4 +104,5 @@ def get_course_answer_service(
         memory_capture=memory_capture,
         feedback_generator=feedback_generator,
         chinese_organizer=chinese_organizer,
+        chinese_stt=chinese_stt,
     )

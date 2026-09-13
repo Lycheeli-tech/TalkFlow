@@ -67,8 +67,11 @@ class SupabaseCourseAudioStorage:
 
     async def delete(self, *, path: str) -> None:
         async with httpx.AsyncClient(timeout=30) as client:
-            response = await client.delete(
-                f"{self._url}/storage/v1/object/learner-audio/{path}", headers=self._headers
+            response = await client.request(
+                "DELETE",
+                f"{self._url}/storage/v1/object/learner-audio",
+                headers=self._headers,
+                json={"prefixes": [path]},
             )
         if response.status_code not in {200, 404}:
             response.raise_for_status()

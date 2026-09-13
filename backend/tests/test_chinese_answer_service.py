@@ -210,3 +210,16 @@ def test_unverifiable_translation_sources_and_numbers_are_rejected(source, excer
             source,
             OrganizedDraft(segments=[OrganizedSegment(source_excerpt=excerpt, english=english)]),
         )
+
+
+@pytest.mark.asyncio
+async def test_late_cleanup_failure_does_not_downgrade_completed_cleanup():
+    repo, _, _, _, service = build()
+    owner = uuid4()
+    draft = await submit(service, owner)
+    saved = await service.confirm(user_id=owner, answer_id=draft.answer.id)
+    await repo.mark_cleanup_complete(owner, saved.answer.id)
+    await repo.mark_cleanup_failed(owner, saved.answer.id)
+    result = await repo.get(owner, saved.answer.id)
+    assert result.answer.audio_retention_status == "EXPIRED"
+    assert result.answer.audio_path is None and not result.answer.audio_cleanup_pending

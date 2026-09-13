@@ -76,6 +76,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
   const [answer, setAnswer] = useState<CourseAnswer | null>(null);
   const [feedbackAnswer, setFeedbackAnswer] = useState<CourseAnswer | null>(null);
   const [drafts, setDrafts] = useState<Record<string, CourseAnswer[]>>({});
+  const [draftAction, setDraftAction] = useState<"DISCARD" | "REANSWER" | null>(null);
   const [restoring, setRestoring] = useState(true);
   const [requestingMicrophone, setRequestingMicrophone] = useState(false);
   const [error, setError] = useState("");
@@ -346,6 +347,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
     }
     stopAudio();
     setQuestion(nextQuestion);
+    setDraftAction(null);
     setAnswer(null);
     setError("");
     setState("PREPARING");
@@ -358,6 +360,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
   }
 
   function resetAnswer() {
+    setDraftAction(null);
     pendingRef.current = null;
     setAnswer(null);
     setError("");
@@ -440,14 +443,21 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
   }
 
   async function abandonDraft(reanswer = false) {
-    if (!answer || busy || !window.confirm(copy.discardDraftConfirm)) return;
+    if (!answer || busy) return;
+    if (draftAction === null) {
+      setDraftAction(reanswer ? "REANSWER" : "DISCARD");
+      return;
+    }
+    const previousState = state;
+    setState("PROCESSING_CHINESE");
+    setDraftAction(null);
     try {
       await discardCourseDraft(getStoredAccessToken(), answer.id);
       setDrafts((current) => ({ ...current, [answer.question_id]:
         (current[answer.question_id] ?? []).filter((item) => item.id !== answer.id) }));
       resetAnswer();
       if (reanswer) setAuxiliaryPanel("CHINESE_GUIDE");
-    } catch { setError(copy.discardDraftError); }
+    } catch { setError(copy.discardDraftError); setState(previousState); }
   }
 
   return (
@@ -551,9 +561,9 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
               <div className={styles.transcript}><strong>{copy.organizedEnglish}</strong><p>{answer.transcript.organized_english}</p></div>
               <p>{copy.confirmDraftHelp}</p>
               <div className={styles.answerActions}>
-                <button className={styles.primaryButton} type="button" onClick={() => void confirmDraft()}>{copy.confirmDraft}</button>
-                <button type="button" onClick={() => void abandonDraft()}>{copy.discard}</button>
-                <button type="button" onClick={() => void abandonDraft(true)}>{copy.answerAgain}</button>
+                <button disabled={draftAction !== null} className={styles.primaryButton} type="button" onClick={() => void confirmDraft()}>{copy.confirmDraft}</button>
+                <button disabled={draftAction !== null} type="button" onClick={() => void abandonDraft()}>{copy.discard}</button>
+                <button disabled={draftAction !== null} type="button" onClick={() => void abandonDraft(true)}>{copy.answerAgain}</button>
               </div>
             </section>
           )}
@@ -626,6 +636,18 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
                 </button>
               </div>
             </div>
+          )}
+
+          {draftAction !== null && (
+            <section role="group" aria-label={copy.discardDraftConfirm}>
+              <p>{copy.discardDraftConfirm}</p>
+              <div className={styles.answerActions}>
+                <button type="button" disabled={busy} onClick={() => void abandonDraft(draftAction === "REANSWER")}>
+                  {copy.discard}
+                </button>
+                <button type="button" onClick={() => setDraftAction(null)}>{copy.close}</button>
+              </div>
+            </section>
           )}
 
           {error && state !== "RECOVERABLE_FAILURE" && (

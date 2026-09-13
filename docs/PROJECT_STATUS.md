@@ -23,7 +23,7 @@ and About Me plus source-validated AI Memory now use dedicated Course Core bound
 
 - Phase: Course Core
 - Stage: 6 — Chinese Answer loop
-- Status: IN PROGRESS — implementation checkpoint; end-to-end/browser release gates remain.
+- Status: IN PROGRESS — real Chinese audio, responsive Draft flows and migration passed; device microphone smoke remains blocked by browser capabilities.
 - Uploaded Chinese Drafts support refresh recovery under approved TBD-010 / ADR-031.
 - Confirmation is required before History, Feedback, or Memory; discard queues private audio cleanup.
 - Transcript-only organization uses exact excerpts, number checks, and a separate fidelity check.
@@ -48,12 +48,13 @@ at tag `course-core-stage-4`. Stage 5 is merged/pushed to `main` at `course-core
 
 ## Course Core Not Yet Implemented
 
-- Chinese flow release validation is pending; remaining-Course answering and Practice V2 are not implemented.
+- Device microphone smoke is pending; remaining-Course answering and Practice V2 are not implemented.
 
 ## Current Blockers
 
 No unresolved P6 product choice remains. TBD-010 is approved in ADR-031.
-P6 migration has only been transactionally verified, not persistently applied/registered.
+P6 migration `202609130020` is persistently applied/registered in the configured test database.
+IAB microphone request does not return; authorized Chrome fallback is unavailable in browser tools.
 Failed Answer/Draft audio TTL remains three days under ADR-028.
 
 ## Next Steps

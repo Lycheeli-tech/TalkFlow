@@ -128,6 +128,12 @@ async def test_chinese_draft_migration_confirmation_recovery_rls_and_legacy_snap
                     await service.confirm(user_id=owner, answer_id=draft.answer.id)
                 ).answer.saved_sequence == saved.answer.saved_sequence
                 assert await snapshot(session, owner) == before
+                await repo.mark_cleanup_complete(owner, saved.answer.id)
+                await repo.mark_cleanup_failed(owner, saved.answer.id)
+                cleaned = await repo.get(owner, saved.answer.id)
+                assert cleaned.answer.audio_retention_status == "EXPIRED"
+                assert cleaned.answer.audio_path is None
+                assert not cleaned.answer.audio_cleanup_pending
                 await service.delete(user_id=owner, answer_id=draft.answer.id)
                 assert await snapshot(session, owner) == before
                 # Owner-filtered authenticated reads and no direct product writes.

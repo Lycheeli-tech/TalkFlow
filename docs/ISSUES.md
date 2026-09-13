@@ -1,5 +1,23 @@
 # FluentLoop Issues
 
+## COURSE-06: P6 real-audio closeout and device-browser limitation
+
+Status: code defects fixed; actual device microphone smoke OPEN.
+
+- Real Chinese audio exposed shared ASR's hard-coded en: Course Chinese now injects zh, preserving
+  the default English/Legacy contract. Real Chinese Transcript and dual Draft passed.
+- Supabase single-object DELETE returned 400; exact `prefixes` bulk-delete succeeded. A concurrent
+  completed cleanup followed by late failure produced CLEANUP_FAILED with a null path; repository
+  failure marking now cannot downgrade completed cleanup. Unit and real PostgreSQL regressions cover it.
+- P6 native Draft confirmation blocked IAB automation; replaced only P6 discard/reanswer with explicit
+  page-level second confirmation. Authenticated 375px discard/reanswer now passed.
+- User authorized localhost:3100 microphone and Chrome fallback. IAB getUserMedia remains pending
+  without a visible permission result; `createBrowserTab('chrome', ...)` reports browser unavailable.
+  No fake microphone injection or alternate unapproved UI automation was used.
+- Next: provide an operational Chrome/browser surface or manual device smoke, verify actual recording,
+  navigation guard, stop/upload and refresh recovery at desktop/375px, then close P6. Migration and
+  synthetic real-provider audio gates are already passed; do not reapply migration or start P7.
+
 ## AUTH-01: Expired-token dead end blocked the login entry path (FIXED)
 
 Status: fix implemented and partially regression-tested; full authenticated-path re-validation
