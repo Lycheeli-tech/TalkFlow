@@ -4,22 +4,22 @@
 
 - 2026-09-13
 - Branch: `codex/course-core-stage-5`
-- Checkpoint: Stage 5 implementation verified locally; product UI decision still pending
+- Checkpoint: `course-core-stage-5`; implementation verified and product UI approved
 
 ## Current State
 
-Course Core Stage 5 implementation and verification are complete, but the stage remains IN PROGRESS
-until the product owner resolves TBD-003 and TBD-004. Course 11 remains the only Answer-enabled Course.
-Do not mark complete, tag, merge, push, or begin Stage 6 without explicit instruction.
+Course Core Stage 5 is COMPLETE. The product owner approved TBD-003/TBD-004 and explicitly authorized
+merge/push on 2026-09-13. Course 11 remains the only Answer-enabled Course.
+Do not begin Stage 6 without explicit instruction.
 
 Legacy remains frozen at `8cc986d` and unmounted from the default runtime. Historical regressions use
 the explicit rollback test app only. `docs/CURRENT_MILESTONE_V1.md` contains full stage evidence.
 
-## Stage 5 Result Candidate
+## Stage 5 Result
 
 - Bounded Course Context Builder, three on-demand support APIs, four versioned prompts, structured
   provider contracts, Answer-scoped Feedback and idempotent retry are implemented outside Legacy.
-- Candidate UI places hints, materials, reference answer, Feedback, and History in one mutually exclusive
+- Approved UI places hints, materials, reference answer, Feedback, and History in one mutually exclusive
   right assistant panel. Recorder state remains independent; desktop uses three columns and mobile a drawer.
 - Feedback validates exact Transcript quotes and rejects source-external numbers. Real-provider testing
   led to a deterministic no-context reference template and exact-source validation for grounded segments.
@@ -45,12 +45,11 @@ the explicit rollback test app only. `docs/CURRENT_MILESTONE_V1.md` contains ful
 
 ## Known Limitations
 
-- Stage 5 cannot close until TBD-003/TBD-004 are explicitly approved. Chinese Answer is Stage 6,
-  other Courses are Stage 7, and Practice V2 is Stage 8.
+- Chinese Answer is Stage 6, other Courses are Stage 7, and Practice V2 is Stage 8; none was added.
 - Auth session lifecycle remains sessionStorage-based. One existing Starlette/httpx warning remains.
-- Preserve the unrelated user change in `frontend/next-env.d.ts`; it is not part of Stage 4.
+- Preserve the unrelated user change in `frontend/next-env.d.ts`; it is not part of Stage 5.
 
 ## Next Action
 
-Obtain product-owner confirmation of the proposed Stage 5 panel structure. Then update DECISIONS only
-for the stable approved choice, create the Stage 5 checkpoint, and stop for review.
+Complete the authorized merge/push of Stage 5 and its checkpoint tag, then stop. ADR-030 records the
+approved panel structure. Stage 6 requires a new explicit instruction.

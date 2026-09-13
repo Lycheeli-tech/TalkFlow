@@ -300,3 +300,25 @@ does not add to or change the meaning of the approved Chinese content.
 - Deleting one source does not delete a Memory that still has another valid source.
 - Object-storage outages do not resurrect deleted Answers or Resumes and do not strand cleanup silently.
 - New source types or action semantics require an explicit schema/prompt version and deterministic validator.
+
+### ADR-030 — Approved Course Assistant Entry and Feedback Layout
+
+**Status:** Accepted
+
+**Date:** 2026-09-13
+
+**Authority:** Build Spec v2.1 TBD-003/TBD-004 and explicit product-owner approval
+
+#### Decision
+
+- Reference Answer is a main answering-area action alongside hints and expression materials; it opens
+  the right assistant panel rather than replacing the Answer workspace.
+- Hints, expression materials, Reference Answer, Feedback, and History share one mutually exclusive
+  assistant panel. Its state is independent of recording state; switching panels does not stop recording.
+- Feedback presents its summary first, followed by 1–3 original-quote and suggestion pairs.
+- Desktop uses Questions / Answer / Assistant columns; mobile uses a right-side drawer.
+
+#### Consequences
+
+- TBD-003 and TBD-004 are resolved for Stage 5. No later-stage functionality is authorized by this choice.
+- Recording and audio mutual-exclusion constraints remain mandatory regardless of panel selection.

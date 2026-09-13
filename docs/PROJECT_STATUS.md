@@ -4,7 +4,7 @@
 
 - 2026-09-13
 - Branch: `codex/course-core-stage-5`
-- HEAD: Stage 5 implementation checkpoint candidate; completion tag pending product UI approval
+- Checkpoint: `course-core-stage-5`; product UI approved; merge/push authorized
 
 ## Product
 
@@ -23,7 +23,7 @@ and About Me plus source-validated AI Memory now use dedicated Course Core bound
 
 - Phase: Course Core
 - Stage: 5 — On-demand AI support and Course Feedback
-- Status: IN PROGRESS — implementation and verification complete; TBD-003/TBD-004 approval pending.
+- Status: COMPLETE — implementation and verification complete; TBD-003/TBD-004 approved.
 - Hints, expression materials, safe reference answers, and Answer-scoped Feedback use a bounded,
   ownership-filtered Course Context Builder and versioned prompts.
 - Feedback failure remains isolated from saved Answers; deterministic validation checks exact quotes,
@@ -36,7 +36,7 @@ The final Legacy code baseline is tag `legacy-loop-final-baseline` at `8cc986d`.
 tag `course-core-stage-0-v2.1`; Stage 1 is merged to `main` and closed at tag
 `course-core-stage-1`; Stage 2 is merged to `main` and closed at tag `course-core-stage-2`; Stage 3
 is merged to `main` and closed at tag `course-core-stage-3`; Stage 4 is merged to `main` and closed
-at tag `course-core-stage-4`. Stage 5 is isolated on `codex/course-core-stage-5`.
+at tag `course-core-stage-4`. Stage 5 closes at `course-core-stage-5` on `codex/course-core-stage-5`.
 
 ## Legacy Implementation Preserved
 
@@ -53,13 +53,13 @@ at tag `course-core-stage-4`. Stage 5 is isolated on `codex/course-core-stage-5`
 
 ## Current Blockers
 
-TBD-003 and TBD-004 require explicit product-owner confirmation before Stage 5 UI can be final and
-the milestone can close. Failed Answer/Draft audio TTL remains three days under ADR-028.
+No Stage 5 blocker remains. TBD-003/TBD-004 are approved in ADR-030.
+Failed Answer/Draft audio TTL remains three days under ADR-028.
 
 ## Next Steps
 
-1. Product owner confirms or changes the proposed Stage 5 reference-answer entry and Feedback layout.
-2. After approval, record the stable UI decision, create the Stage 5 checkpoint, and stop for review.
+1. Complete the explicitly authorized Stage 5 merge and push.
+2. Stop after closeout; do not begin Stage 6 without explicit instruction.
 
 ## Stage 4 Verification Snapshot
 
