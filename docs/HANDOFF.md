@@ -2,7 +2,7 @@
 
 ## Updated
 
-- 2026-09-13
+- 2026-09-14
 - Branch: `codex/course-core-stage-8`
 - Completion checkpoint: `course-core-stage-8` (use `git rev-parse` for final HEAD)
 - Baseline: verified pushed P7 main `66de471`; P7 tag `ac360dd`; P8 approval checkpoint `75716c2`
@@ -10,8 +10,9 @@
 ## Current State
 
 P7 merge/push is complete: remote main, P7 branch and tag were verified after the authorized retry.
-User explicitly authorized P8 and approved TBD-007 / ADR-032. P8 is COMPLETE and waiting for review;
-P8 merge/push and post-MVP work are not authorized.
+User explicitly authorized P8 and approved TBD-007 / ADR-032. P8 is COMPLETE. On 2026-09-14 the owner explicitly authorized merge/push of P8 and all
+subsequent review fixes (through `6a98e10`) and marking P8 complete. No post-MVP work is authorized.
+Delivery checkpoint: `course-core-stage-8-complete`; preserve original stage tag at `04fbfce`.
 
 Review follow-up RESUME-09 is fixed: Chinese filenames were rejected as Storage keys. New uploads
 use an owner/document ASCII key and preserve the original display filename; provider failures return
@@ -53,7 +54,8 @@ history, personalization, Course Answer/Memory writes or Legacy changes. Active 
 
 ## Verification / Recovery
 
-- Backend: 292 passed / 13 opt-in skipped; Ruff check/format passed.
+- Closeout: backend 306 passed / 13 opt-in skipped; auth-session 14 passed (2026-09-14).
+  Prior TypeScript/ESLint/production build and Ruff evidence remains valid; no runtime code changes.
 - Real PostgreSQL P8: 1 passed (18.81s); ownership/RLS, no direct writes, idempotency/CAS,
   expiry, completion deletion, cleanup backoff/new-registration protection and unchanged
   Legacy/Course/Memory snapshots. Fixtures rolled back.
@@ -91,6 +93,6 @@ history, personalization, Course Answer/Memory writes or Legacy changes. Active 
 
 ## Next Action
 
-Review P8 in the browser. Await explicit P8 merge/push authorization. Completed reports cannot be
+P8 COMPLETE; publish main/source branch and completion tags and verify matching remote refs. Completed reports cannot be
 recovered after refresh/lost response by design; unuploaded device blobs are not refresh recoverable.
 Audio cleanup is asynchronous with durable backoff; semantic feedback quality remains model-dependent.

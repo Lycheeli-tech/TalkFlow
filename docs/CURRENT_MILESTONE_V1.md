@@ -234,7 +234,9 @@
 - 2026-09-13 P7 main `66de471`、分支及 `course-core-stage-7` / `ac360dd` 已 atomic push 并核对远程 refs；开始 P8，分支 `codex/course-core-stage-8`。
 - 已阅读 Practice 选题、语音过程、整场 Feedback、临时数据/API 和 Legacy 边界要求；TBD-007 已批准，见 ADR-032。
 - 已批准：进行中 Run 从创建起保留 24 小时；完成/放弃立即删除临时文本，音频进入幂等清理；无已完成 History。
-- 状态：COMPLETE；本地完成标签 `course-core-stage-8`。完成后等待产品负责人 review；未授权 P8 merge/push 或 post-MVP 工作。
+- 状态：COMPLETE；2026-09-14 产品负责人批准 P8 及所有后续修复 merge/push。
+  交付标签 `course-core-stage-8-complete`；保留原实现标签 `course-core-stage-8` / `04fbfce`。
+  未授权后续或 post-MVP 工作。
 
 1. 随机抽取 3 / 5 题；
 2. 逐题语音回答；
@@ -258,7 +260,7 @@
 - 清理：P8 disposable owner 的 Run、cleanup job、私有 Practice Storage 对象均为 0；P6 原三条设备 Course Answer/录音及 Auth 保留。用户原账号 Course 数据未修改。
 - 验收对照：阶段 8 七项，以及 20.3 的 1/2、7/9/10、22–29 相关条目通过；其余 Course/About Me 合约沿用 P3–P7 并通过完整自动回归。无 Legacy 文件/schema/进度变更，无后续或 post-MVP 范围。
 - 限制：报告仅在完成响应当前页面显示，刷新或完成响应丢失不能恢复。未上传设备录音不跨刷新恢复，已上传进行中回答在 24 小时内可恢复。音频异步清理，失败保留任务重试；反馈语义质量依赖模型，精确摘录不等于正式能力评测。本次未声称三/五题均完成真人口述，设备静音测试和合成语音闭环分别记录。
-- Git：`codex/course-core-stage-8`；批准 checkpoint `75716c2`，完成 HEAD 由 `course-core-stage-8` 标签确定。仅原有 `frontend/next-env.d.ts` 改动保留并排除提交。下一步 review，不自动 merge/push。
+- Git：`codex/course-core-stage-8`；批准 checkpoint `75716c2`，完成 HEAD 由 `course-core-stage-8` 标签确定。仅原有 `frontend/next-env.d.ts` 改动保留并排除提交。2026-09-14 已批准整体 merge/push；交付标签包含全部 review 修复。
 
 ### Review 修复：中文文件名简历上传
 
@@ -268,7 +270,7 @@
 - 合成探针 Unicode 400 / ASCII 200 复现；修复后独立账号中文 PDF 上传 201、解析、列表、
   原名显示和删除通过，账号及 source/job/Storage 残留均为 0。完整后端 298 passed / 13 skipped，
   Ruff check/format passed。后端已重启，About Me 已刷新，原文件可直接重传。
-- 修复作为 P8 后续本地 checkpoint；完成标签 `course-core-stage-8` / `04fbfce` 保持不变，仍待 review。
+- 修复作为 P8 后续本地 checkpoint；完成标签 `course-core-stage-8` / `04fbfce` 保持不变；已包含于 2026-09-14 批准的整体交付。
 
 ### Review 修复：补充资料保存状态
 
@@ -290,8 +292,6 @@
   Course/Memory/Practice 保存边界及 Legacy 不变。实际未等待 72 小时，验证由模拟过期与
   真实续期组成；主动退出后可用同账号重新登录。本地 auth 安全基线为 `86108de`。
 
-## 阶段更新规则
-
 ### Review 修复：未作答时生成参考答案
 
 - REF-12 CLOSED / ADR-034：入口原本无中文/英文回答前置条件，但模型偶尔输出空 text 或
@@ -305,6 +305,17 @@
   console errors 为零。前端代码未改动，原有 next-env.d.ts 保留并排除提交。
 - 限制：内容语义质量仍依赖模型；来源不足继续使用安全占位模板，不把生成内容写成用户回答。
   本地分支 `codex/course-core-stage-8`；安全标签 `course-reference-recovery-baseline`。
+
+### P8 最终交付
+
+- 2026-09-14：产品负责人批准将 P8 到当前的全部内容合并到 main 并推送，P8 标记 COMPLETE。
+- 范围包含 Practice V2、简历上传、补充资料保存提示、持久登录续期、初始参考答案生成修复；
+  代码截止 `6a98e10`。交付 checkpoint `course-core-stage-8-complete`，原 P8 标签不移动。
+- 当日后端 306 passed / 13 opt-in skipped；登录续期 14 passed。之前前端 build/TypeScript/
+  ESLint、真实 DB/Provider/浏览器验收继续有效，本次仅更新交付文档。
+- 原账号及所有资料历史继续保留；next-env.d.ts 原有未提交改动排除交付。
+
+## 阶段更新规则
 
 每次开始、恢复或结束一个阶段时，必须更新：
 

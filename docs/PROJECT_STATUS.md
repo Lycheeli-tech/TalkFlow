@@ -2,8 +2,8 @@
 
 ## Last Updated
 
-- 2026-09-13
-- Branch: `codex/course-core-stage-8`
+- 2026-09-14
+- Delivery branch: `main`; source: `codex/course-core-stage-8`
 - Safe baseline: pushed P7 main `66de471`; P7 tag `ac360dd`; P8 authorization checkpoint `75716c2`
 
 ## Product
@@ -15,17 +15,17 @@ source-validated Memory to help users express truthful experience in clearer, mo
 ## Current Lifecycle
 
 The v1.1 Legacy Loop implementation and Phase 2 local acceptance are complete at `8cc986d`. Product
-architecture has moved to Build Spec v2.1. Course Core Stages 1–7 are complete and locally merged;
-Stage 7 is pushed. All 30 Courses use the isolated English/Chinese Answer engine; About Me
+architecture has moved to Build Spec v2.1. Course Core Stages 1–8 are COMPLETE; P8 and all review fixes are approved for main delivery. All 30 Courses use the isolated English/Chinese Answer engine; About Me
 and source-validated AI Memory use dedicated boundaries. Legacy is preserved but unmounted by default.
 
 ## Current Work
 
 - Phase: Course Core
 - Stage: 8 — Practice V2
-- Status: COMPLETE — P7 main/branch/tag pushed and verified; P8 implementation and acceptance passed.
+- Status: COMPLETE — product owner approved P8 and all review fixes for merge/push on 2026-09-14.
+  Delivery checkpoint: `course-core-stage-8-complete`; original implementation tag is preserved.
   TBD-007 approved (ADR-032): 24-hour in-progress TTL, immediate completed/abandoned text deletion.
-  Isolated API, persistence, recorder UI and whole-feedback complete; local tag `course-core-stage-8`.
+  Isolated API, persistence, recorder UI and whole-feedback complete; original tag `course-core-stage-8`.
 - Review upload fix RESUME-09: Chinese filename PDF upload/parse/list/delete now passes; safe
   ASCII object keys preserve original names. Backend follow-up: 298 passed / 13 opt-in skipped.
 - Review facts-save feedback ABOUT-10: saving/saved notices added; persistence was already working.
@@ -71,9 +71,9 @@ Failed Answer/Draft audio TTL remains three days under ADR-028.
 
 ## Next Steps
 
-1. Review completed P8 at `/practice`; see CURRENT_MILESTONE_V1.md for acceptance and limitations.
-2. Await explicit P8 merge/push authorization; no post-MVP work is authorized.
-3. Retained P6 device data remain available locally; clean only the owner-scoped disposable review data after review.
+1. P8 COMPLETE; publish main/source branch and completion tags, then verify remote refs.
+2. No later or post-MVP work is authorized.
+3. Preserve the original acceptance account and data; cleanup requires explicit user instruction.
 
 ## Stage 4 Verification Snapshot
 
