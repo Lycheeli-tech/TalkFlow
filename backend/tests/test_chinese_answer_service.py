@@ -187,13 +187,13 @@ async def test_newest_two_only_counts_confirmed_chinese_and_language_groups_stay
             content_type="audio/webm",
             duration_ms=100,
         )
-    with pytest.raises(PermissionError):
+    with pytest.raises(LookupError):
         await submit(
             service,
             owner,
             key="blocked-other-course",
-            course_id="course-12",
-            question_id="course-12.core",
+            course_id="course-31",
+            question_id="course-31.core",
         )
 
 

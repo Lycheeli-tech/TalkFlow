@@ -76,7 +76,7 @@ def test_submit_history_detail_audio_and_retry_contracts(
     assert audio.objects == {}
 
 
-def test_course_answer_api_validates_media_question_and_rollout(
+def test_course_answer_api_validates_media_question_and_catalog(
     client: TestClient, override_current_user
 ) -> None:
     configure_course_service(client, override_current_user)
@@ -94,12 +94,12 @@ def test_course_answer_api_validates_media_question_and_rollout(
     )
     assert wrong_question.status_code == 404
 
-    outside_rollout = client.post(
-        "/api/v1/courses/course-10/questions/course-10.core/answers",
-        data={"idempotency_key": "outside-rollout"},
+    outside_catalog = client.post(
+        "/api/v1/courses/course-31/questions/course-31.core/answers",
+        data={"idempotency_key": "outside-catalog"},
         files={"recording": ("answer.webm", b"audio", "audio/webm")},
     )
-    assert outside_rollout.status_code == 409
+    assert outside_catalog.status_code == 404
 
 
 def test_question_tts_is_authenticated_and_exact(client: TestClient, override_current_user) -> None:
@@ -107,4 +107,6 @@ def test_question_tts_is_authenticated_and_exact(client: TestClient, override_cu
     response = client.get("/api/v1/courses/course-11/questions/course-11.follow-up/tts")
     assert response.status_code == 200
     assert response.content == b"fake-audio:default:What was specifically your contribution?"
-    assert client.get("/api/v1/courses/course-10/questions/course-10.core/tts").status_code == 409
+    assert (
+        client.get("/api/v1/courses/course-30/questions/course-30.follow-up/tts").status_code == 404
+    )

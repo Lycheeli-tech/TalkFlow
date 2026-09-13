@@ -3,8 +3,8 @@
 ## Last Updated
 
 - 2026-09-13
-- Branch: `main`
-- Checkpoint: `course-core-stage-6`; safe baseline `course-core-stage-5` / `9f08381`
+- Branch: `codex/course-core-stage-7`
+- Checkpoint: `course-core-stage-7`; safe baseline `main` / `71f606b`, P6 tag / `3f71595`
 
 ## Product
 
@@ -15,22 +15,21 @@ source-validated Memory to help users express truthful experience in clearer, mo
 ## Current Lifecycle
 
 The v1.1 Legacy Loop implementation and Phase 2 local acceptance are complete at `8cc986d`. Product
-architecture has moved to Build Spec v2.1. Course Core Stages 1–6 are complete and merged: Legacy remains
-preserved for rollback but is not mounted by default; Course 11 has the isolated English Answer loop,
-and About Me plus source-validated AI Memory now use dedicated Course Core boundaries.
+architecture has moved to Build Spec v2.1. Course Core Stages 1–6 are complete and merged; Stage 7 is
+complete on its review branch. All 30 Courses use the isolated English/Chinese Answer engine; About Me
+and source-validated AI Memory use dedicated boundaries. Legacy is preserved but unmounted by default.
 
 ## Current Work
 
 - Phase: Course Core
-- Stage: 6 — Chinese Answer loop
-- Status: COMPLETE — user-operated device recording, Chinese confirmation, saved dual texts,
-  refresh durability and Feedback passed; product owner authorized merge/push, fast-forward merged
-  to main and pushed to Lycheeli-tech/TalkFlow after explicit remote/ref confirmation.
-  P7 is not authorized.
+- Stage: 7 — All Courses
+- Status: COMPLETE — authorized on 2026-09-13; all 30 Courses / 59 Questions use one engine.
+  Backend, frontend, real PostgreSQL and desktop/375px browser checks passed. Awaiting review;
+  P7 is not merged or pushed, and P8 is not authorized.
 - Uploaded Chinese Drafts support refresh recovery under approved TBD-010 / ADR-031.
 - Confirmation is required before History, Feedback, or Memory; discard queues private audio cleanup.
 - Transcript-only organization uses exact excerpts, number checks, and a separate fidelity check.
-- Remaining-Course answering and Practice V2 remain disabled.
+- All Course answering is enabled; Practice V2 remains disabled.
 
 ## Stable Baseline
 
@@ -51,19 +50,20 @@ at tag `course-core-stage-4`. Stage 5 is merged/pushed to `main` at `course-core
 
 ## Course Core Not Yet Implemented
 
-- Remaining-Course answering and Practice V2 are not implemented.
+- Practice V2 is not implemented.
 
 ## Current Blockers
 
-No unresolved P6 product choice remains. TBD-010 is approved in ADR-031.
+No unresolved P7 blocker remains. TBD-010 is approved in ADR-031.
 P6 migration `202609130020` is persistently applied/registered in the configured test database.
 User-operated IAB device recording now passed; the previous microphone blocker is resolved.
 Failed Answer/Draft audio TTL remains three days under ADR-028.
 
 ## Next Steps
 
-1. P6 is closed at `course-core-stage-6` / `3f71595`; disposable device data remain available locally.
-2. Clean the owner-scoped review data afterward; do not begin P7 without explicit instruction.
+1. Review P7 at `course-core-stage-7`; see CURRENT_MILESTONE_V1.md for acceptance evidence.
+2. Await explicit merge/push or P8 authorization. Retained P6 device data remain available locally;
+   clean only the owner-scoped disposable review data after review.
 
 ## Stage 4 Verification Snapshot
 

@@ -506,7 +506,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
         </aside>
 
         <article className={styles.answerPanel}>
-          <p className={styles.eyebrow}>{copy.answerStageEyebrow}</p>
+          <p className={styles.eyebrow}>{copy.course} {String(course.order).padStart(2, "0")} · {copy.answerStageEyebrow}</p>
           <h1>{locale === "zh-CN" ? course.name_zh_cn : course.name_en}</h1>
           <p className={styles.questionKind}>
             {question.kind === "CORE" ? copy.coreQuestion : copy.followUpQuestion}

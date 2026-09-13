@@ -12,7 +12,6 @@ from app.course.chinese_organizer import (
 from app.course.cleanup import cleanup_course_audio_batch
 from app.course.entities import CourseAnswer, CourseAnswerAggregate, CourseTranscript
 from app.course.repository import CourseAnswerRepository
-from app.course.rollout import english_answer_is_enabled
 from app.course.storage import CourseAudioStorage
 
 
@@ -57,7 +56,6 @@ class CourseAnswerService:
         self, *, course_id: str, question_id: str, voice: str = "default"
     ) -> bytes:
         question = self._question(course_id, question_id)
-        self._require_rollout(course_id)
         return await self._tts.synthesize(text=question.text, voice=voice)
 
     async def submit_english(
@@ -120,7 +118,6 @@ class CourseAnswerService:
     ) -> CourseAnswerAggregate:
         await self.cleanup_expired_failed_audio()
         self._question(course_id, question_id)
-        self._require_rollout(course_id)
         existing = await self._repository.get_by_idempotency(user_id, idempotency_key)
         if existing:
             self._validate_idempotent_target(existing, course_id, question_id, language)
@@ -197,7 +194,6 @@ class CourseAnswerService:
         self, *, user_id: UUID, course_id: str, question_id: str
     ) -> list[CourseAnswerAggregate]:
         self._question(course_id, question_id)
-        self._require_rollout(course_id)
         return await self._repository.list_drafts(user_id, question_id)
 
     async def confirm(self, *, user_id: UUID, answer_id: UUID) -> CourseAnswerAggregate:
@@ -224,7 +220,6 @@ class CourseAnswerService:
     ) -> list[CourseAnswerAggregate]:
         await self.cleanup_expired_failed_audio()
         self._question(course_id, question_id)
-        self._require_rollout(course_id)
         return await self._repository.list_history(user_id, question_id)
 
     async def audio_for(self, *, user_id: UUID, answer_id: UUID) -> tuple[bytes, str]:
@@ -354,11 +349,6 @@ class CourseAnswerService:
         if question is None:
             raise LookupError("Question was not found in this Course.")
         return question
-
-    @staticmethod
-    def _require_rollout(course_id: str) -> None:
-        if not english_answer_is_enabled(course_id):
-            raise PermissionError("English answering is not enabled for this Course yet.")
 
     @staticmethod
     def _validate_idempotent_target(

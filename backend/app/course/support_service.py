@@ -4,7 +4,6 @@ from uuid import UUID
 from app.course.context import CourseContextBuilder, _resolve_question
 from app.course.entities import CourseAnswerAggregate, CourseFeedback
 from app.course.repository import CourseAnswerRepository
-from app.course.rollout import english_answer_is_enabled
 from app.course.support_entities import (
     CourseExpressionMaterials,
     CourseHints,
@@ -127,8 +126,6 @@ class CourseSupportService:
     @staticmethod
     def _require_available(course_id: str, question_id: str) -> None:
         _resolve_question(course_id, question_id)
-        if not english_answer_is_enabled(course_id):
-            raise PermissionError("AI Course support is not enabled for this Course yet.")
 
 
 def _validate_feedback(transcript: str, generated) -> None:

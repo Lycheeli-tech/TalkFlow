@@ -8,13 +8,10 @@ def source(relative_path: str) -> str:
     return (REPOSITORY_ROOT / relative_path).read_text(encoding="utf-8")
 
 
-def test_stage_three_rollout_is_generic_and_limited_to_course_eleven() -> None:
-    backend_rollout = source("backend/app/course/rollout.py")
-    frontend_rollout = source("frontend/lib/course-core-flags.ts")
+def test_answer_engine_remains_generic_after_catalog_rollout() -> None:
     service = source("backend/app/course/answer_service.py")
-
-    assert 'frozenset({"course-11"})' in backend_rollout
-    assert 'new Set(["course-11"])' in frontend_rollout
+    detail = source("frontend/components/course-core/course-detail.tsx")
+    assert "ENGLISH_ANSWER_ENABLED_COURSE_IDS" not in detail
     assert 'course_id == "course-11"' not in service
 
 
@@ -43,7 +40,7 @@ def test_recording_guard_audio_exclusion_and_final_transcript_are_explicit() -> 
     assert "answer.transcript.transcript" in workspace
 
 
-def test_stage_five_keeps_chinese_and_other_course_rollout_disabled() -> None:
+def test_course_support_preserves_practice_feature_gate() -> None:
     workspace = source("frontend/components/course-core/course-workspace.tsx")
     flags = source("frontend/lib/course-core-flags.ts")
     assert "answerInChinese" in workspace

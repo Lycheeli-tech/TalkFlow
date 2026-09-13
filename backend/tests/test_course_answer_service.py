@@ -277,7 +277,7 @@ async def test_answer_delete_is_final_while_failed_audio_cleanup_remains_retryab
 
 
 @pytest.mark.asyncio
-async def test_user_ownership_and_stage_three_rollout_are_enforced() -> None:
+async def test_user_ownership_and_catalog_boundaries_are_enforced() -> None:
     owner_id, other_user_id = uuid4(), uuid4()
     _, _, service = build_service()
     saved = await service.submit_english(
@@ -292,12 +292,12 @@ async def test_user_ownership_and_stage_three_rollout_are_enforced() -> None:
 
     with pytest.raises(LookupError):
         await service.get(user_id=other_user_id, answer_id=saved.answer.id)
-    with pytest.raises(PermissionError, match="not enabled"):
+    with pytest.raises(LookupError):
         await service.submit_english(
             user_id=owner_id,
-            course_id="course-10",
-            question_id="course-10.core",
-            idempotency_key="outside-rollout",
+            course_id="course-30",
+            question_id="course-30.follow-up",
+            idempotency_key="outside-catalog",
             audio=b"audio",
             content_type="audio/webm",
             duration_ms=900,

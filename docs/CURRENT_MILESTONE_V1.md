@@ -18,7 +18,7 @@
 | 阶段 4 | COMPLETE | 已由产品负责人确认并合并、推送；checkpoint 为 `course-core-stage-4` |
 | 阶段 5 | COMPLETE | 功能与验证已完成；产品负责人已确认 TBD-003 / TBD-004 并授权 merge/push；checkpoint 为 `course-core-stage-5` |
 | 阶段 6 | COMPLETE | 中文 Answer 闭环与用户设备录音验收通过；产品负责人已授权合并、推送 |
-| 阶段 7 | 未开始 | 所有 Course 必须复用同一通用引擎 |
+| 阶段 7 | COMPLETE | 全部 30 Course / 59 Question 使用同一通用引擎，待 review |
 | 阶段 8 | 未开始 | 依赖 Catalog、录音、STT 和 Feedback 基础设施 |
 
 ## 阶段 0：规格和安全边界
@@ -206,12 +206,28 @@
 
 ## 阶段 7：开放其余 29 个 Course
 
+- 2026-09-13 产品负责人授权开始 P7。
+- 分支：`codex/course-core-stage-7`；安全基线：已推送的 `main` / `71f606b`，P6 完成标签 `course-core-stage-6` / `3f71595`。
+- 范围：全部 Catalog Course 的英文/中文 Answer、TTS、按需 AI 帮助与 Feedback 复用既有引擎；不增加 Catalog 内容或 P8 Practice，不修改 Legacy。
+
 1. 使用同一引擎加载其余 Course；
 2. 验证完整 Catalog；
 3. 验证全部核心问题和追问；
 4. 验证 Course 30 无追问；
 5. 禁止 Course 11 特例；
 6. 完成全部 Course 响应式 smoke test。
+
+### 阶段 7 完成 checkpoint
+
+- 状态：COMPLETE，等待产品负责人 review；分支 `codex/course-core-stage-7`，完成 checkpoint `course-core-stage-7`。未 merge/push，未开始 P8。
+- 移除前后端 Course 11 rollout allowlist；全部 30 Course / 59 Question 复用英文/中文录音、确认、History、TTS、按需支持和 Feedback 引擎。Catalog 内容、ID、顺序和回答重点未变，Course 30 的 follow-up 为 null，非法或跨 Course Question 请求返回 404。
+- Course Workspace 按 Course ID 重新挂载；加载时核对当前 ID，忽略过期 Catalog 请求，避免沿用上一门 Course 的题目与状态。页眉动态显示课程序号。
+- 空上下文参考回答改为当前静态 Question 加中性真实细节占位符；不再默认要求项目职责/决策/结果，不创建用户经历。
+- 自动回归：后端 273 passed / 11 opt-in skipped；Ruff check/format passed；前端 TypeScript、ESLint、production build passed。新增 59 题 API 参数化回归覆盖 TTS 固定文本、回答重点、三类辅助内容、英文幂等保存、中文确认前隔离/确认后 Feedback、按题 History 和直接回答追问；另有全部 59 题无上下文生产 fallback 检查。
+- 真实 PostgreSQL：P7 opt-in 检查 1 passed（368.77s），59 题英文保存及 4 个代表性 Course 中文 Draft/确认通过；repository ownership、跨用户 RLS、禁止客户端 INSERT、全用户 Legacy 进度和五表计数不变。外层事务已回滚，未创建真实音频或调用 STT/AI。
+- 浏览器：认证后 1280×900 和 375×812 下各遍历 30 Course；桌面全部 59 题可选择，移动题目抽屉打开/切题/关闭通过，Course 30 仅一题。全部页面无横向溢出，英文和中文入口齐全；页面内 Course 01 追问→Catalog→Course 30 重置为 core，History 为当前题。Course 30 实际 Bailian hints、静态回答重点及安全 reference fallback 正常，移动辅助面板在视口内，最终页面无控制台 error。
+- 验收对照：阶段 7 六项及 20.3 中任意 Course/直接追问/固定 Catalog/无完成或自动推进/用户隔离/Legacy 写隔离/通用引擎的相关标准通过。录音互斥、导航保护、音频保留和删除、Memory 验证复用 P3–P6，相关自动回归通过；本阶段未逐题重复人工麦克风录音。
+- 限制：无新增 migration；未上传录音不跨刷新恢复，已上传中文 Draft 恢复遵循 ADR-031。空 About Me 的参考回答仅提供真实细节占位模板。P6 临时设备 review 数据继续保留，P7 数据库合成记录已回滚。Practice V2 保持禁用；Legacy 冻结。
 
 ## 阶段 8：Practice V2
 

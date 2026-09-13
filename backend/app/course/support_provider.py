@@ -68,11 +68,7 @@ class FakeCourseSupportProvider:
 
     async def reference_answer(self, context: CourseContext) -> CourseReferenceAnswer:
         return CourseReferenceAnswer(
-            answer=(
-                "One project I am proud of was [project]. The goal was [goal]. "
-                "I was responsible for [my responsibility], and I chose [key decision] because "
-                "[reason]. The result was [truthful result]."
-            ),
+            answer=_safe_generic_reference(context),
             personalization_note=_personalization_note(context),
             prompt_version=REFERENCE_PROMPT_VERSION,
             provider_name=self.provider_name,
@@ -135,7 +131,7 @@ class BailianCourseSupportProvider:
         evidence = _context_evidence(context)
         if not evidence:
             return CourseReferenceAnswer(
-                answer=_safe_generic_reference(),
+                answer=_safe_generic_reference(context),
                 personalization_note=_personalization_note(context),
                 prompt_version=REFERENCE_PROMPT_VERSION,
                 provider_name="deterministic-fallback",
@@ -147,7 +143,7 @@ class BailianCourseSupportProvider:
             if segment.kind == "GENERIC_TEMPLATE":
                 if segment.source_excerpt is not None:
                     raise RuntimeError("A generic reference segment cannot cite learner data.")
-                answer_segments.append(_safe_generic_reference())
+                answer_segments.append(_safe_generic_reference(context))
             elif not segment.source_excerpt or not any(
                 segment.source_excerpt.casefold() in item.casefold() for item in evidence
             ):
@@ -242,9 +238,9 @@ def _context_evidence(context: CourseContext) -> list[str]:
     ]
 
 
-def _safe_generic_reference() -> str:
+def _safe_generic_reference(context: CourseContext) -> str:
     return (
-        "A truthful answer can follow this structure: [the real situation or goal]. "
-        "My responsibility was [your actual responsibility]. I decided to [your actual decision] "
-        "because [your real reason]. The result was [your verified result]."
+        f'To answer "{context.question}", replace the placeholders with your own true details: '
+        "[your direct response]. [relevant context or reasoning]. "
+        "[supporting facts, if available]."
     )
