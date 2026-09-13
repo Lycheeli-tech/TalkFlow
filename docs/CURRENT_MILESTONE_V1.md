@@ -17,7 +17,7 @@
 | 阶段 3 | COMPLETE | Course 11 英文 Answer 最小闭环已确认、合并并推送；checkpoint 为 `course-core-stage-3` |
 | 阶段 4 | COMPLETE | 已由产品负责人确认并合并、推送；checkpoint 为 `course-core-stage-4` |
 | 阶段 5 | COMPLETE | 功能与验证已完成；产品负责人已确认 TBD-003 / TBD-004 并授权 merge/push；checkpoint 为 `course-core-stage-5` |
-| 阶段 6 | IN PROGRESS | 中文 Answer 闭环；已批准未确认 Draft 跨刷新恢复（TBD-010） |
+| 阶段 6 | COMPLETE | 中文 Answer 闭环与用户设备录音验收通过；等待 review，未 merge/push |
 | 阶段 7 | 未开始 | 所有 Course 必须复用同一通用引擎 |
 | 阶段 8 | 未开始 | 依赖 Catalog、录音、STT 和 Feedback 基础设施 |
 
@@ -185,9 +185,9 @@
 6. 接入最近两条录音；
 7. 验证不补充用户未表达事实。
 
-### 阶段 6 当前 checkpoint
+### 阶段 6 完成 checkpoint
 
-- 状态：IN PROGRESS；实现 checkpoint，未关闭发布门、未创建完成 tag、未 merge/push。
+- 状态：COMPLETE；本地验收完成，checkpoint tag 为 `course-core-stage-6`；等待 review，未 merge/push。
 - 已实现：中文录音/最终 STT、独立组织 Prompt 与忠实度检查、持久 Draft 列表/恢复、双稿只读展示、确认幂等、放弃/重新回答、确认后 Feedback/Memory 与按语言最近两条录音。
 - 整理只接收当前中文 Transcript；逐段来源摘录和来源外数字由代码验证，语义忠实度由独立结构化检查过滤。不使用 About Me、Resume、Memory 或历史补全中文事实。
 - 新迁移：`202609130020_chinese_answer_drafts.sql` 已获授权持久应用并登记于配置的测试库；迁移前后 Legacy 全用户进度字段及五张表计数不变。最终 fidelity Prompt 字段真实库回归通过。
@@ -197,7 +197,10 @@
 - 浏览器：认证后桌面 1280px 恢复双稿、刷新再恢复、确认及 History 通过；375px 双稿、History 抽屉、放弃和重新回答进入中文引导通过，无横向溢出或最终页面控制台错误。
 - 剩余发布门仅为真实设备麦克风录音 smoke：用户已批准 localhost 麦克风及改用 Chrome，但内置浏览器 getUserMedia 请求不返回，当前浏览器工具报告 Chrome 不可用。没有伪造录音或将合成音频测试等同于设备录音；P6 保持 IN PROGRESS，不创建完成 tag。
 - 2026-09-13 本次恢复复核：后端 153 passed / 10 opt-in skipped、Ruff check/format、前端 TypeScript/ESLint/production build、20 个 migration 校验均通过；只读真实库登记核对确认 `202609130020` 已存在，未重复迁移。系统 Chrome 窗口存在，但 browser connector 不可用；原生 sky 读取被自动审批拒绝（要求使用 cua_repl，其原生控制当前禁用）。需用户在 Chrome 完成设备 smoke，不能追认为阶段完成。
+- 2026-09-13 最终设备门：用户在内置浏览器使用已确认的独立测试账号完成真实设备录音，未注入模拟麦克风或合成音频。两条英文和一条中文 Answer 均为 SAVED；中文设备录音为 `audio/webm;codecs=opus`、31,226 ms，实际 Bailian STT/organizer、两份版本化 Prompt、中文原稿与英文整理稿、confirmed_at/saved_at 及 READY Feedback 已落库。服务日志确认 answers 201、confirm 200、History 200；刷新后 History 仍为三条，中文双稿与时长可查看，核心问题仍选中，中文 Feedback 界面正常。此前设备权限不返回的阻塞已解除。
+- 验收证据分工：本次直接核对用户设备录音、确认、保存、刷新持久性与 Feedback；录音期间导航/互斥及 375px Draft 行为沿用已通过的自动/浏览器检查，不声称本次直接观察了用户录音中的每个操作。
 - 清理：一次性 Auth 账号、Answer/Feedback/Memory、私有音频及本地凭据/合成音频已删除；持久 Answer 与 Storage 对象残留计数为零。
+- 最终 review 账号暂保留：三条用户设备 Answer 与三个私有音频对象供 review；OS 临时状态记录于 HANDOFF，仅由 owner-scoped cleanup 清理，不提交凭据或真实稿件。
 - 已知限制：Auth 仍为 sessionStorage 生命周期；未上传设备录音不能跨刷新恢复，只有已归属服务端的 Draft 可恢复；忠实度语义检查依赖模型，不能把精确摘录当作完整语义证明。
 - 范围：仍只有 Course 11 可回答；P7/P8 未开始；Legacy 保持冻结。
 

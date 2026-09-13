@@ -4,7 +4,7 @@
 
 - 2026-09-13
 - Branch: `codex/course-core-stage-6`
-- Checkpoint: Stage 6 implementation checkpoint; safe baseline `course-core-stage-5` / `9f08381`
+- Checkpoint: `course-core-stage-6`; safe baseline `course-core-stage-5` / `9f08381`
 
 ## Product
 
@@ -23,7 +23,8 @@ and About Me plus source-validated AI Memory now use dedicated Course Core bound
 
 - Phase: Course Core
 - Stage: 6 — Chinese Answer loop
-- Status: IN PROGRESS — real Chinese audio, responsive Draft flows and migration passed; device microphone smoke remains blocked by browser capabilities.
+- Status: COMPLETE — user-operated device recording, Chinese confirmation, saved dual texts,
+  refresh durability and Feedback passed; awaiting review, not merged/pushed.
 - Uploaded Chinese Drafts support refresh recovery under approved TBD-010 / ADR-031.
 - Confirmation is required before History, Feedback, or Memory; discard queues private audio cleanup.
 - Transcript-only organization uses exact excerpts, number checks, and a separate fidelity check.
@@ -48,20 +49,19 @@ at tag `course-core-stage-4`. Stage 5 is merged/pushed to `main` at `course-core
 
 ## Course Core Not Yet Implemented
 
-- Device microphone smoke is pending; remaining-Course answering and Practice V2 are not implemented.
+- Remaining-Course answering and Practice V2 are not implemented.
 
 ## Current Blockers
 
 No unresolved P6 product choice remains. TBD-010 is approved in ADR-031.
 P6 migration `202609130020` is persistently applied/registered in the configured test database.
-IAB microphone request does not return; authorized Chrome fallback is unavailable in browser tools.
+User-operated IAB device recording now passed; the previous microphone blocker is resolved.
 Failed Answer/Draft audio TTL remains three days under ADR-028.
 
 ## Next Steps
 
-1. Finish only the actual-device microphone smoke in user-operated Chrome; real Chinese-audio,
-   authenticated desktop/375px Draft flows, and migration rollout have already passed.
-2. Close P6 only after its release gates pass; do not merge/push or begin P7 without explicit instruction.
+1. Review the completed P6 checkpoint; disposable device account/data remain available for review.
+2. Clean the owner-scoped review data afterward; do not merge/push or begin P7 without explicit instruction.
 
 ## Stage 4 Verification Snapshot
 

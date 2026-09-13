@@ -2,7 +2,7 @@
 
 ## AUTH-02: P6 device smoke used an unconfirmed disposable account
 
-Status: replacement confirmed device account created; password login and authenticated Draft API passed.
+Status: CLOSED — replacement confirmed device account successfully used for recording and saved Answers.
 
 - User reported failed login; the current Course 11 login page displayed `Email not confirmed`.
   User clarified that the account is disposable and has no real inbox; asking for email verification
@@ -14,7 +14,7 @@ Status: replacement confirmed device account created; password login and authent
 
 ## COURSE-06: P6 real-audio closeout and device-browser limitation
 
-Status: code defects fixed; actual device microphone smoke OPEN.
+Status: CLOSED — code defects fixed and user-operated actual device microphone smoke passed.
 
 - Real Chinese audio exposed shared ASR's hard-coded en: Course Chinese now injects zh, preserving
   the default English/Legacy contract. Real Chinese Transcript and dual Draft passed.
@@ -33,9 +33,12 @@ Status: code defects fixed; actual device microphone smoke OPEN.
 - Resume checks passed: backend 153 passed / 10 opt-in skipped, Ruff check/format, frontend
   TypeScript/ESLint/production build, 20-migration validation, and read-only live migration registry
   verification of `202609130020`. No migration was reapplied and no test account/data was created.
-- Next: provide an operational Chrome/browser surface or manual device smoke, verify actual recording,
-  navigation guard, stop/upload and refresh recovery at desktop/375px, then close P6. Migration and
-  synthetic real-provider audio gates are already passed; do not reapply migration or start P7.
+- Final evidence: user-operated IAB produced two saved English device Answers and one confirmed Chinese
+  device Answer (31,226 ms, WebM/Opus). Chinese STT and organizer used Bailian, dual texts and both Prompt
+  versions persisted, Feedback READY, confirmation returned 200, and History remained three after reload.
+  No simulated microphone or generated audio was used for this device gate. Prior guard/responsive
+  checks remain the evidence for those contracts; do not claim direct observation of every user action.
+- Next: review P6 and clean its disposable owner-scoped account/data afterward; no migration replay or P7.
 
 ## AUTH-01: Expired-token dead end blocked the login entry path (FIXED)
 
