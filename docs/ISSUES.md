@@ -1,5 +1,25 @@
 # FluentLoop Issues
 
+## AUTH-03: Hour-long access token expired without renewal
+
+Status: CLOSED — original account restored; persistent session/refresh regressions and data digests passed.
+
+- During review, Course API returned 401 and the UI fell back to login. Old Course Core auth retained
+  only access_token in sessionStorage, discarded refresh_token and had no renewal lifecycle.
+- Original confirmed review account password login succeeded (200); provider access-token lifetime is
+  3600 seconds and a refresh token is supplied. The account was not deleted or unconfirmed.
+- ADR-033 implements persistent browser session and single-flight pre-request/active-page renewal;
+  all authenticated Course/About Me/Practice clients use it. 401 retries once for the same owner;
+  transient outages retain credentials, late responses/new-login and cross-tab sign-out are guarded.
+- Fourteen frontend regressions passed, including simulated three-day absence, rotation, concurrency,
+  outages and owner-switch/logout races. Actual provider refresh returned 200 for the original owner.
+  Frontend ESLint/TypeScript/production build and backend 298 passed / 13 skipped passed.
+- Original account restored via UI; independent new page opened authenticated with original two roles,
+  two PDFs and supplemental fact. Profile/role/SourceDocument/Memory/Answer/Transcript/Feedback row
+  digests match the pre-recovery snapshot. No new account, reset, cleanup or business/schema changes.
+- Three days are covered by retained-account policy and simulated expiry/real refresh verification;
+  no claim of waiting 72 hours in real time. Explicit sign-out still requires same-account sign-in.
+
 ## ABOUT-10: Supplemental facts save had no visible progress or confirmation
 
 Status: CLOSED — TypeScript/ESLint/build passed; browser saving/saved states verified.

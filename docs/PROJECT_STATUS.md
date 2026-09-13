@@ -29,6 +29,8 @@ and source-validated AI Memory use dedicated boundaries. Legacy is preserved but
 - Review upload fix RESUME-09: Chinese filename PDF upload/parse/list/delete now passes; safe
   ASCII object keys preserve original names. Backend follow-up: 298 passed / 13 opt-in skipped.
 - Review facts-save feedback ABOUT-10: saving/saved notices added; persistence was already working.
+- AUTH-03 / ADR-033: same-account persistent login and automatic refresh passed; original review data
+  preserved. Keep this account/data for the owner's three-day acceptance, with no automatic cleanup.
 - Uploaded Chinese Drafts support refresh recovery under approved TBD-010 / ADR-031.
 - Confirmation is required before History, Feedback, or Memory; discard queues private audio cleanup.
 - Transcript-only organization uses exact excerpts, number checks, and a separate fidelity check.

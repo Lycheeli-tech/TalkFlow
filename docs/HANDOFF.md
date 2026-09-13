@@ -24,6 +24,20 @@ but no progress/success UI was displayed. Saving/saved notices and edit-reset/in
 frontend ESLint/TypeScript/build passed. Browser verification uses only existing user facts.
 Saving and saved states both passed with no error; user facts were preserved. ABOUT-10 CLOSED.
 
+AUTH-03 CLOSED / ADR-033: original account restored with persistent access/refresh credentials,
+single-flight automatic renewal and same-owner 401 retry. Auth lifetime remains 3600s; actual refresh
+200, fourteen frontend expiry/concurrency/three-day/logout tests, ESLint/TypeScript/build and backend
+298 passed. Original profile/roles/PDF/Memory/Answer/Transcript/Feedback digests unchanged.
+
+## Acceptance Account Retention — Required
+
+- Product owner requested one stable account for at least the next three days (2026-09-13 onward).
+- Keep the original confirmed P6 account and all user-uploaded/entered/recorded data. Do not run its
+  prepare/cleanup/reset helper, delete it, replace it, or create another account for user review.
+- Do not automatically clean it after three days either; cleanup requires explicit user instruction.
+- Credentials remain only in the existing OS temporary state path below. Auth persists across page
+  reopen/expiry; explicit logout can be followed by the same credentials. No password is browser-stored.
+
 Practice V2 uses its own Run/attempt aggregate, repository/service/API/client, private audio and
 whole-feedback prompt. Three/five unique static Questions, voice recording, pause/skip/return/
 re-answer and final encouragement feedback are enabled. No hints, per-question feedback, completed
@@ -55,8 +69,9 @@ history, personalization, Course Answer/Memory writes or Legacy changes. Active 
 - Backend: 127.0.0.1:8000, owned escalated exec session 60658, PID 21428.
   Restart with comma-separated `CORS_ORIGINS=http://localhost:3100,http://127.0.0.1:3100`;
   this setting is a string list, not JSON. External database/provider access requires escalation.
-- Frontend: production Next 127.0.0.1:3100, owned exec session 4819.
-- User IAB tab 1 is at `/about-me`, refreshed after the upload fix; user can reselect the original PDF.
+- Frontend: production Next 127.0.0.1:3100, owned exec session 85181.
+- AUTH-03: tab 1 returned to `/courses/course-01` under the original account; independent About Me
+  restore page verified the same saved data, then closed. Original review account stays signed in.
   Existing target roles/answers are preserved. Separate smoke tab closed, viewport restored.
 - Retained confirmed P6 disposable review account credentials are only in OS temporary state:
   `C:\Users\Galatea\AppData\Local\Temp\fluentloop-p6-607ae176946542cc96fed5b0c6d1cf67.json`.

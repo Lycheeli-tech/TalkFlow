@@ -1,4 +1,4 @@
-import { clearAccessToken } from "@/lib/auth-session";
+import { sessionFetch } from "@/lib/auth-session";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "http://localhost:8000";
@@ -30,11 +30,10 @@ export type AboutMe = {
 };
 
 async function request<T>(token: string, path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await sessionFetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: { Authorization: `Bearer ${token}`, ...init?.headers },
   });
-  if (response.status === 401) clearAccessToken();
   if (!response.ok) {
     const payload = (await response.json().catch(() => null)) as { detail?: string } | null;
     throw new Error(payload?.detail ?? `Request failed with status ${response.status}.`);

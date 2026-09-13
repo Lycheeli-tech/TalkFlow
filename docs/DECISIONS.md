@@ -353,3 +353,22 @@ does not add to or change the meaning of the approved Chinese content.
   Run deletion. Expired Runs follow the same cleanup path.
 - Practice has separate models/repositories and cannot create Course Answers, Memory sources or
   Legacy Sessions/Attempts/progress. Deterministic sampling uses the fixed 59-Question Catalog.
+
+### ADR-033 — Persistent Course Core Authentication Recovery
+
+**Status:** Accepted
+
+**Date:** 2026-09-13
+
+**Authority:** Product owner explicitly requested reuse of the same account, preserved state and
+three days of acceptance access; Build Spec v2.1 retains Supabase Auth as identity authority.
+
+- Course Core stores access/refresh credentials and expiry in browser persistent storage, never passwords.
+  Refresh occurs before authenticated requests and while a page is active/visible; the provider's
+  access-token lifetime stays unchanged. Browser reopening can renew an expired token for the same owner.
+- Refresh is single-flight per page; 401 allows one same-owner renewal/retry before sign-out.
+  Network/provider outages preserve session data for retry; confirmed invalid refresh credentials sign out.
+- Late refreshes cannot undo logout, overwrite a new login/tab renewal, or replay a product write under
+  another owner. Cross-tab logout removes the legacy token fallback; explicit logout clears both stores.
+- Existing Supabase ownership/RLS, Course/About Me state and Practice TTL/history policies are unchanged.
+  Shared legacy signIn/signUp interfaces remain compatible; frozen Legacy UI/business files are unchanged.

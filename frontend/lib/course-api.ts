@@ -1,4 +1,4 @@
-import { clearAccessToken } from "@/lib/auth-session";
+import { sessionFetch } from "@/lib/auth-session";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "http://localhost:8000";
@@ -103,11 +103,10 @@ async function catalogFetch<T>(path: string): Promise<T> {
 }
 
 async function authenticatedFetch<T>(token: string, path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await sessionFetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: { Authorization: `Bearer ${token}`, ...init?.headers },
   });
-  if (response.status === 401) clearAccessToken();
   if (!response.ok) {
     const payload = (await response.json().catch(() => null)) as { detail?: string } | null;
     throw new Error(payload?.detail ?? `Request failed with status ${response.status}.`);
@@ -211,10 +210,9 @@ export function confirmCourseDraft(token: string, answerId: string): Promise<Cou
 }
 
 export async function discardCourseDraft(token: string, answerId: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/course-answers/${encodeURIComponent(answerId)}/draft`, {
+  const response = await sessionFetch(`${API_BASE_URL}/api/v1/course-answers/${encodeURIComponent(answerId)}/draft`, {
     method: "DELETE", headers: { Authorization: `Bearer ${token}` },
   });
-  if (response.status === 401) clearAccessToken();
   if (!response.ok) throw new Error("Draft discard failed.");
 }
 
@@ -227,10 +225,9 @@ export function retryCourseFeedback(token: string, answerId: string): Promise<Co
 }
 
 async function authenticatedAudio(token: string, path: string): Promise<Blob> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await sessionFetch(`${API_BASE_URL}${path}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (response.status === 401) clearAccessToken();
   if (!response.ok) {
     const payload = (await response.json().catch(() => null)) as { detail?: string } | null;
     throw new Error(payload?.detail ?? `Request failed with status ${response.status}.`);

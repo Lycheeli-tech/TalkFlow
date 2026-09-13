@@ -1,4 +1,4 @@
-import { clearAccessToken, getStoredAccessToken } from "@/lib/auth-session";
+import { sessionFetch } from "@/lib/auth-session";
 import type { CourseQuestion } from "@/lib/course-api";
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "http://localhost:8000";
@@ -12,9 +12,7 @@ export type PracticeFeedback = { summary: string; strengths: Evidence[]; improve
   score: number; prompt_version: string; provider_name: string; model_name: string | null };
 
 async function response(path: string, options?: RequestInit) {
-  const result = await fetch(`${BASE}/api/v1/practice${path}`, { ...options,
-    headers: { ...options?.headers, Authorization: `Bearer ${getStoredAccessToken()}` } });
-  if (result.status === 401) clearAccessToken();
+  const result = await sessionFetch(`${BASE}/api/v1/practice${path}`, options);
   if (!result.ok) {
     const payload = await result.json().catch(() => null);
     throw new Error(payload?.detail ?? "Practice request failed.");

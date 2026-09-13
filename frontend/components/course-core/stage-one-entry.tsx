@@ -1,14 +1,15 @@
 "use client";
 
-import { FormEvent, ReactNode, useState, useSyncExternalStore } from "react";
+import { FormEvent, ReactNode, useEffect, useState, useSyncExternalStore } from "react";
 
 import { useInterfaceLocale } from "@/components/interface-locale-provider";
-import { signIn, signUp } from "@/lib/auth";
+import { signInSession, signUpSession } from "@/lib/auth";
 import {
   ACCESS_TOKEN_STORAGE_EVENT,
   clearAccessToken,
   getStoredAccessToken,
-  storeAccessToken,
+  storeAuthSession,
+  maintainAuthSession,
 } from "@/lib/auth-session";
 import { getMessages } from "@/lib/i18n";
 
@@ -36,6 +37,7 @@ export function StageOneEntry({ children }: { children?: ReactNode }) {
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  useEffect(maintainAuthSession, []);
 
   async function authenticate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -45,11 +47,11 @@ export function StageOneEntry({ children }: { children?: ReactNode }) {
     setNotice("");
     setError("");
     try {
-      const nextToken = mode === "sign-in"
-        ? await signIn(email, password)
-        : await signUp(email, password);
-      if (nextToken) {
-        storeAccessToken(nextToken);
+      const nextSession = mode === "sign-in"
+        ? await signInSession(email, password)
+        : await signUpSession(email, password);
+      if (nextSession) {
+        storeAuthSession(nextSession);
       } else {
         setNotice(copy.confirmationSent);
       }

@@ -278,6 +278,18 @@
 - 前端 ESLint、TypeScript、production build passed；浏览器正在保存→资料已保存、重复输入保护
   和无错误恢复通过，既有填写内容保留；ABOUT-10 CLOSED。
 
+### Review 修复：同账号持久登录与三天验收
+
+- AUTH-03 CLOSED / ADR-033：旧实现丢弃 refresh_token，约 3600 秒的 access_token 过期后
+  401 清掉登录状态；原账号仍已确认且密码登录正常。新增持久 session、请求前/活跃页续期、
+  单次同 owner 401 重试、晚到刷新/切账号/跨页退出保护，保持服务端 token 生命周期不变。
+- 十四项前端回归 passed（含模拟三天后恢复），真实 provider refresh 200；ESLint、TypeScript、
+  production build 和后端 298 passed / 13 skipped passed。原账号 UI 登录/新页恢复通过，
+  Profile/岗位/两份简历/Memory/三条 Answer/Transcript/Feedback 摘要与恢复前一致。
+- 用户指定保留同一账号至少三天；期间及之后均不自动清理，删除须另获明确指示。
+  Course/Memory/Practice 保存边界及 Legacy 不变。实际未等待 72 小时，验证由模拟过期与
+  真实续期组成；主动退出后可用同账号重新登录。本地 auth 安全基线为 `86108de`。
+
 ## 阶段更新规则
 
 每次开始、恢复或结束一个阶段时，必须更新：
