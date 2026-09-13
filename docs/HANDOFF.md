@@ -84,6 +84,12 @@ Local acceptance servers remain running: production frontend `127.0.0.1:3100`, b
 Processes started for this resume: backend PID 9480; frontend is the `next start --port 3100` process.
 Stop only these acceptance services after device evidence is collected; do not stop unrelated processes.
 
+Login recovery: user clarified their failed login was for a disposable account with no real inbox.
+`prepare-device` now creates an already-confirmed temporary user without synthetic audio. Password
+login and authenticated Draft API returned success. Keep the replacement until device smoke finishes.
+Recovery state is in OS temp: `fluentloop-p6-607ae176946542cc96fed5b0c6d1cf67.json`.
+Do not commit its contents; pass its absolute path to the existing `cleanup --state` action afterward.
+
 User-operated Chrome smoke at `http://localhost:3100/courses/course-11`:
 1. Sign in, open Chinese guide, start recording and approve microphone if requested.
 2. Speak a short Chinese answer using only actual facts; while recording verify Question/navigation

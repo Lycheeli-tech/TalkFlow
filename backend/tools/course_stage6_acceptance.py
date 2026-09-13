@@ -110,7 +110,7 @@ async def migrate(apply):
         await engine.dispose()
 
 
-async def prepare():
+async def prepare(*, generate_audio=True):
     settings = get_settings()
     state = {
         "email": f"fluentloop-p6-{uuid4().hex[:12]}@outlook.com",
@@ -138,6 +138,10 @@ async def prepare():
         response.raise_for_status()
         state["access_token"] = response.json()["access_token"]
         state_path.write_text(json.dumps(state), encoding="utf-8")
+        if not generate_audio:
+            print("Disposable confirmed P6 device account state:", state_path)
+            print("Password sign-in verified; no synthetic audio generated.")
+            return
         response = await client.post(
             settings.bailian_dashscope_base_url.rstrip("/")
             + "/services/aigc/multimodal-generation/generation",
@@ -334,6 +338,7 @@ if __name__ == "__main__":
             "check",
             "migrate",
             "prepare",
+            "prepare-device",
             "submit",
             "confirm",
             "inspect",
@@ -345,8 +350,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.action in {"check", "migrate"}:
         asyncio.run(migrate(args.action == "migrate"))
-    elif args.action == "prepare":
-        asyncio.run(prepare())
+    elif args.action in {"prepare", "prepare-device"}:
+        asyncio.run(prepare(generate_audio=args.action == "prepare"))
     elif args.action in {"submit", "confirm"}:
         asyncio.run(submit(args.state, args.action == "confirm"))
     elif args.action == "inspect":

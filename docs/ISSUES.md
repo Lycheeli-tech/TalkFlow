@@ -1,5 +1,17 @@
 # FluentLoop Issues
 
+## AUTH-02: P6 device smoke used an unconfirmed disposable account
+
+Status: replacement confirmed device account created; password login and authenticated Draft API passed.
+
+- User reported failed login; the current Course 11 login page displayed `Email not confirmed`.
+  User clarified that the account is disposable and has no real inbox; asking for email verification
+  was the wrong recovery path. No existing user's confirmation state was changed.
+- Added `course_stage6_acceptance.py prepare-device`: creates a dedicated confirmed disposable Auth
+  user and verifies password login without generating TTS audio. The account must remain available
+  until user-operated device smoke completes, then use the existing owner-scoped cleanup command.
+- Credentials are stored only in OS temporary state, never in repository docs. No email was sent.
+
 ## COURSE-06: P6 real-audio closeout and device-browser limitation
 
 Status: code defects fixed; actual device microphone smoke OPEN.
