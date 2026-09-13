@@ -187,7 +187,7 @@
 
 ### 阶段 6 完成 checkpoint
 
-- 状态：COMPLETE；设备验收完成，checkpoint tag 为 `course-core-stage-6` / `3f71595`；2026-09-13 产品负责人授权 merge/push，已快进合并至 `main`；push 被自动审批拦截，待明确确认 origin 目的地及分支/标签范围；不自动开始 P7。
+- 状态：COMPLETE；设备验收完成，checkpoint tag 为 `course-core-stage-6` / `3f71595`；2026-09-13 产品负责人授权 merge/push 并确认远程目的地和 refs，已快进合并至 `main`；`main`、P6 分支及完成标签已推送到 `Lycheeli-tech/TalkFlow` 并核对远程提交；不自动开始 P7。
 - 已实现：中文录音/最终 STT、独立组织 Prompt 与忠实度检查、持久 Draft 列表/恢复、双稿只读展示、确认幂等、放弃/重新回答、确认后 Feedback/Memory 与按语言最近两条录音。
 - 整理只接收当前中文 Transcript；逐段来源摘录和来源外数字由代码验证，语义忠实度由独立结构化检查过滤。不使用 About Me、Resume、Memory 或历史补全中文事实。
 - 新迁移：`202609130020_chinese_answer_drafts.sql` 已获授权持久应用并登记于配置的测试库；迁移前后 Legacy 全用户进度字段及五张表计数不变。最终 fidelity Prompt 字段真实库回归通过。

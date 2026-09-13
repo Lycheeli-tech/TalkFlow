@@ -9,8 +9,10 @@
 ## Current State
 
 Course Core Stages 5–6 are COMPLETE. On 2026-09-13 the product owner authorized P6 merge/push;
-P6 was fast-forward merged to main at `3f71595`. Push was rejected by automatic approval, requiring
-explicit destination/ref confirmation. No remote was updated; local closeout is ready to push.
+P6 was fast-forward merged to main at `3f71595`. The user confirmed the remote and refs after the
+initial automatic-approval rejection. Main, P6 branch and completion tag were atomically pushed to
+Lycheeli-tech/TalkFlow; remote main `1ad6f5c` and branch/tag `3f71595` were verified before this final
+documentation sync. No P7 authorization was given.
 TBD-010 is explicitly approved: uploaded unconfirmed Chinese Drafts support refresh recovery (ADR-031).
 Course 11 remains the only Answer-enabled Course. Do not merge/push or begin P7 without authorization.
 

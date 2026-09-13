@@ -25,7 +25,7 @@ and About Me plus source-validated AI Memory now use dedicated Course Core bound
 - Stage: 6 — Chinese Answer loop
 - Status: COMPLETE — user-operated device recording, Chinese confirmation, saved dual texts,
   refresh durability and Feedback passed; product owner authorized merge/push, fast-forward merged
-  to main. Push is pending explicit remote/ref confirmation required by automatic approval.
+  to main and pushed to Lycheeli-tech/TalkFlow after explicit remote/ref confirmation.
   P7 is not authorized.
 - Uploaded Chinese Drafts support refresh recovery under approved TBD-010 / ADR-031.
 - Confirmation is required before History, Feedback, or Memory; discard queues private audio cleanup.
