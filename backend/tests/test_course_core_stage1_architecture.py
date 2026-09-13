@@ -81,6 +81,15 @@ def test_default_runtime_mounts_no_legacy_product_routes(client: TestClient) -> 
         "/api/v1/about-me/resumes/{document_id}": frozenset({"delete"}),
         "/api/v1/about-me/memories": frozenset({"get"}),
         "/api/v1/about-me/memories/{memory_id}": frozenset({"delete"}),
+        "/api/v1/practice/runs": frozenset({"post"}),
+        "/api/v1/practice/runs/current": frozenset({"get"}),
+        "/api/v1/practice/runs/{run_id}": frozenset({"get", "delete"}),
+        "/api/v1/practice/runs/{run_id}/position": frozenset({"patch"}),
+        "/api/v1/practice/runs/{run_id}/answers": frozenset({"post"}),
+        "/api/v1/practice/runs/{run_id}/answers/{answer_id}/retry": frozenset({"post"}),
+        "/api/v1/practice/runs/{run_id}/answers/{answer_id}/audio": frozenset({"get"}),
+        "/api/v1/practice/runs/{run_id}/tts": frozenset({"get"}),
+        "/api/v1/practice/runs/{run_id}/complete": frozenset({"post"}),
     }
     for prefix in legacy_prefixes:
         assert client.get(prefix).status_code == 404
@@ -115,6 +124,12 @@ def test_default_runtime_exposes_only_approved_course_core_product_write_paths()
         ("/api/v1/about-me/resumes", "POST"),
         ("/api/v1/about-me/resumes/{document_id}", "DELETE"),
         ("/api/v1/about-me/memories/{memory_id}", "DELETE"),
+        ("/api/v1/practice/runs", "POST"),
+        ("/api/v1/practice/runs/{run_id}", "DELETE"),
+        ("/api/v1/practice/runs/{run_id}/position", "PATCH"),
+        ("/api/v1/practice/runs/{run_id}/answers", "POST"),
+        ("/api/v1/practice/runs/{run_id}/answers/{answer_id}/retry", "POST"),
+        ("/api/v1/practice/runs/{run_id}/complete", "POST"),
     }
 
 

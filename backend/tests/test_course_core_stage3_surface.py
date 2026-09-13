@@ -40,10 +40,11 @@ def test_recording_guard_audio_exclusion_and_final_transcript_are_explicit() -> 
     assert "answer.transcript.transcript" in workspace
 
 
-def test_course_support_preserves_practice_feature_gate() -> None:
+def test_course_support_and_practice_remain_separate_workspaces() -> None:
     workspace = source("frontend/components/course-core/course-workspace.tsx")
     flags = source("frontend/lib/course-core-flags.ts")
     assert "answerInChinese" in workspace
     assert "disabled" in workspace
     assert "retryCourseFeedback" in workspace
-    assert "practice: false" in flags
+    assert "practice: true" in flags
+    assert "PracticeV2Page" in source("frontend/app/practice/page.tsx")

@@ -74,6 +74,8 @@ const expectedRlsTables = [
   "learner_assessments",
   "memory_items",
   "memory_sources",
+  "practice_audio_cleanup_jobs",
+  "practice_runs",
   "profiles",
   "retrieval_opportunities",
   "sessions",

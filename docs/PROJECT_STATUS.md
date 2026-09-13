@@ -3,8 +3,8 @@
 ## Last Updated
 
 - 2026-09-13
-- Branch: `main`
-- Checkpoint: `course-core-stage-7`; safe baseline `main` / `71f606b`, P6 tag / `3f71595`
+- Branch: `codex/course-core-stage-8`
+- Safe baseline: pushed P7 main `66de471`; P7 tag `ac360dd`; P8 authorization checkpoint `75716c2`
 
 ## Product
 
@@ -16,20 +16,20 @@ source-validated Memory to help users express truthful experience in clearer, mo
 
 The v1.1 Legacy Loop implementation and Phase 2 local acceptance are complete at `8cc986d`. Product
 architecture has moved to Build Spec v2.1. Course Core Stages 1–7 are complete and locally merged;
-Stage 7 push is pending GitHub connectivity. All 30 Courses use the isolated English/Chinese Answer engine; About Me
+Stage 7 is pushed. All 30 Courses use the isolated English/Chinese Answer engine; About Me
 and source-validated AI Memory use dedicated boundaries. Legacy is preserved but unmounted by default.
 
 ## Current Work
 
 - Phase: Course Core
-- Stage: 7 — All Courses
-- Status: COMPLETE — merge/push authorized on 2026-09-13; local main fast-forwarded to `ac360dd`.
-  Push is blocked by GitHub HTTPS connectivity (GIT-07). P8 is authorized after P7 push completes;
-  implementation has not begun. Practice Run TTL approval (TBD-007) is still needed.
+- Stage: 8 — Practice V2
+- Status: COMPLETE — P7 main/branch/tag pushed and verified; P8 implementation and acceptance passed.
+  TBD-007 approved (ADR-032): 24-hour in-progress TTL, immediate completed/abandoned text deletion.
+  Isolated API, persistence, recorder UI and whole-feedback complete; local tag `course-core-stage-8`.
 - Uploaded Chinese Drafts support refresh recovery under approved TBD-010 / ADR-031.
 - Confirmation is required before History, Feedback, or Memory; discard queues private audio cleanup.
 - Transcript-only organization uses exact excerpts, number checks, and a separate fidelity check.
-- All Course answering is enabled; Practice V2 remains disabled.
+- All Course answering and Practice V2 entries are enabled on the P8 development branch.
 
 ## Stable Baseline
 
@@ -50,11 +50,13 @@ at tag `course-core-stage-4`. Stage 5 is merged/pushed to `main` at `course-core
 
 ## Course Core Not Yet Implemented
 
-- Practice V2 is not implemented.
+- No later or post-MVP scope is authorized.
 
 ## Current Blockers
 
-P7 push is blocked by GitHub HTTPS connectivity; P8 Run TTL needs approval (TBD-007).
+P7 push connectivity is resolved (GIT-07); P8 TTL is approved (ADR-032).
+P8 feedback citation, device-silence and mobile navigation defects are resolved; no current blocker.
+P8 migration `202609130021` is applied/registered in the configured development/test database.
 TBD-010 is approved in ADR-031.
 P6 migration `202609130020` is persistently applied/registered in the configured test database.
 User-operated IAB device recording now passed; the previous microphone blocker is resolved.
@@ -62,8 +64,8 @@ Failed Answer/Draft audio TTL remains three days under ADR-028.
 
 ## Next Steps
 
-1. Restore GitHub connectivity, retry the authorized P7 atomic push and verify remote refs (GIT-07).
-2. Confirm the proposed Practice Run TTL in CURRENT_MILESTONE_V1.md; then begin the authorized P8.
+1. Review completed P8 at `/practice`; see CURRENT_MILESTONE_V1.md for acceptance and limitations.
+2. Await explicit P8 merge/push authorization; no post-MVP work is authorized.
 3. Retained P6 device data remain available locally; clean only the owner-scoped disposable review data after review.
 
 ## Stage 4 Verification Snapshot

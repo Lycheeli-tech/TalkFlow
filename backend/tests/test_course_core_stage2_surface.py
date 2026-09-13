@@ -23,10 +23,10 @@ def test_new_app_shell_exposes_three_equal_entries_without_legacy_navigation() -
 def test_stage_gated_entries_are_isolated_by_explicit_feature_flags() -> None:
     flags = source("frontend/lib/course-core-flags.ts")
     assert "courses: true" in flags
-    assert "practice: false" in flags
+    assert "practice: true" in flags
     assert "aboutMe: true" in flags
 
-    assert 'feature="practice"' in source("frontend/app/practice/page.tsx")
+    assert "PracticeV2Page" in source("frontend/app/practice/page.tsx")
     assert "AboutMeSurface" in source("frontend/app/about-me/page.tsx")
 
 

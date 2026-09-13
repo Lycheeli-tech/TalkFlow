@@ -2,7 +2,7 @@
 
 ## GIT-07: P7 remote push blocked by GitHub HTTPS connectivity
 
-Status: OPEN — local merge complete; remote push not successful.
+Status: CLOSED — retry succeeded; P7 refs verified remotely at main `66de471`, branch/tag `ac360dd`.
 
 - 2026-09-13 user authorized P7 merge/push, then P8. Local main fast-forwarded from `71f606b`
   to P7 checkpoint `ac360dd`; original `frontend/next-env.d.ts` changes were preserved.
@@ -13,7 +13,66 @@ Status: OPEN — local merge complete; remote push not successful.
   no environment/Git HTTP proxy was detected. No credentials or network settings were changed.
 - Recovery: restore external GitHub HTTPS connectivity; fetch/check remote main, then retry
   `git -c http.version=HTTP/1.1 push --atomic origin main codex/course-core-stage-7 refs/tags/course-core-stage-7`.
-  Verify all three refs remotely before beginning P8 implementation. P8 TBD-007 TTL also needs approval.
+  All refs are now verified; P8 TBD-007 approved under ADR-032. No further network diagnosis needed.
+
+## PRACTICE-08: Expiry policy used transaction-start time
+
+Status: CLOSED — final real PostgreSQL regression passed (1 passed, 18.81s).
+
+- Initial P8 rolled-back integration passed saves, idempotency, RLS ownership and cleanup retry,
+  but an expired owned Run stayed readable inside the long outer test transaction.
+- PostgreSQL `now()` is fixed at transaction start, so it cannot enforce expiry during a long
+  transaction. P8 RLS now compares against `statement_timestamp()`; application GET and cleanup
+  additionally check actual UTC expiry. Migration `202609130021` is applied/registered in the test DB.
+- Re-run `test_practice_v2_database_integration.py` with the opt-in environment flag; no production
+  schema or Legacy behavior changed. P8 retention is approved in ADR-032.
+
+## PRACTICE-09: Silence accepted as a punctuation-only Answer
+
+Status: CLOSED — actual device silence and same-recording retry remained FAILED; automated cases passed.
+
+- P8 actual microphone smoke reached RECORDING with blocked question/navigation controls; stop
+  uploaded audio and ASR returned only punctuation. `strip()` was not sufficient to detect no speech.
+- P8 now requires at least one alphanumeric character in the final STT text; punctuation-only
+  output becomes a FAILED attempt with retained audio and same-attempt retry. Course/Legacy unchanged.
+- Initial synthetic helper timed out before localhost Run creation because HTTPX inherited the
+  environment proxy. Local HTTP requests now use a separate client with `trust_env=False`;
+  external Auth/TTS/provider calls keep normal proxy settings. No proxy configuration was changed.
+
+## PRACTICE-10: Provider cited a Question instead of an Answer excerpt
+
+Status: CLOSED — fixed-source Bailian fixture passed (9.72s), real synthetic voice complete passed (95).
+
+- Synthetic voice passed actual TTS/upload/STT/audio replay; complete returned 503 and preserved
+  the Run. A separate fixed-text Bailian fixture reproduced a citation quoting Question text.
+- Practice feedback now supplies deterministic transcript-only quote IDs. The provider selects an
+  ID and writes an observation; code resolves both the exact quote and its Question ID, rejects
+  unknown IDs, then applies existing exact-source validation. No AI state decisions or new history.
+- Re-run `test_practice_v2_live.py` and owner-scoped synthetic voice smoke; cleanup retry remains
+  durable; final owner Run/job/Practice Storage object counts are all zero. Five-question browser
+  completion also passed (92), with one voiced synthetic answer and four explicitly skipped questions.
+
+## SHELL-08: Mobile navigation covered the language switch
+
+Status: CLOSED — rebuilt Practice/Course language clicks and viewport navigation bounds passed.
+
+- At 375x812, DOM bounds put the fixed navigation at y=24..71 inside the 72px sticky header,
+  overlapping locale buttons at y=17..54. Clicking 中文 hit About Me instead. The header's backdrop
+  filter established the fixed navigation's containing block; this pre-existing Course Core defect
+  also appeared during P7 testing and was not caused by Practice state or locale persistence.
+- Remove backdrop-filter only at the existing mobile breakpoint so navigation anchors to the
+  viewport bottom. No Legacy component or route changed. Verify bounds and actual Chinese/English
+  clicks on Practice and a Course; check recording still removes navigation links.
+
+## PRACTICE-11: Upload completed after abandonment cleanup
+
+Status: CLOSED — two service race cases and real PostgreSQL cleanup generation regression passed.
+
+- A Run can be abandoned while a Storage upload is pending. Its deletion job may finish before
+  the upload returns, leaving a late object without a Run or pending job.
+- After late upload success or lost-response failure, missing Run ownership re-registers only the
+  previously owned Practice path. Cleanup deletes/updates a job only if its schedule and attempt
+  still match, preserving a newer registration. Real PostgreSQL regression passed (18.81s).
 
 ## AUTH-02: P6 device smoke used an unconfirmed disposable account
 

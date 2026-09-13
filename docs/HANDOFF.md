@@ -3,55 +3,60 @@
 ## Updated
 
 - 2026-09-13
-- Branch: `main`
-- Completion checkpoint: `course-core-stage-7`
-- Safe baseline: pushed main `71f606b`; P6 tag `course-core-stage-6` / `3f71595`
+- Branch: `codex/course-core-stage-8`
+- Completion checkpoint: `course-core-stage-8` (use `git rev-parse` for final HEAD)
+- Baseline: verified pushed P7 main `66de471`; P7 tag `ac360dd`; P8 approval checkpoint `75716c2`
 
 ## Current State
 
-P7 is COMPLETE and locally merged. The product owner authorized P7 merge/push, then P8 on
-2026-09-13. All 30 Courses / 59 Questions now reuse the English/Chinese Answer, support, TTS,
-History and Feedback engine. Catalog IDs, wording, focus and order are unchanged. Course 30 has
-one core Question and no follow-up. No migration was needed; no Legacy file or schema changed.
+P7 merge/push is complete: remote main, P7 branch and tag were verified after the authorized retry.
+User explicitly authorized P8 and approved TBD-007 / ADR-032. P8 is COMPLETE and waiting for review;
+P8 merge/push and post-MVP work are not authorized.
 
-Local main fast-forwarded to P7 `ac360dd`. Push failed because GitHub HTTPS cannot connect (GIT-07);
-P8 is authorized after push completes, so implementation has not begun. Practice V2 remains disabled.
-P8 TTL decision TBD-007 is still unapproved; a concrete 24-hour active Run / immediate completion
-and abandonment deletion proposal is recorded in CURRENT_MILESTONE_V1.md, not a production rule.
-The full acceptance evidence is in `docs/CURRENT_MILESTONE_V1.md`, Stage 7. Stable decisions
-remain in DECISIONS.md; Chinese Draft recovery continues under ADR-031.
+Practice V2 uses its own Run/attempt aggregate, repository/service/API/client, private audio and
+whole-feedback prompt. Three/five unique static Questions, voice recording, pause/skip/return/
+re-answer and final encouragement feedback are enabled. No hints, per-question feedback, completed
+history, personalization, Course Answer/Memory writes or Legacy changes. Active Run TTL is fixed
+24 hours; completion/abandonment delete text immediately and queue durable audio cleanup.
 
-## Verification
+## Verification / Recovery
 
-- Backend: 273 passed / 11 opt-in skipped; Ruff check/format passed.
-- Frontend: TypeScript, ESLint and production build passed.
-- Real PostgreSQL P7 regression: 1 passed, 59 English saves and four representative Chinese
-  Draft/confirmation paths, ownership/RLS/direct-write restrictions and Legacy snapshots passed.
-  All synthetic records were rolled back; no actual provider calls or Storage uploads in this test.
-- Authenticated IAB: all 30 Courses on desktop 1280x900 and mobile 375x812, all desktop Questions,
-  mobile question drawers, direct follow-up selection, Course 30 and cross-Course state reset passed.
-  No overflow or final console errors; real Course 30 hints and safe reference fallback passed.
-- P7 did not repeat human microphone recording for every Question; P6 real-device evidence and
-  recorder/retention/Memory/failure-isolation regression remain applicable.
+- Backend: 292 passed / 13 opt-in skipped; Ruff check/format passed.
+- Real PostgreSQL P8: 1 passed (18.81s); ownership/RLS, no direct writes, idempotency/CAS,
+  expiry, completion deletion, cleanup backoff/new-registration protection and unchanged
+  Legacy/Course/Memory snapshots. Fixtures rolled back.
+- Fixed-text real Bailian feedback: 1 passed (9.72s). Three-question real synthetic speech
+  TTS/upload/STT/replay/feedback passed (95), completed GET 404 and owner snapshots unchanged.
+- Five-question browser completion: one synthetic voiced answer plus four explicit skips,
+  real whole-feedback (92), bilingual display, refresh with no report/history.
+- Actual device silence: recording locks and retained-audio retry worked; punctuation-only
+  ASR is FAILED. Human full three/five-question speaking was not claimed.
+- Frontend TypeScript/ESLint/production build and 21 migration validations passed.
+- 1280px/375px checks: no overflow/error logs, pause/reload/recovery/skip/back passed. Shared
+  mobile navigation overlap fixed and actual locale clicks checked on Practice and Course 11.
+- Migration `202609130021` is applied/registered only in configured development/test DB.
+- P8 test owner Run/job/private Practice object counts are zero. P6 three Course device Answers
+  and Auth retained; original user's Course data were not modified.
+- Details/limitations: CURRENT_MILESTONE_V1.md Stage 8; resolved issues PRACTICE-08..11 / SHELL-08.
 
-## Local Review / Recovery
+## Local Review
 
-- P7 backend: local uvicorn 127.0.0.1:8000, owned exec session 52240 (PID 11376).
-- P7 frontend: production Next server 127.0.0.1:3100, owned exec session 42757.
-- Existing user IAB tab 2 remains on Course 11 and was refreshed to the P7 build; History still has three Answers.
-- Retained P6 disposable confirmed Auth account has two English and one Chinese device Answers
-  for review. No real inbox is needed. Credentials are only in the OS temporary state file:
+- Backend: 127.0.0.1:8000, owned escalated exec session 65771, PID 15568.
+  Restart with comma-separated `CORS_ORIGINS=http://localhost:3100,http://127.0.0.1:3100`;
+  this setting is a string list, not JSON. External database/provider access requires escalation.
+- Frontend: production Next 127.0.0.1:3100, owned exec session 45209.
+- Original user IAB tab 1 is opened at `/practice`; separate smoke tab closed, viewport restored.
+- Retained confirmed P6 disposable review account credentials are only in OS temporary state:
   `C:\Users\Galatea\AppData\Local\Temp\fluentloop-p6-607ae176946542cc96fed5b0c6d1cf67.json`.
-  Do not commit credentials or actual transcripts. After review, use the owner-scoped helper
-  `backend/tools/course_stage6_acceptance.py cleanup --state <temporary-state-path>`.
-- Unrelated existing `frontend/next-env.d.ts` changes are preserved and excluded from checkpoint.
-- Node is bundled at `C:\Users\Galatea\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe`;
-  invoke local TypeScript/ESLint/Next scripts directly when npm is absent from PATH.
-- Python is `backend\.venv\Scripts\python.exe`.
+  No real inbox is needed. Never commit credentials/transcripts or delete unrelated user data.
+  Its `p8_run_id` is a now-completed Run; no active Practice data are retained for review.
+- Preserve unrelated `frontend/next-env.d.ts` changes; excluded from checkpoint. Next builds restore
+  its original text. Stop/restart only owned services.
+- Bundled Node: `C:\Users\Galatea\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe`.
+  Invoke local Next/ESLint/TypeScript scripts directly when npm is absent. Python: backend `.venv`.
 
 ## Next Action
 
-Restore GitHub connectivity; follow GIT-07 to fetch/check, retry the already-authorized P7 atomic
-push and verify all refs. Confirm TBD-007 before Practice schema/storage policy is finalized, then
-create `codex/course-core-stage-8` from pushed main and implement P8. Preserve retained review data.
-Stop only owned local services if restarting; do not kill unrelated processes.
+Review P8 in the browser. Await explicit P8 merge/push authorization. Completed reports cannot be
+recovered after refresh/lost response by design; unuploaded device blobs are not refresh recoverable.
+Audio cleanup is asynchronous with durable backoff; semantic feedback quality remains model-dependent.

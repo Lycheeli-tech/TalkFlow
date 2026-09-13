@@ -760,6 +760,7 @@
 @media (max-width: 880px) {
   .appHeader {
     grid-template-columns: 1fr auto;
+    backdrop-filter: none;
   }
 
   .navigation {

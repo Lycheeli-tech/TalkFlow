@@ -1,5 +1,5 @@
-import { FeatureGatePage } from "@/components/course-core/feature-gate-page";
+import { PracticeV2Page } from "@/components/practice-v2/practice-page";
 
 export default function PracticePage() {
-  return <FeatureGatePage feature="practice" />;
+  return <PracticeV2Page />;
 }

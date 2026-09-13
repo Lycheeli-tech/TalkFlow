@@ -18,8 +18,8 @@
 | 阶段 4 | COMPLETE | 已由产品负责人确认并合并、推送；checkpoint 为 `course-core-stage-4` |
 | 阶段 5 | COMPLETE | 功能与验证已完成；产品负责人已确认 TBD-003 / TBD-004 并授权 merge/push；checkpoint 为 `course-core-stage-5` |
 | 阶段 6 | COMPLETE | 中文 Answer 闭环与用户设备录音验收通过；产品负责人已授权合并、推送 |
-| 阶段 7 | COMPLETE | 全部 30 Course / 59 Question 使用同一通用引擎，待 review |
-| 阶段 8 | IN PROGRESS | 已授权 Practice V2；TTL 已批准（ADR-032） |
+| 阶段 7 | COMPLETE | 全部 30 Course / 59 Question 已合并、推送并核对远程 refs |
+| 阶段 8 | COMPLETE | Practice V2 功能与验收通过；TTL 已批准（ADR-032），等待 review |
 
 ## 阶段 0：规格和安全边界
 
@@ -219,7 +219,7 @@
 
 ### 阶段 7 完成 checkpoint
 
-- 状态：COMPLETE；完成 checkpoint `course-core-stage-7` / `ac360dd`。2026-09-13 产品负责人授权 merge/push，已快进合并到本地 `main`；GitHub HTTPS 连接失败，push 待恢复网络后重试（GIT-07）。
+- 状态：COMPLETE；完成 checkpoint `course-core-stage-7` / `ac360dd`。2026-09-13 产品负责人授权 merge/push，已快进合并；网络重试后 atomic push 成功，远程 `main` / `66de471`、P7 分支和完成标签 / `ac360dd` 已核对（GIT-07 CLOSED）。
 - 移除前后端 Course 11 rollout allowlist；全部 30 Course / 59 Question 复用英文/中文录音、确认、History、TTS、按需支持和 Feedback 引擎。Catalog 内容、ID、顺序和回答重点未变，Course 30 的 follow-up 为 null，非法或跨 Course Question 请求返回 404。
 - Course Workspace 按 Course ID 重新挂载；加载时核对当前 ID，忽略过期 Catalog 请求，避免沿用上一门 Course 的题目与状态。页眉动态显示课程序号。
 - 空上下文参考回答改为当前静态 Question 加中性真实细节占位符；不再默认要求项目职责/决策/结果，不创建用户经历。
@@ -234,7 +234,7 @@
 - 2026-09-13 P7 main `66de471`、分支及 `course-core-stage-7` / `ac360dd` 已 atomic push 并核对远程 refs；开始 P8，分支 `codex/course-core-stage-8`。
 - 已阅读 Practice 选题、语音过程、整场 Feedback、临时数据/API 和 Legacy 边界要求；TBD-007 已批准，见 ADR-032。
 - 已批准：进行中 Run 从创建起保留 24 小时；完成/放弃立即删除临时文本，音频进入幂等清理；无已完成 History。
-- 下一步：独立 Practice V2 schema/repository、确定性选题、语音状态机和整场 Feedback 实现及验收。
+- 状态：COMPLETE；本地完成标签 `course-core-stage-8`。完成后等待产品负责人 review；未授权 P8 merge/push 或 post-MVP 工作。
 
 1. 随机抽取 3 / 5 题；
 2. 逐题语音回答；
@@ -243,6 +243,22 @@
 5. 鼓励性评分；
 6. 不提供 History；
 7. 不触发 Legacy 状态。
+
+### 阶段 8 完成 checkpoint
+
+- 独立 `practice_v2` model/repository/service/API/client/UI；新 `practice_runs` 保存进行中 Run 的版本化 JSON 聚合和录音 attempts，`practice_audio_cleanup_jobs` 仅保存清理元数据。不复用 Legacy Session/Attempt、Course Answer、Memory 或旧 Practice。
+- 静态 59 Question 随机无放回抽取 3/5 题；测试可注入 seed，生产请求拒绝 seed 和额外字段。未引入 Profile/History/Memory 选题、自由追问、提示、素材、参考回答或逐题纠错/Feedback。
+- 英文 turn-based 录音、问题 TTS、原音频回放、最终只读转写、暂停/恢复、跳题、返回和重答已实现。上传先登记所有权，重复请求不复制录音；失败保留音频并限制重试。录音锁定题目、导航、语言和退出，后退/刷新/关闭有保护；音频播放互斥，晚到播放请求不会打断录音。
+- 整场结束才调用版本化 `practice_feedback_v1`，输出优点、改进建议、0–100 鼓励分及非能力/正式测评/通过率说明。模型选择 transcript-only quote ID，代码还原精确摘录和 Question ID 后验证；生成失败保留已保存回答。完成立即删除 Run/临时文字，仅当前响应显示报告，无已完成 History。
+- ADR-032 固定 24 小时 TTL 不因暂停延长；完成、放弃、过期和删号通过事务触发器登记私有音频清理。失败指数退避且任务持久保留；晚到上传重新登记已删除任务，旧 worker 不删除新登记的任务。CAS revision/处理 lease 防止晚到 STT 或 Feedback 覆盖/删除新状态。
+- 后端最终完整回归：292 passed / 13 opt-in skipped；Ruff check/format passed。真实 PostgreSQL P8：1 passed（18.81s），覆盖 ownership、RLS、客户端无直写权限、幂等/CAS、完成删除、过期隔离、失败退避和重新登记并发保护；合成数据外层事务回滚，Legacy 全用户进度及五表、Course/Transcript/Feedback/Memory 快照不变。
+- 前端 TypeScript、ESLint、production build passed；21 个 migration 校验 passed。迁移 `202609130021_practice_v2_runs.sql` 已应用并登记于配置的 development/test 数据库，Legacy/Course/Memory 快照不变；未对 production 执行迁移。
+- 真实服务：固定稿 Bailian Feedback fixture 1 passed（9.72s）；3 题合成语音完整 TTS→私有上传→STT→精确回放→整场 Feedback 95 分→完成 GET 404 通过，Legacy/Course/Memory owner 快照不变。5 题服务场次（一题合成语音、四题显式跳过）在浏览器完成并展示 92 分报告，刷新后无旧报告。
+- 浏览器：3/5 题、暂停刷新恢复、跳题/返回、结束前无 Feedback、录音保护、实际设备静音失败及原录音重试、双语状态保持、1280px/375px 无横向溢出通过。移动 App Shell backdrop-filter 导致导航遮挡语言按钮，已在原 mobile breakpoint 修复；Practice/Course 11 实际语言点击及导航边界复核通过，最终 console errors 为零。
+- 清理：P8 disposable owner 的 Run、cleanup job、私有 Practice Storage 对象均为 0；P6 原三条设备 Course Answer/录音及 Auth 保留。用户原账号 Course 数据未修改。
+- 验收对照：阶段 8 七项，以及 20.3 的 1/2、7/9/10、22–29 相关条目通过；其余 Course/About Me 合约沿用 P3–P7 并通过完整自动回归。无 Legacy 文件/schema/进度变更，无后续或 post-MVP 范围。
+- 限制：报告仅在完成响应当前页面显示，刷新或完成响应丢失不能恢复。未上传设备录音不跨刷新恢复，已上传进行中回答在 24 小时内可恢复。音频异步清理，失败保留任务重试；反馈语义质量依赖模型，精确摘录不等于正式能力评测。本次未声称三/五题均完成真人口述，设备静音测试和合成语音闭环分别记录。
+- Git：`codex/course-core-stage-8`；批准 checkpoint `75716c2`，完成 HEAD 由 `course-core-stage-8` 标签确定。仅原有 `frontend/next-env.d.ts` 改动保留并排除提交。下一步 review，不自动 merge/push。
 
 ## 阶段更新规则
 

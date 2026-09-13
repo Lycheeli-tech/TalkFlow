@@ -26,8 +26,8 @@ export function CourseCoreAppShell({
         {navigationBlocked ? <span className={styles.wordmark}>FluentLoop</span> : <Link className={styles.wordmark} href="/">FluentLoop</Link>}
         <nav className={styles.navigation} aria-label={copy.navigationLabel}>
           {navigationBlocked ? <span aria-disabled="true">{copy.courses}</span> : <Link href="/courses">{copy.courses}</Link>}
-          {COURSE_CORE_FEATURES.practice ? <Link href="/practice">{copy.practice}</Link> : <span aria-disabled="true">{copy.practice}</span>}
-          {COURSE_CORE_FEATURES.aboutMe ? <Link href="/about-me">{copy.aboutMe}</Link> : <span aria-disabled="true">{copy.aboutMe}</span>}
+          {COURSE_CORE_FEATURES.practice && !navigationBlocked ? <Link href="/practice">{copy.practice}</Link> : <span aria-disabled="true">{copy.practice}</span>}
+          {COURSE_CORE_FEATURES.aboutMe && !navigationBlocked ? <Link href="/about-me">{copy.aboutMe}</Link> : <span aria-disabled="true">{copy.aboutMe}</span>}
         </nav>
         <div className={styles.headerActions}>
           <div className={styles.localeSwitch} aria-label={copy.languageLabel}>

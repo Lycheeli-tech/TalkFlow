@@ -9,17 +9,20 @@ from app.about_me.cleanup import run_about_me_document_cleanup_loop, stop_about_
 from app.api.v1.router import api_router
 from app.core.config import get_settings
 from app.course.cleanup import run_course_audio_cleanup_loop, stop_course_audio_cleanup
+from app.practice_v2.cleanup import run_practice_cleanup_loop, stop_practice_cleanup
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     cleanup_task = asyncio.create_task(run_course_audio_cleanup_loop())
     document_cleanup_task = asyncio.create_task(run_about_me_document_cleanup_loop())
+    practice_cleanup_task = asyncio.create_task(run_practice_cleanup_loop())
     try:
         yield
     finally:
         await stop_course_audio_cleanup(cleanup_task)
         await stop_about_me_document_cleanup(document_cleanup_task)
+        await stop_practice_cleanup(practice_cleanup_task)
 
 
 def create_app() -> FastAPI:
