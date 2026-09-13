@@ -3,7 +3,7 @@
 ## Last Updated
 
 - 2026-09-13
-- Branch: `codex/course-core-stage-6`
+- Branch: `main`
 - Checkpoint: `course-core-stage-6`; safe baseline `course-core-stage-5` / `9f08381`
 
 ## Product
@@ -15,7 +15,7 @@ source-validated Memory to help users express truthful experience in clearer, mo
 ## Current Lifecycle
 
 The v1.1 Legacy Loop implementation and Phase 2 local acceptance are complete at `8cc986d`. Product
-architecture has moved to Build Spec v2.1. Course Core Stages 1–5 are complete and merged: Legacy remains
+architecture has moved to Build Spec v2.1. Course Core Stages 1–6 are complete and merged: Legacy remains
 preserved for rollback but is not mounted by default; Course 11 has the isolated English Answer loop,
 and About Me plus source-validated AI Memory now use dedicated Course Core boundaries.
 
@@ -24,7 +24,9 @@ and About Me plus source-validated AI Memory now use dedicated Course Core bound
 - Phase: Course Core
 - Stage: 6 — Chinese Answer loop
 - Status: COMPLETE — user-operated device recording, Chinese confirmation, saved dual texts,
-  refresh durability and Feedback passed; awaiting review, not merged/pushed.
+  refresh durability and Feedback passed; product owner authorized merge/push, fast-forward merged
+  to main. Push is pending explicit remote/ref confirmation required by automatic approval.
+  P7 is not authorized.
 - Uploaded Chinese Drafts support refresh recovery under approved TBD-010 / ADR-031.
 - Confirmation is required before History, Feedback, or Memory; discard queues private audio cleanup.
 - Transcript-only organization uses exact excerpts, number checks, and a separate fidelity check.
@@ -60,8 +62,8 @@ Failed Answer/Draft audio TTL remains three days under ADR-028.
 
 ## Next Steps
 
-1. Review the completed P6 checkpoint; disposable device account/data remain available for review.
-2. Clean the owner-scoped review data afterward; do not merge/push or begin P7 without explicit instruction.
+1. P6 is closed at `course-core-stage-6` / `3f71595`; disposable device data remain available locally.
+2. Clean the owner-scoped review data afterward; do not begin P7 without explicit instruction.
 
 ## Stage 4 Verification Snapshot
 

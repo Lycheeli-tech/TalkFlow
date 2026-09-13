@@ -17,7 +17,7 @@
 | 阶段 3 | COMPLETE | Course 11 英文 Answer 最小闭环已确认、合并并推送；checkpoint 为 `course-core-stage-3` |
 | 阶段 4 | COMPLETE | 已由产品负责人确认并合并、推送；checkpoint 为 `course-core-stage-4` |
 | 阶段 5 | COMPLETE | 功能与验证已完成；产品负责人已确认 TBD-003 / TBD-004 并授权 merge/push；checkpoint 为 `course-core-stage-5` |
-| 阶段 6 | COMPLETE | 中文 Answer 闭环与用户设备录音验收通过；等待 review，未 merge/push |
+| 阶段 6 | COMPLETE | 中文 Answer 闭环与用户设备录音验收通过；产品负责人已授权合并、推送 |
 | 阶段 7 | 未开始 | 所有 Course 必须复用同一通用引擎 |
 | 阶段 8 | 未开始 | 依赖 Catalog、录音、STT 和 Feedback 基础设施 |
 
@@ -187,7 +187,7 @@
 
 ### 阶段 6 完成 checkpoint
 
-- 状态：COMPLETE；本地验收完成，checkpoint tag 为 `course-core-stage-6`；等待 review，未 merge/push。
+- 状态：COMPLETE；设备验收完成，checkpoint tag 为 `course-core-stage-6` / `3f71595`；2026-09-13 产品负责人授权 merge/push，已快进合并至 `main`；push 被自动审批拦截，待明确确认 origin 目的地及分支/标签范围；不自动开始 P7。
 - 已实现：中文录音/最终 STT、独立组织 Prompt 与忠实度检查、持久 Draft 列表/恢复、双稿只读展示、确认幂等、放弃/重新回答、确认后 Feedback/Memory 与按语言最近两条录音。
 - 整理只接收当前中文 Transcript；逐段来源摘录和来源外数字由代码验证，语义忠实度由独立结构化检查过滤。不使用 About Me、Resume、Memory 或历史补全中文事实。
 - 新迁移：`202609130020_chinese_answer_drafts.sql` 已获授权持久应用并登记于配置的测试库；迁移前后 Legacy 全用户进度字段及五张表计数不变。最终 fidelity Prompt 字段真实库回归通过。

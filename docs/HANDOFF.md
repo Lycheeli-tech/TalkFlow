@@ -3,12 +3,14 @@
 ## Updated
 
 - 2026-09-13
-- Branch: `codex/course-core-stage-6`
+- Branch: `main`
 - Checkpoint: `course-core-stage-6`; baseline `course-core-stage-5` / `9f08381`
 
 ## Current State
 
-Course Core Stage 5 is COMPLETE and merged/pushed. Stage 6 is COMPLETE locally, awaiting review.
+Course Core Stages 5–6 are COMPLETE. On 2026-09-13 the product owner authorized P6 merge/push;
+P6 was fast-forward merged to main at `3f71595`. Push was rejected by automatic approval, requiring
+explicit destination/ref confirmation. No remote was updated; local closeout is ready to push.
 TBD-010 is explicitly approved: uploaded unconfirmed Chinese Drafts support refresh recovery (ADR-031).
 Course 11 remains the only Answer-enabled Course. Do not merge/push or begin P7 without authorization.
 
@@ -67,7 +69,7 @@ the explicit rollback test app only. `docs/CURRENT_MILESTONE_V1.md` contains ful
 
 ## Known Limitations
 
-- Chinese Answer implementation is P6-only; P7/P8 were not added. P6 awaits review before merge/push.
+- Chinese Answer implementation is P6-only; P7/P8 were not added. P6 merge/push is explicitly authorized.
 - Auth session lifecycle remains sessionStorage-based. One existing Starlette/httpx warning remains.
 - Preserve the unrelated user change in `frontend/next-env.d.ts`; exclude it from P6 commits and restore
   its `.next/dev/types` imports after production builds regenerate it.
@@ -102,8 +104,8 @@ User-operated Chrome smoke at `http://localhost:3100/courses/course-11`:
    discarded through the explicit confirmation and must not enter History.
 
 Final state supersedes the pending-device instructions above: user device recording passed and P6 is
-locally COMPLETE. `CURRENT_MILESTONE_V1.md` records evidence and its limits. Prior tests cover
+COMPLETE and merged to main. `CURRENT_MILESTONE_V1.md` records evidence and its limits. Prior tests cover
 recording/navigation guards and 375px Draft flows; not every user action was directly observed.
 Three saved device Answers and three private audio objects remain only for review in the disposable
 account; cleanup its OS-temp state after review. Do not stop services or delete review data prematurely.
-Next: product-owner review only; do not merge/push or start P7 without explicit authorization.
+Next: wait for explicit P7 authorization. Do not automatically start P7 after the authorized P6 push.
