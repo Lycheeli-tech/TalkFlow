@@ -63,6 +63,20 @@ class ReferenceAnswerDraft(BaseModel):
     segments: list[ReferenceAnswerSegment] = Field(min_length=1, max_length=8)
 
 
+class ReferenceAnswerSourceSegment(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    kind: Literal["GENERIC_TEMPLATE", "SOURCE_GROUNDED"]
+    text: str = Field(min_length=1, max_length=1200)
+    source_id: str | None
+
+
+class ReferenceAnswerSourceDraft(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    segments: list[ReferenceAnswerSourceSegment] = Field(min_length=1, max_length=8)
+
+
 class FeedbackChange(BaseModel):
     original_quote: str = Field(min_length=1, max_length=1000)
     suggestion: str = Field(min_length=1, max_length=1000)

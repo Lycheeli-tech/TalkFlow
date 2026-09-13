@@ -31,6 +31,13 @@ single-flight automatic renewal and same-owner 401 retry. Auth lifetime remains 
 
 ## Acceptance Account Retention — Required
 
+REF-12 CLOSED / ADR-034: initial Course 01 reference generation works with zero Answer History,
+no recording or Chinese submission. Model excerpt copying caused intermittent validation 503;
+v2 selects code-owned source IDs instead, validates cited-source numbers, and allows one bounded
+regeneration only for rejected content. Backend 306 passed / 13 opt-in skipped; Ruff passed.
+Eight new regressions passed; real reference is displayed
+in tab 6. No profile/Answer/Draft/Memory writes. Recovery tag `course-reference-recovery-baseline`.
+
 - Product owner requested one stable account for at least the next three days (2026-09-13 onward).
 - Keep the original confirmed P6 account and all user-uploaded/entered/recorded data. Do not run its
   prepare/cleanup/reset helper, delete it, replace it, or create another account for user review.
@@ -66,7 +73,7 @@ history, personalization, Course Answer/Memory writes or Legacy changes. Active 
 
 ## Local Review
 
-- Backend: 127.0.0.1:8000, owned escalated exec session 60658, PID 21428.
+- Backend: 127.0.0.1:8000, owned escalated exec session 97278, PID 18812.
   Restart with comma-separated `CORS_ORIGINS=http://localhost:3100,http://127.0.0.1:3100`;
   this setting is a string list, not JSON. External database/provider access requires escalation.
 - Frontend: production Next 127.0.0.1:3100, owned exec session 85181.

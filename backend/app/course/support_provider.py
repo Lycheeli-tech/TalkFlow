@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Protocol, TypeVar
 
 import httpx
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from app.course.support_entities import (
     CourseContext,
@@ -12,12 +12,12 @@ from app.course.support_entities import (
     CourseHints,
     CourseReferenceAnswer,
     GeneratedCourseFeedback,
-    ReferenceAnswerDraft,
+    ReferenceAnswerSourceDraft,
 )
 
 HINTS_PROMPT_VERSION = "course_hints_v1"
 MATERIALS_PROMPT_VERSION = "course_expression_materials_v1"
-REFERENCE_PROMPT_VERSION = "course_reference_answer_v1"
+REFERENCE_PROMPT_VERSION = "course_reference_answer_v2"
 FEEDBACK_PROMPT_VERSION = "course_feedback_v1"
 
 
@@ -137,27 +137,48 @@ class BailianCourseSupportProvider:
                 provider_name="deterministic-fallback",
                 model_name=None,
             )
-        draft = await self._generate(REFERENCE_PROMPT_VERSION, context, ReferenceAnswerDraft)
+        for attempt in range(2):
+            try:
+                draft = await self._generate(
+                    REFERENCE_PROMPT_VERSION,
+                    context,
+                    ReferenceAnswerSourceDraft,
+                    repair=attempt > 0,
+                    reference_sources={f"source-{i}": text for i, text in enumerate(evidence, 1)},
+                )
+                return self._validate_reference(context, draft, evidence)
+            except RuntimeError as error:
+                # Retry malformed model content, never authentication/provider outages.
+                if attempt or not isinstance(
+                    error.__cause__, (ValidationError, json.JSONDecodeError)
+                ):
+                    raise
+            except ValueError:
+                # A rejected draft is never shown or used as learner context.
+                if attempt:
+                    raise
+        raise RuntimeError("Reference Answer validation failed.")
+
+    def _validate_reference(
+        self, context: CourseContext, draft: ReferenceAnswerSourceDraft, evidence: list[str]
+    ) -> CourseReferenceAnswer:
+        sources = {f"source-{i}": text for i, text in enumerate(evidence, 1)}
         answer_segments: list[str] = []
         for segment in draft.segments:
             if segment.kind == "GENERIC_TEMPLATE":
-                if segment.source_excerpt is not None:
-                    raise RuntimeError("A generic reference segment cannot cite learner data.")
+                if segment.source_id is not None:
+                    raise ValueError("A generic reference segment cannot cite learner data.")
                 answer_segments.append(_safe_generic_reference(context))
-            elif not segment.source_excerpt or not any(
-                segment.source_excerpt.casefold() in item.casefold() for item in evidence
-            ):
-                raise RuntimeError(
-                    "A grounded reference segment requires an exact verified excerpt."
-                )
+            elif segment.source_id not in sources:
+                raise ValueError("A grounded reference segment requires a verified source ID.")
             else:
                 unsupported_numbers = set(re.findall(r"\d+(?:\.\d+)?%?", segment.text)) - set(
-                    re.findall(r"\d+(?:\.\d+)?%?", " ".join(evidence))
+                    re.findall(r"\d+(?:\.\d+)?%?", sources[segment.source_id])
                 )
                 if unsupported_numbers:
-                    raise RuntimeError(
-                        "A grounded reference segment contains an unsupported number."
-                    )
+                    raise ValueError("A grounded reference segment contains an unsupported number.")
+                if not segment.text.strip():
+                    raise ValueError("A grounded reference segment requires non-empty text.")
                 answer_segments.append(segment.text.strip())
         return CourseReferenceAnswer(
             answer=" ".join(dict.fromkeys(answer_segments)),
@@ -171,11 +192,24 @@ class BailianCourseSupportProvider:
         return await self._generate(FEEDBACK_PROMPT_VERSION, context, GeneratedCourseFeedback)
 
     async def _generate(
-        self, prompt_version: str, context: CourseContext, schema_type: type[SchemaT]
+        self,
+        prompt_version: str,
+        context: CourseContext,
+        schema_type: type[SchemaT],
+        *,
+        repair: bool = False,
+        reference_sources: dict[str, str] | None = None,
     ) -> SchemaT:
         instructions = (
             Path(__file__).parents[1] / "ai" / "prompts" / f"{prompt_version}.txt"
         ).read_text(encoding="utf-8")
+        if repair:
+            instructions += (
+                "\nThe previous draft failed schema or evidence validation. Generate a new draft. "
+                "Check every required field and length limit. Select a source_id exactly "
+                "from reference_sources; never invent a source ID or unsupported numbers. "
+                "Use GENERIC_TEMPLATE if a fact cannot be supported."
+            )
         schema = schema_type.model_json_schema()
         payload = {
             "model": self.model_name,
@@ -184,7 +218,15 @@ class BailianCourseSupportProvider:
                 {
                     "role": "user",
                     "content": json.dumps(
-                        {"context": context.model_dump(), "output_contract": schema},
+                        {
+                            "context": context.model_dump(),
+                            "output_contract": schema,
+                            **(
+                                {"reference_sources": reference_sources}
+                                if reference_sources is not None
+                                else {}
+                            ),
+                        },
                         ensure_ascii=False,
                         default=str,
                     ),

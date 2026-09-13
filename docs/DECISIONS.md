@@ -372,3 +372,23 @@ three days of acceptance access; Build Spec v2.1 retains Supabase Auth as identi
   another owner. Cross-tab logout removes the legacy token fallback; explicit logout clears both stores.
 - Existing Supabase ownership/RLS, Course/About Me state and Practice TTL/history policies are unchanged.
   Shared legacy signIn/signUp interfaces remain compatible; frozen Legacy UI/business files are unchanged.
+
+### ADR-034 — Code-Owned Sources for Reference Answer Generation
+
+**Status:** Accepted
+
+**Date:** 2026-09-13
+
+**Authority:** Build Spec v2.1 Sections 9.1, 9.4, 9.6; product owner authorized initial reference
+generation verification and continued provider-contract repair.
+
+- Reference generation remains user-triggered and independent of English/Chinese Answer submission.
+- `course_reference_answer_v2` gives the model bounded, owner-scoped source IDs to select, rather
+  than requiring it to reproduce source excerpts. Code validates the ID against the current context.
+  Numeric claims must appear in the selected source. Invalid/generic citations and empty text fail.
+- Rejected schema/JSON/evidence content may regenerate once with fixed validation instructions;
+  rejected drafts are never returned or added to context. Transport/auth/provider failures propagate.
+- Generic segments continue to resolve to the code-owned safe template; no invented learner facts,
+  product-state authority, Answer/Draft/Memory writes or Legacy changes are introduced.
+- Public reference response shape remains compatible. The prior v1 prompt and draft contract remain
+  available for historical inspection. Source linkage is not a proof of every semantic claim.

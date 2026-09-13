@@ -292,6 +292,20 @@
 
 ## 阶段更新规则
 
+### Review 修复：未作答时生成参考答案
+
+- REF-12 CLOSED / ADR-034：入口原本无中文/英文回答前置条件，但模型偶尔输出空 text 或
+  翻译后的 source_excerpt，导致结构/引用校验返回 503。仅增强提示重试仍不稳定。
+- 新版本 `course_reference_answer_v2` 由模型选择当前 owner 上下文的代码生成 source ID；
+  代码校验 ID 和对应资料中的数字，不要求模型复制中文引用。无效内容最多重新生成一次，
+  仍失败则保持隔离错误；provider 网络/鉴权失败不重复调用。未放宽事实或 Memory 边界。
+- 八项新回归通过；真实 Course 01 在 History 0、无录音/中文 Draft 提交状态下生成并显示
+  参考答案，可主动播放。无用户资料、历史、schema、Legacy 或前端业务改动。
+- 完整后端 306 passed / 13 opt-in skipped；Ruff check/format、git diff check 通过，浏览器
+  console errors 为零。前端代码未改动，原有 next-env.d.ts 保留并排除提交。
+- 限制：内容语义质量仍依赖模型；来源不足继续使用安全占位模板，不把生成内容写成用户回答。
+  本地分支 `codex/course-core-stage-8`；安全标签 `course-reference-recovery-baseline`。
+
 每次开始、恢复或结束一个阶段时，必须更新：
 
 1. 当前阶段状态；

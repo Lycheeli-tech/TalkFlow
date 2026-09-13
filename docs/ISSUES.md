@@ -284,3 +284,19 @@ calibration and Quick Review categories, so PostgreSQL rejected `RETRIEVE`.
 - Journey's hard-coded English summary, phase, day, and accessibility labels now use locale files;
   Daily phase/step/minute labels are localized as well.
 - Post-fix reload showed no Next.js Issue badge or new console warning/error.
+# REF-12: Initial Reference Answer provider response validation (CLOSED)
+
+- 2026-09-13: Course 01 core with zero Answers and no Chinese Draft exposes an enabled
+  AI reference answer action; frontend/API/service have no prior-answer requirement.
+- User-authorized browser generation returned 503 and the isolated support-panel error.
+  Owner-scoped read-only diagnostic identified `course_reference_answer_v1 generation failed`
+  caused by Pydantic `ValidationError`; no learner content or credentials were logged.
+- This is provider response-contract failure, not an answer prerequisite or login failure.
+  No Answer, Draft, Memory or profile writes were performed.
+- Product owner subsequently authorized continued diagnostics and repair. Reproduction found
+  empty segment text (`string_too_short`) and model-translated/nonmatching source excerpts.
+- Versioned `course_reference_answer_v2` uses code-owned source IDs, with strict ID/text/number
+  checks and at most one regeneration for invalid model content. Outages are not retried.
+  Numbers must come from the selected source, not an unrelated context entry.
+- Eight synthetic regressions passed; real Course 01 initial generation returned 200 and
+  displayed a profile-grounded reference while Answer History remained zero. No learner writes.
