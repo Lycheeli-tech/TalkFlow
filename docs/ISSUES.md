@@ -1,5 +1,22 @@
 # FluentLoop Issues
 
+## RESUME-09: Chinese display filename caused upload Failed to fetch
+
+Status: CLOSED — real Chinese PDF upload/parse/list/delete passed; 298 backend tests passed.
+
+- User review reached authenticated About Me; resumes POST returned 500 while other reads and
+  role writes worked. Storage rejected the original Unicode object name with `InvalidKey 400`.
+  The unhandled upload exception surfaced as a browser network/CORS error rather than a detail.
+- A same-bucket synthetic probe reproduced Unicode 400 / ASCII 200 and removed its test object.
+- Product-neutral DocumentStorage now uses `{owner}/{document}/resume.pdf`; SourceDocument still
+  retains the exact original display filename. Existing saved paths and private ownership are unchanged.
+  HTTP/storage failures become a safe typed exception; About Me returns readable 503 with CORS headers.
+- Mock HTTP regressions cover Unicode/accented/path-like display names, provider/network failures,
+  unchanged raw bytes and API 503/CORS. Real disposable-account Chinese PDF POST 201, parse/list/name
+  preservation and DELETE passed; account/source/job/Storage fixtures removed (all residuals zero).
+- Ruff check/format and full backend 298 passed / 13 opt-in skipped. No frontend, schema, Legacy
+  business or user data changes. Backend restarted with the fix; original About Me page refreshed.
+
 ## GIT-07: P7 remote push blocked by GitHub HTTPS connectivity
 
 Status: CLOSED — retry succeeded; P7 refs verified remotely at main `66de471`, branch/tag `ac360dd`.

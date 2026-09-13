@@ -6,6 +6,10 @@ import httpx
 from app.core.config import get_settings
 
 
+class DocumentStorageError(RuntimeError):
+    """A private document upload failed without exposing its path or contents."""
+
+
 class DocumentStorage(Protocol):
     async def store_resume(
         self, *, user_id: UUID, document_id: UUID, filename: str, content: bytes
@@ -21,8 +25,7 @@ class FakeDocumentStorage:
     async def store_resume(
         self, *, user_id: UUID, document_id: UUID, filename: str, content: bytes
     ) -> str:
-        safe_name = filename.replace("/", "_").replace("\\", "_")
-        path = f"{user_id}/{document_id}/{safe_name}"
+        path = f"{user_id}/{document_id}/resume.pdf"
         self.objects[path] = content
         return path
 
@@ -40,20 +43,23 @@ class SupabaseDocumentStorage:
     async def store_resume(
         self, *, user_id: UUID, document_id: UUID, filename: str, content: bytes
     ) -> str:
-        safe_name = filename.replace("/", "_").replace("\\", "_")
-        path = f"{user_id}/{document_id}/{safe_name}"
-        async with httpx.AsyncClient(timeout=30) as client:
-            response = await client.post(
-                f"{self._url}/storage/v1/object/resumes/{path}",
-                headers={
-                    "apikey": self._key,
-                    "Authorization": f"Bearer {self._key}",
-                    "Content-Type": "application/pdf",
-                    "x-upsert": "false",
-                },
-                content=content,
-            )
-            response.raise_for_status()
+        # Keep the original display filename in SourceDocument, not in the object key.
+        path = f"{user_id}/{document_id}/resume.pdf"
+        try:
+            async with httpx.AsyncClient(timeout=30) as client:
+                response = await client.post(
+                    f"{self._url}/storage/v1/object/resumes/{path}",
+                    headers={
+                        "apikey": self._key,
+                        "Authorization": f"Bearer {self._key}",
+                        "Content-Type": "application/pdf",
+                        "x-upsert": "false",
+                    },
+                    content=content,
+                )
+                response.raise_for_status()
+        except httpx.HTTPError:
+            raise DocumentStorageError("Resume upload unavailable. Please try again.") from None
         return path
 
     async def delete(self, *, path: str) -> None:

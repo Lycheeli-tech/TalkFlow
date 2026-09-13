@@ -26,6 +26,8 @@ and source-validated AI Memory use dedicated boundaries. Legacy is preserved but
 - Status: COMPLETE — P7 main/branch/tag pushed and verified; P8 implementation and acceptance passed.
   TBD-007 approved (ADR-032): 24-hour in-progress TTL, immediate completed/abandoned text deletion.
   Isolated API, persistence, recorder UI and whole-feedback complete; local tag `course-core-stage-8`.
+- Review upload fix RESUME-09: Chinese filename PDF upload/parse/list/delete now passes; safe
+  ASCII object keys preserve original names. Backend follow-up: 298 passed / 13 opt-in skipped.
 - Uploaded Chinese Drafts support refresh recovery under approved TBD-010 / ADR-031.
 - Confirmation is required before History, Feedback, or Memory; discard queues private audio cleanup.
 - Transcript-only organization uses exact excerpts, number checks, and a separate fidelity check.

@@ -260,6 +260,16 @@
 - 限制：报告仅在完成响应当前页面显示，刷新或完成响应丢失不能恢复。未上传设备录音不跨刷新恢复，已上传进行中回答在 24 小时内可恢复。音频异步清理，失败保留任务重试；反馈语义质量依赖模型，精确摘录不等于正式能力评测。本次未声称三/五题均完成真人口述，设备静音测试和合成语音闭环分别记录。
 - Git：`codex/course-core-stage-8`；批准 checkpoint `75716c2`，完成 HEAD 由 `course-core-stage-8` 标签确定。仅原有 `frontend/next-env.d.ts` 改动保留并排除提交。下一步 review，不自动 merge/push。
 
+### Review 修复：中文文件名简历上传
+
+- RESUME-09 CLOSED：私有存储拒绝中文对象名，未捕获异常导致浏览器 `Failed to fetch`。
+  存储对象统一使用 owner/document 下的 `resume.pdf`，SourceDocument 保留完整原文件名；
+  存储/网络失败返回可读 503。旧路径、用户资料、schema 和 Legacy 业务不变。
+- 合成探针 Unicode 400 / ASCII 200 复现；修复后独立账号中文 PDF 上传 201、解析、列表、
+  原名显示和删除通过，账号及 source/job/Storage 残留均为 0。完整后端 298 passed / 13 skipped，
+  Ruff check/format passed。后端已重启，About Me 已刷新，原文件可直接重传。
+- 修复作为 P8 后续本地 checkpoint；完成标签 `course-core-stage-8` / `04fbfce` 保持不变，仍待 review。
+
 ## 阶段更新规则
 
 每次开始、恢复或结束一个阶段时，必须更新：

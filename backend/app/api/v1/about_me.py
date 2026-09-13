@@ -18,6 +18,7 @@ from app.api.core_dependencies import get_course_current_user
 from app.core.auth import AuthenticatedUser
 from app.core.config import get_settings
 from app.services.documents import ResumeValidationError
+from app.storage.documents import DocumentStorageError
 
 router = APIRouter()
 
@@ -104,6 +105,8 @@ async def create_resume(
         )
     except ResumeValidationError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
+    except DocumentStorageError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
 
 
 @router.delete("/resumes/{document_id}", response_model=DeleteResult)

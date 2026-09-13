@@ -13,6 +13,12 @@ P7 merge/push is complete: remote main, P7 branch and tag were verified after th
 User explicitly authorized P8 and approved TBD-007 / ADR-032. P8 is COMPLETE and waiting for review;
 P8 merge/push and post-MVP work are not authorized.
 
+Review follow-up RESUME-09 is fixed: Chinese filenames were rejected as Storage keys. New uploads
+use an owner/document ASCII key and preserve the original display filename; provider failures return
+readable 503. Real Chinese PDF upload/parse/list/delete passed with disposable data removed. Full
+backend is now 298 passed / 13 skipped; Ruff passed. Latest recovery checkpoint is the current HEAD
+after `course-core-stage-8`; the stage completion tag remains at `04fbfce`.
+
 Practice V2 uses its own Run/attempt aggregate, repository/service/API/client, private audio and
 whole-feedback prompt. Three/five unique static Questions, voice recording, pause/skip/return/
 re-answer and final encouragement feedback are enabled. No hints, per-question feedback, completed
@@ -41,11 +47,12 @@ history, personalization, Course Answer/Memory writes or Legacy changes. Active 
 
 ## Local Review
 
-- Backend: 127.0.0.1:8000, owned escalated exec session 65771, PID 15568.
+- Backend: 127.0.0.1:8000, owned escalated exec session 60658, PID 21428.
   Restart with comma-separated `CORS_ORIGINS=http://localhost:3100,http://127.0.0.1:3100`;
   this setting is a string list, not JSON. External database/provider access requires escalation.
 - Frontend: production Next 127.0.0.1:3100, owned exec session 45209.
-- Original user IAB tab 1 is opened at `/practice`; separate smoke tab closed, viewport restored.
+- User IAB tab 1 is at `/about-me`, refreshed after the upload fix; user can reselect the original PDF.
+  Existing target roles/answers are preserved. Separate smoke tab closed, viewport restored.
 - Retained confirmed P6 disposable review account credentials are only in OS temporary state:
   `C:\Users\Galatea\AppData\Local\Temp\fluentloop-p6-607ae176946542cc96fed5b0c6d1cf67.json`.
   No real inbox is needed. Never commit credentials/transcripts or delete unrelated user data.

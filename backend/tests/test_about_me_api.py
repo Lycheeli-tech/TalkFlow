@@ -5,8 +5,10 @@ from fastapi.testclient import TestClient
 
 from app.about_me.entities import AboutMeSnapshot, MemoryItem, ResumeDocument, TargetRole
 from app.api.about_me_dependencies import get_about_me_service
+from app.core.config import get_settings
 from app.main import app
 from app.schemas import AuthenticatedUser
+from app.storage.documents import DocumentStorageError
 
 
 class StubAboutMeService:
@@ -89,6 +91,25 @@ def test_about_me_is_optional_and_requires_authentication(client: TestClient) ->
     assert client.get("/api/v1/about-me").status_code == 401
 
 
+def test_storage_outage_returns_readable_503_with_cors(client, override_current_user):
+    service = configure(client, override_current_user)
+
+    async def failed_upload(**kwargs):
+        raise DocumentStorageError("Resume upload unavailable. Please try again.")
+
+    service.add_resume = failed_upload
+    origin = get_settings().cors_origin_list[0]
+    result = client.post(
+        "/api/v1/about-me/resumes",
+        files={"resume": ("简历 测试.pdf", b"%PDF fixture", "application/pdf")},
+        headers={"Origin": origin},
+    )
+    assert result.status_code == 503
+    assert result.headers["access-control-allow-origin"] == origin
+    assert result.json() == {"detail": "Resume upload unavailable. Please try again."}
+    assert service.resumes == []
+
+
 def test_about_me_roles_facts_resumes_and_non_enumerating_delete(
     client: TestClient, override_current_user
 ) -> None:
@@ -113,10 +134,11 @@ def test_about_me_roles_facts_resumes_and_non_enumerating_delete(
 
     resume = client.post(
         "/api/v1/about-me/resumes",
-        files={"resume": ("resume.pdf", b"%PDF fixture", "application/pdf")},
+        files={"resume": ("简历 测试.pdf", b"%PDF fixture", "application/pdf")},
     )
     assert resume.status_code == 201
     assert "raw_text" not in resume.json()
+    assert resume.json()["filename"] == "简历 测试.pdf"
     assert len(service.resumes) == 1
 
     assert client.delete(f"/api/v1/about-me/target-roles/{role.json()['id']}").status_code == 200
