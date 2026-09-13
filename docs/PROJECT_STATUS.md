@@ -61,8 +61,8 @@ at tag `course-core-stage-4`. Stage 5 is merged/pushed to `main` at `course-core
 
 ## Current Blockers
 
-GIT-08: P8 locally merged and COMPLETE; GitHub connection reset / port 443 unreachable prevents
-push and fresh remote verification (2026-09-14). Retry remains authorized, with no force push.
+GIT-08 CLOSED: P8 and all review fixes merged/pushed. Remote main/P8 branch `66d53f8`,
+original stage tag `04fbfce` and delivery tag `b5bd05b` verified by ls-remote on successful retry.
 
 P7 push connectivity is resolved (GIT-07); P8 TTL is approved (ADR-032).
 P8 feedback citation, device-silence and mobile navigation defects are resolved; no current blocker.
@@ -74,7 +74,7 @@ Failed Answer/Draft audio TTL remains three days under ADR-028.
 
 ## Next Steps
 
-1. P8 COMPLETE; publish main/source branch and completion tags, then verify remote refs.
+1. P8 COMPLETE; main/source branch and completion tags pushed and remote refs verified.
 2. No later or post-MVP work is authorized.
 3. Preserve the original acceptance account and data; cleanup requires explicit user instruction.
 

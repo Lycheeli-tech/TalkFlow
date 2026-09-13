@@ -93,7 +93,7 @@ history, personalization, Course Answer/Memory writes or Legacy changes. Active 
 
 ## Next Action
 
-P8 COMPLETE; publish main/source branch and completion tags and verify matching remote refs. Completed reports cannot be
+P8 COMPLETE; main/source branch and completion tags pushed and remote refs verified. Completed reports cannot be
 recovered after refresh/lost response by design; unuploaded device blobs are not refresh recoverable.
 Audio cleanup is asynchronous with durable backoff; semantic feedback quality remains model-dependent.
 
@@ -103,3 +103,7 @@ atomic push attempts failed (connection reset / GitHub port 443 unreachable). No
 or current remote verification is claimed; last verified remote main was `66de471` (GIT-08).
 Authorization persists: retry `git push --atomic origin main codex/course-core-stage-8
 refs/tags/course-core-stage-8 refs/tags/course-core-stage-8-complete`, then verify remote refs.
+
+GIT-08 CLOSED: subsequent owner-requested retry succeeded with atomic push. Remote refs verified:
+main/P8 branch `66d53f8`; original P8 tag `04fbfce`; final delivery tag `b5bd05b`.
+The prior connectivity-failure notes above are historical. No additional delivery approval needed.

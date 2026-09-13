@@ -284,7 +284,7 @@ calibration and Quick Review categories, so PostgreSQL rejected `RETRIEVE`.
 - Journey's hard-coded English summary, phase, day, and accessibility labels now use locale files;
   Daily phase/step/minute labels are localized as well.
 - Post-fix reload showed no Next.js Issue badge or new console warning/error.
-# GIT-08: P8 delivery GitHub connectivity (OPEN)
+# GIT-08: P8 delivery GitHub connectivity (CLOSED)
 
 - 2026-09-14 owner authorized merging/pushing P8 and all review fixes, marking P8 COMPLETE.
 - Backend 306 passed / 13 skipped; auth-session 14 passed. Local main fast-forwarded to
@@ -293,8 +293,9 @@ calibration and Quick Review categories, so PostgreSQL rejected `RETRIEVE`.
   connect to github.com port 443 after about 21s. No Git/environment proxy is configured.
 - No push success or current remote verification is claimed. User next-env work and account
   data preserved. Retry is already authorized; do not ask for merge/push approval again.
-- Next: restore connectivity, fetch and check divergence, normal atomic push of main/P8 branch
-  and two completion tags, then ls-remote verification. Never force push.
+- Resolved on owner-requested retry: atomic push succeeded; ls-remote verified main/P8 branch
+  at `66d53f8`, original stage tag at `04fbfce`, final delivery tag at `b5bd05b`.
+  The subsequent documentation closeout is published normally; no force push.
 
 # REF-12: Initial Reference Answer provider response validation (CLOSED)
 

@@ -308,6 +308,9 @@
 
 ### P8 最终交付
 
+- 网络重试后 atomic push 成功，ls-remote 核对 main/P8 分支 `66d53f8`、原 P8 标签
+  `04fbfce`、最终交付标签 `b5bd05b` 一致；GIT-08 CLOSED。P8 COMPLETE 且已远程交付。
+
 - 2026-09-14：产品负责人批准将 P8 到当前的全部内容合并到 main 并推送，P8 标记 COMPLETE。
 - 范围包含 Practice V2、简历上传、补充资料保存提示、持久登录续期、初始参考答案生成修复；
   代码截止 `6a98e10`。交付 checkpoint `course-core-stage-8-complete`，原 P8 标签不移动。
