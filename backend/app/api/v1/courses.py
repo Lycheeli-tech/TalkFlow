@@ -127,6 +127,7 @@ async def submit_english_answer(
     idempotency_key: Annotated[str, Form(min_length=8, max_length=128)],
     recording: UploadFile = File(...),
     response_duration_ms: Annotated[int | None, Form(ge=0)] = None,
+    answer_language: Annotated[str, Form(pattern="^(ENGLISH|CHINESE)$")] = "ENGLISH",
     current_user: AuthenticatedUser = Depends(get_course_current_user),
     service: CourseAnswerService = Depends(get_course_answer_service),
 ) -> CourseAnswerView:
@@ -146,7 +147,8 @@ async def submit_english_answer(
             detail="An audio recording is required.",
         )
     try:
-        aggregate = await service.submit_english(
+        submit = service.submit_chinese if answer_language == "CHINESE" else service.submit_english
+        aggregate = await submit(
             user_id=current_user.id,
             course_id=course_id,
             question_id=question_id,
@@ -162,6 +164,29 @@ async def submit_english_answer(
     except ValueError as error:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
     return CourseAnswerView.from_aggregate(aggregate)
+
+
+@router.get("/{course_id}/questions/{question_id}/drafts", response_model=CourseHistoryResponse)
+async def list_chinese_drafts(
+    course_id: str,
+    question_id: str,
+    current_user: AuthenticatedUser = Depends(get_course_current_user),
+    service: CourseAnswerService = Depends(get_course_answer_service),
+) -> CourseHistoryResponse:
+    try:
+        drafts = await service.drafts(
+            user_id=current_user.id, course_id=course_id, question_id=question_id
+        )
+    except LookupError as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+    except PermissionError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+    return CourseHistoryResponse(
+        course_id=course_id,
+        question_id=question_id,
+        count=len(drafts),
+        answers=tuple(CourseAnswerView.from_aggregate(item) for item in drafts),
+    )
 
 
 @router.get("/{course_id}/questions/{question_id}/tts")

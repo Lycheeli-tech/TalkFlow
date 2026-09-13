@@ -11,6 +11,9 @@ import {
   CourseHints,
   CourseReferenceAnswer,
   deleteCourseAnswer,
+  confirmCourseDraft,
+  discardCourseDraft,
+  getCourseDrafts,
   CourseCatalogItem,
   CourseQuestion,
   generateCourseExpressionMaterials,
@@ -32,6 +35,9 @@ type WorkspaceState =
   | "PREPARING"
   | "RECORDING_ENGLISH"
   | "PROCESSING_ENGLISH"
+  | "RECORDING_CHINESE"
+  | "PROCESSING_CHINESE"
+  | "AWAITING_CHINESE_CONFIRMATION"
   | "ANSWER_SAVED"
   | "RECOVERABLE_FAILURE";
 
@@ -39,9 +45,10 @@ type PendingSubmission = {
   blob: Blob;
   durationMs: number;
   idempotencyKey: string;
+  language: "ENGLISH" | "CHINESE";
 };
 
-type AuxiliaryPanel = "NONE" | "HINTS" | "EXPRESSION_MATERIALS" | "REFERENCE_ANSWER" | "FEEDBACK" | "HISTORY";
+type AuxiliaryPanel = "NONE" | "HINTS" | "EXPRESSION_MATERIALS" | "REFERENCE_ANSWER" | "FEEDBACK" | "HISTORY" | "CHINESE_GUIDE";
 
 function formatDuration(durationMs: number | null): string {
   if (durationMs === null) return "—";
@@ -67,6 +74,10 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
   const [supportLoading, setSupportLoading] = useState(false);
   const [supportError, setSupportError] = useState("");
   const [answer, setAnswer] = useState<CourseAnswer | null>(null);
+  const [feedbackAnswer, setFeedbackAnswer] = useState<CourseAnswer | null>(null);
+  const [drafts, setDrafts] = useState<Record<string, CourseAnswer[]>>({});
+  const [restoring, setRestoring] = useState(true);
+  const [requestingMicrophone, setRequestingMicrophone] = useState(false);
   const [error, setError] = useState("");
   const [elapsedMs, setElapsedMs] = useState(0);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -74,14 +85,20 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
   const chunksRef = useRef<Blob[]>([]);
   const recordingStartedRef = useRef(0);
   const pendingRef = useRef<PendingSubmission | null>(null);
+  const recordingLanguageRef = useRef<"ENGLISH" | "CHINESE">("ENGLISH");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUrlRef = useRef<string | null>(null);
 
-  const recording = state === "RECORDING_ENGLISH";
-  const processing = state === "PROCESSING_ENGLISH";
+  const recording = state === "RECORDING_ENGLISH" || state === "RECORDING_CHINESE";
+  const processing = state === "PROCESSING_ENGLISH" || state === "PROCESSING_CHINESE";
+  const busy = recording || processing || restoring || requestingMicrophone;
+  const audioGenerationRef = useRef(0);
+  const recordingActiveRef = useRef(false);
+  const mountedRef = useRef(true);
   const selectedHistory = history[question.id] ?? [];
 
   const stopAudio = useCallback(() => {
+    audioGenerationRef.current += 1;
     audioRef.current?.pause();
     audioRef.current = null;
     window.speechSynthesis?.cancel();
@@ -91,9 +108,12 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
 
   const playBlob = useCallback(
     async (load: () => Promise<Blob>) => {
+      if (recordingActiveRef.current) return;
       stopAudio();
+      const generation = audioGenerationRef.current;
       try {
         const blob = await load();
+        if (recordingActiveRef.current || generation !== audioGenerationRef.current) return;
         const url = URL.createObjectURL(blob);
         const nextAudio = new Audio(url);
         audioUrlRef.current = url;
@@ -129,6 +149,19 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
   }, [copy.historyError, course.id, questions]);
 
   useEffect(() => {
+    let cancelled = false;
+    void Promise.all(questions.map(async (item) => [item.id,
+      (await getCourseDrafts(getStoredAccessToken(), course.id, item.id)).answers] as const))
+      .then((entries) => {
+        if (cancelled) return;
+        setDrafts(Object.fromEntries(entries));
+      })
+      .catch(() => { if (!cancelled) setError(copy.draftRestoreError); })
+      .finally(() => { if (!cancelled) setRestoring(false); });
+    return () => { cancelled = true; };
+  }, [copy.draftRestoreError, course.id, questions]);
+
+  useEffect(() => {
     if (!recording) return;
     const preventUnload = (event: BeforeUnloadEvent) => {
       event.preventDefault();
@@ -150,31 +183,44 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
   useEffect(() => {
     if (!recording) return;
     const timer = window.setInterval(() => {
-      setElapsedMs(Date.now() - recordingStartedRef.current);
+      setElapsedMs(performance.now() - recordingStartedRef.current);
     }, 250);
     return () => window.clearInterval(timer);
   }, [recording]);
 
   useEffect(
-    () => () => {
-      stopAudio();
-      streamRef.current?.getTracks().forEach((track) => track.stop());
+    () => {
+      mountedRef.current = true;
+      return () => {
+        mountedRef.current = false;
+        stopAudio();
+        streamRef.current?.getTracks().forEach((track) => track.stop());
+      };
     },
     [stopAudio],
   );
 
-  async function beginRecording() {
+  async function beginRecording(language: "ENGLISH" | "CHINESE" = "ENGLISH") {
+    if (busy || recordingActiveRef.current) return;
+    setRequestingMicrophone(true);
+    recordingActiveRef.current = true;
     setError("");
     stopAudio();
     let stream: MediaStream | null = null;
     try {
       const acquiredStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!mountedRef.current) {
+        acquiredStream.getTracks().forEach((track) => track.stop());
+        return;
+      }
       stream = acquiredStream;
       const recorder = new MediaRecorder(acquiredStream);
       recorderRef.current = recorder;
       streamRef.current = acquiredStream;
       chunksRef.current = [];
       pendingRef.current = null;
+      recordingLanguageRef.current = language;
+      recordingActiveRef.current = true;
       setAnswer(null);
       recorder.addEventListener("dataavailable", (event) => {
         if (event.data.size > 0) chunksRef.current.push(event.data);
@@ -183,13 +229,18 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
         acquiredStream.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
       });
-      recordingStartedRef.current = Date.now();
+      recorder.addEventListener("start", (event) => {
+        recordingStartedRef.current = event.timeStamp;
+      }, { once: true });
       setElapsedMs(0);
       recorder.start();
-      setState("RECORDING_ENGLISH");
+      setState(language === "CHINESE" ? "RECORDING_CHINESE" : "RECORDING_ENGLISH");
     } catch {
       stream?.getTracks().forEach((track) => track.stop());
+      recordingActiveRef.current = false;
       setError(copy.micError);
+    } finally {
+      setRequestingMicrophone(false);
     }
   }
 
@@ -199,22 +250,24 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
     recorderRef.current = null;
     if (recorder && recorder.state !== "inactive") recorder.stop();
     chunksRef.current = [];
+    recordingActiveRef.current = false;
     pendingRef.current = null;
     setElapsedMs(0);
     setState("PREPARING");
   }
 
-  function finishRecording() {
+  function finishRecording(event: React.MouseEvent<HTMLButtonElement>) {
     const recorder = recorderRef.current;
     if (!recorder || recorder.state === "inactive") return;
-    const durationMs = Date.now() - recordingStartedRef.current;
+    const durationMs = Math.max(0, Math.round(event.timeStamp - recordingStartedRef.current));
     recorder.addEventListener(
       "stop",
       () => {
         const blob = new Blob(chunksRef.current, {
           type: recorder.mimeType || "audio/webm",
         });
-        const pending = { blob, durationMs, idempotencyKey: crypto.randomUUID() };
+        recordingActiveRef.current = false;
+        const pending = { blob, durationMs, idempotencyKey: crypto.randomUUID(), language: recordingLanguageRef.current };
         pendingRef.current = pending;
         void submitPending(pending);
       },
@@ -222,12 +275,12 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
     );
     recorder.stop();
     recorderRef.current = null;
-    setState("PROCESSING_ENGLISH");
+    setState(recordingLanguageRef.current === "CHINESE" ? "PROCESSING_CHINESE" : "PROCESSING_ENGLISH");
   }
 
   async function submitPending(pending: PendingSubmission) {
     setError("");
-    setState("PROCESSING_ENGLISH");
+    setState(pending.language === "CHINESE" ? "PROCESSING_CHINESE" : "PROCESSING_ENGLISH");
     try {
       const result = await submitCourseAnswer(
         getStoredAccessToken(),
@@ -236,6 +289,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
         pending.blob,
         pending.durationMs,
         pending.idempotencyKey,
+        pending.language,
       );
       settleResult(result);
     } catch {
@@ -246,10 +300,17 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
 
   function settleResult(result: CourseAnswer) {
     setAnswer(result);
+    setDrafts((current) => ({ ...current, [result.question_id]: [
+      ...(result.answer_language === "CHINESE" && result.status !== "SAVED" ? [result] : []),
+      ...(current[result.question_id] ?? []).filter((item) => item.id !== result.id),
+    ] }));
     if (result.status === "SAVED") {
       pendingRef.current = null;
       setState("ANSWER_SAVED");
       void loadHistory(question.id);
+    } else if (result.status === "AWAITING_CONFIRMATION") {
+      pendingRef.current = null;
+      setState("AWAITING_CHINESE_CONFIRMATION");
     } else {
       setError(copy.failure);
       setState("RECOVERABLE_FAILURE");
@@ -258,7 +319,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
 
   async function retry() {
     setError("");
-    setState("PROCESSING_ENGLISH");
+    setState((answer?.answer_language ?? pendingRef.current?.language) === "CHINESE" ? "PROCESSING_CHINESE" : "PROCESSING_ENGLISH");
     try {
       const result = answer
         ? await retryCourseAnswer(getStoredAccessToken(), answer.id)
@@ -269,6 +330,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
             pendingRef.current!.blob,
             pendingRef.current!.durationMs,
             pendingRef.current!.idempotencyKey,
+            pendingRef.current!.language,
           );
       settleResult(result);
     } catch {
@@ -278,7 +340,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
   }
 
   function chooseQuestion(nextQuestion: CourseQuestion) {
-    if (recording) {
+    if (busy) {
       setError(copy.leaveBlocked);
       return;
     }
@@ -315,7 +377,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
     }
   }
 
-  async function openSupport(panel: Exclude<AuxiliaryPanel, "NONE" | "FEEDBACK" | "HISTORY">) {
+  async function openSupport(panel: Exclude<AuxiliaryPanel, "NONE" | "FEEDBACK" | "HISTORY" | "CHINESE_GUIDE">) {
     setAuxiliaryPanel(panel);
     setSupportError("");
     const token = getStoredAccessToken();
@@ -341,18 +403,18 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
   }
 
   function openFeedback(item: CourseAnswer) {
-    setAnswer(item);
+    setFeedbackAnswer(item);
     setAuxiliaryPanel("FEEDBACK");
     setSupportError("");
   }
 
   async function retryFeedback() {
-    if (!answer) return;
+    if (!feedbackAnswer) return;
     setSupportLoading(true);
     setSupportError("");
     try {
-      const updated = await retryCourseFeedback(getStoredAccessToken(), answer.id);
-      setAnswer(updated);
+      const updated = await retryCourseFeedback(getStoredAccessToken(), feedbackAnswer.id);
+      setFeedbackAnswer(updated);
       await loadHistory(question.id);
     } catch {
       setSupportError(copy.feedbackError);
@@ -362,11 +424,30 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
   }
 
   function playReferenceAnswer() {
-    if (!referenceAnswer || recording) return;
+    if (!referenceAnswer || recording || recordingActiveRef.current) return;
     stopAudio();
     const utterance = new SpeechSynthesisUtterance(referenceAnswer.answer);
     utterance.lang = "en-US";
     window.speechSynthesis.speak(utterance);
+  }
+
+  async function confirmDraft() {
+    if (!answer || busy) return;
+    setError("");
+    setState("PROCESSING_CHINESE");
+    try { settleResult(await confirmCourseDraft(getStoredAccessToken(), answer.id)); }
+    catch { setError(copy.confirmDraftError); setState("AWAITING_CHINESE_CONFIRMATION"); }
+  }
+
+  async function abandonDraft(reanswer = false) {
+    if (!answer || busy || !window.confirm(copy.discardDraftConfirm)) return;
+    try {
+      await discardCourseDraft(getStoredAccessToken(), answer.id);
+      setDrafts((current) => ({ ...current, [answer.question_id]:
+        (current[answer.question_id] ?? []).filter((item) => item.id !== answer.id) }));
+      resetAnswer();
+      if (reanswer) setAuxiliaryPanel("CHINESE_GUIDE");
+    } catch { setError(copy.discardDraftError); }
   }
 
   return (
@@ -400,7 +481,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
           {questions.map((item) => (
             <button
               className={item.id === question.id ? styles.selectedQuestion : ""}
-              disabled={recording || processing}
+              disabled={busy}
               key={item.id}
               type="button"
               onClick={() => chooseQuestion(item)}
@@ -447,13 +528,34 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
               >
                 {copy.listen}
               </button>
-              <button className={styles.primaryButton} type="button" onClick={beginRecording}>
+              <button disabled={busy} className={styles.primaryButton} type="button" onClick={() => void beginRecording()}>
                 {copy.startAnswer}
               </button>
-              <button className={styles.disabledButton} disabled type="button">
-                {copy.answerInChinese} · {copy.stage6Unavailable}
+              <button disabled={busy} className={styles.secondaryButton} type="button" onClick={() => setAuxiliaryPanel("CHINESE_GUIDE")}>
+                {copy.answerInChinese}
               </button>
             </div>
+          )}
+
+          {state === "PREPARING" && (drafts[question.id] ?? []).map((draft) => (
+            <div className={styles.failurePanel} key={draft.id}>
+              <p>{copy.recoverDraft}</p>
+              <button type="button" disabled={busy} onClick={() => settleResult(draft)}>{copy.resumeDraft}</button>
+            </div>
+          ))}
+
+          {state === "AWAITING_CHINESE_CONFIRMATION" && answer?.transcript && (
+            <section className={styles.savedPanel}>
+              <p>{copy.draftNotSaved}</p>
+              <div className={styles.transcript}><strong>{copy.chineseTranscript}</strong><p>{answer.transcript.transcript}</p></div>
+              <div className={styles.transcript}><strong>{copy.organizedEnglish}</strong><p>{answer.transcript.organized_english}</p></div>
+              <p>{copy.confirmDraftHelp}</p>
+              <div className={styles.answerActions}>
+                <button className={styles.primaryButton} type="button" onClick={() => void confirmDraft()}>{copy.confirmDraft}</button>
+                <button type="button" onClick={() => void abandonDraft()}>{copy.discard}</button>
+                <button type="button" onClick={() => void abandonDraft(true)}>{copy.answerAgain}</button>
+              </div>
+            </section>
           )}
 
           {recording && (
@@ -472,9 +574,9 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
             </div>
           )}
 
-          {state === "PROCESSING_ENGLISH" && (
+          {processing && (
             <p className={styles.processing} role="status">
-              {copy.processing}
+              {state === "PROCESSING_CHINESE" ? copy.processingChinese : copy.processing}
             </p>
           )}
 
@@ -488,7 +590,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
                     {copy.retry}
                   </button>
                 )}
-                <button className={styles.secondaryButton} type="button" onClick={resetAnswer}>
+                <button className={styles.secondaryButton} type="button" onClick={() => answer?.answer_language === "CHINESE" ? void abandonDraft(true) : resetAnswer()}>
                   {copy.answerAgain}
                 </button>
               </div>
@@ -505,6 +607,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
                 <section className={styles.transcript}>
                   <span>{copy.readOnlyTranscript}</span>
                   <p>{answer.transcript.transcript}</p>
+                  {answer.transcript.organized_english && <><strong>{copy.organizedEnglish}</strong><p>{answer.transcript.organized_english}</p></>}
                 </section>
               )}
               <button
@@ -541,6 +644,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
                 {auxiliaryPanel === "REFERENCE_ANSWER" && copy.referenceAnswer}
                 {auxiliaryPanel === "FEEDBACK" && copy.feedback}
                 {auxiliaryPanel === "HISTORY" && copy.history}
+                {auxiliaryPanel === "CHINESE_GUIDE" && copy.answerInChinese}
               </h2>
               <button type="button" onClick={() => setAuxiliaryPanel("NONE")}>
                 {copy.close}
@@ -549,6 +653,13 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
 
             {supportLoading && <p className={styles.processing}>{copy.generating}</p>}
             {supportError && <p className={styles.error}>{supportError}</p>}
+
+            {auxiliaryPanel === "CHINESE_GUIDE" && (
+              <div className={styles.supportContent}>
+                <p>{copy.chineseGuide}</p>
+                <button disabled={busy || state !== "PREPARING"} type="button" onClick={() => void beginRecording("CHINESE")}>{copy.startChineseAnswer}</button>
+              </div>
+            )}
 
             {auxiliaryPanel === "HINTS" && hints && !supportLoading && (
               <div className={styles.supportContent}>
@@ -585,12 +696,12 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
               </div>
             )}
 
-            {auxiliaryPanel === "FEEDBACK" && answer && !supportLoading && (
+            {auxiliaryPanel === "FEEDBACK" && feedbackAnswer && !supportLoading && (
               <div className={styles.supportContent}>
-                {answer.feedback?.status === "READY" ? (
+                {feedbackAnswer.feedback?.status === "READY" ? (
                   <>
-                    <p className={styles.feedbackSummary}>{answer.feedback.summary}</p>
-                    {(answer.feedback.priority_changes ?? []).map((change, index) => (
+                    <p className={styles.feedbackSummary}>{feedbackAnswer.feedback.summary}</p>
+                    {(feedbackAnswer.feedback.priority_changes ?? []).map((change, index) => (
                       <section key={index}>
                         <strong>{copy.originalQuote}</strong>
                         <blockquote>{String(change.original_quote ?? "")}</blockquote>
@@ -601,7 +712,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
                   </>
                 ) : (
                   <div>
-                    <p>{answer.feedback?.status === "PENDING" ? copy.feedbackPending : copy.feedbackFailed}</p>
+                    <p>{feedbackAnswer.feedback?.status === "PENDING" ? copy.feedbackPending : copy.feedbackFailed}</p>
                     <button type="button" onClick={() => void retryFeedback()}>{copy.retryFeedback}</button>
                   </div>
                 )}
@@ -615,6 +726,7 @@ export function CourseWorkspace({ course }: { course: CourseCatalogItem }) {
                   <article className={styles.historyItem} key={item.id}>
                     <time>{item.saved_at ? new Date(item.saved_at).toLocaleString(locale) : ""}</time>
                     <p>{item.transcript?.transcript}</p>
+                    {item.transcript?.organized_english && <><strong>{copy.organizedEnglish}</strong><p>{item.transcript.organized_english}</p></>}
                     <small>{copy.duration}: {formatDuration(item.response_duration_ms)}</small>
                     {item.audio_available ? (
                       <button disabled={recording} type="button" onClick={() => void playBlob(() => getCourseAnswerAudio(getStoredAccessToken(), item.id))}>{copy.playAnswer}</button>

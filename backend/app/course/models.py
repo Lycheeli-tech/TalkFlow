@@ -67,6 +67,9 @@ class CourseTranscriptRow(Base):
     stt_provider: Mapped[str] = mapped_column(String(64))
     stt_model: Mapped[str | None] = mapped_column(String(64))
     organizer_prompt_version: Mapped[str | None] = mapped_column(String(64))
+    organizer_provider: Mapped[str | None] = mapped_column(String(64))
+    organizer_model: Mapped[str | None] = mapped_column(String(64))
+    fidelity_prompt_version: Mapped[str | None] = mapped_column(String(64))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 

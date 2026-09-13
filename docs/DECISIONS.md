@@ -322,3 +322,18 @@ does not add to or change the meaning of the approved Chinese content.
 
 - TBD-003 and TBD-004 are resolved for Stage 5. No later-stage functionality is authorized by this choice.
 - Recording and audio mutual-exclusion constraints remain mandatory regardless of panel selection.
+
+### ADR-031 — Recoverable Unconfirmed Chinese Drafts
+
+**Status:** Accepted
+
+**Date:** 2026-09-13
+
+**Authority:** Build Spec v2.1 TBD-010 and explicit product-owner approval
+
+- Unconfirmed Chinese Drafts support refresh recovery through authenticated, owner-scoped server state.
+- This is temporary Draft storage, not permanent Answer History retention: no Feedback or Memory source
+  is created until explicit confirmation. Discard/re-answer removes the prior Draft and queues audio cleanup.
+- Processing failures retain the same audio and Chinese Transcript for retry under ADR-028; successful
+  pending Drafts remain recoverable until the owner confirms or discards them, with no invented Draft TTL.
+- Confirmation is idempotent and stores both immutable Chinese Transcript and organized English.

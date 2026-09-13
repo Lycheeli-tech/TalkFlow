@@ -3,6 +3,12 @@ from uuid import UUID, uuid4
 
 from app.ai.interfaces import SpeechToTextService, TextToSpeechService
 from app.course.catalog_v1 import CATALOG_VERSION, COURSES_BY_ID, QuestionDefinition
+from app.course.chinese_organizer import (
+    FIDELITY_PROMPT_VERSION,
+    ORGANIZER_PROMPT_VERSION,
+    ChineseAnswerOrganizer,
+    validate_organized_draft,
+)
 from app.course.cleanup import cleanup_course_audio_batch
 from app.course.entities import CourseAnswer, CourseAnswerAggregate, CourseTranscript
 from app.course.repository import CourseAnswerRepository
@@ -35,6 +41,7 @@ class CourseAnswerService:
         audio: CourseAudioStorage,
         memory_capture: CourseAnswerMemoryCapture | None = None,
         feedback_generator: CourseAnswerFeedbackGenerator | None = None,
+        chinese_organizer: ChineseAnswerOrganizer | None = None,
     ) -> None:
         self._repository = repository
         self._stt = stt
@@ -42,6 +49,7 @@ class CourseAnswerService:
         self._audio = audio
         self._memory_capture = memory_capture
         self._feedback_generator = feedback_generator
+        self._chinese_organizer = chinese_organizer
 
     async def synthesize_question(
         self, *, course_id: str, question_id: str, voice: str = "default"
@@ -61,12 +69,59 @@ class CourseAnswerService:
         content_type: str,
         duration_ms: int | None,
     ) -> CourseAnswerAggregate:
+        return await self._submit(
+            user_id=user_id,
+            course_id=course_id,
+            question_id=question_id,
+            idempotency_key=idempotency_key,
+            audio=audio,
+            content_type=content_type,
+            duration_ms=duration_ms,
+            language="ENGLISH",
+        )
+
+    async def submit_chinese(
+        self,
+        *,
+        user_id: UUID,
+        course_id: str,
+        question_id: str,
+        idempotency_key: str,
+        audio: bytes,
+        content_type: str,
+        duration_ms: int | None,
+    ) -> CourseAnswerAggregate:
+        if self._chinese_organizer is None:
+            raise PermissionError("Chinese answering is not enabled.")
+        return await self._submit(
+            user_id=user_id,
+            course_id=course_id,
+            question_id=question_id,
+            idempotency_key=idempotency_key,
+            audio=audio,
+            content_type=content_type,
+            duration_ms=duration_ms,
+            language="CHINESE",
+        )
+
+    async def _submit(
+        self,
+        *,
+        user_id: UUID,
+        course_id: str,
+        question_id: str,
+        idempotency_key: str,
+        audio: bytes,
+        content_type: str,
+        duration_ms: int | None,
+        language,
+    ) -> CourseAnswerAggregate:
         await self.cleanup_expired_failed_audio()
         self._question(course_id, question_id)
         self._require_rollout(course_id)
         existing = await self._repository.get_by_idempotency(user_id, idempotency_key)
         if existing:
-            self._validate_idempotent_target(existing, course_id, question_id)
+            self._validate_idempotent_target(existing, course_id, question_id, language)
             return existing
 
         now = datetime.now(UTC)
@@ -76,7 +131,7 @@ class CourseAnswerService:
             catalog_version=CATALOG_VERSION,
             course_id=course_id,
             question_id=question_id,
-            answer_language="ENGLISH",
+            answer_language=language,
             status="PROCESSING",
             idempotency_key=idempotency_key,
             response_duration_ms=duration_ms,
@@ -85,7 +140,7 @@ class CourseAnswerService:
         )
         reserved = await self._repository.create(answer)
         if reserved.answer.id != answer.id:
-            self._validate_idempotent_target(reserved, course_id, question_id)
+            self._validate_idempotent_target(reserved, course_id, question_id, language)
             return reserved
         try:
             audio_path = await self._audio.store(
@@ -113,7 +168,7 @@ class CourseAnswerService:
         if aggregate is None:
             raise LookupError("Course Answer was not found.")
         answer = aggregate.answer
-        if answer.status == "SAVED":
+        if answer.status in {"SAVED", "AWAITING_CONFIRMATION"}:
             return aggregate
         if answer.status not in {"PROCESSING", "PROCESSING_FAILED"} or answer.audio_path is None:
             raise ValueError("This Course Answer cannot be retried.")
@@ -135,6 +190,32 @@ class CourseAnswerService:
         if aggregate is None:
             raise LookupError("Course Answer was not found.")
         return aggregate
+
+    async def drafts(
+        self, *, user_id: UUID, course_id: str, question_id: str
+    ) -> list[CourseAnswerAggregate]:
+        self._question(course_id, question_id)
+        self._require_rollout(course_id)
+        return await self._repository.list_drafts(user_id, question_id)
+
+    async def confirm(self, *, user_id: UUID, answer_id: UUID) -> CourseAnswerAggregate:
+        aggregate = await self.get(user_id=user_id, answer_id=answer_id)
+        if aggregate.answer.answer_language != "CHINESE":
+            raise ValueError("Only Chinese Drafts require confirmation.")
+        if aggregate.answer.status == "SAVED":
+            return aggregate
+        if aggregate.answer.status != "AWAITING_CONFIRMATION" or not aggregate.transcript:
+            raise ValueError("Chinese Draft is not ready for confirmation.")
+        transcript = aggregate.transcript.model_copy(update={"updated_at": datetime.now(UTC)})
+        saved, pending = await self._repository.save_transcript(aggregate.answer, transcript)
+        return await self._after_save(saved, pending)
+
+    async def discard_draft(self, *, user_id: UUID, answer_id: UUID) -> None:
+        if await self._repository.get(user_id, answer_id) is None:
+            return
+        pending = await self._repository.delete(user_id, answer_id, draft_only=True)
+        if pending is not None:
+            await self._cleanup_one(pending.user_id, pending.answer_id, pending.audio_path)
 
     async def history(
         self, *, user_id: UUID, course_id: str, question_id: str
@@ -167,6 +248,11 @@ class CourseAnswerService:
         )
 
     async def _process(self, answer: CourseAnswer, audio: bytes) -> CourseAnswerAggregate:
+        current = await self.get(user_id=answer.user_id, answer_id=answer.id)
+        if current.answer.status in {"SAVED", "AWAITING_CONFIRMATION"}:
+            return current
+        if answer.answer_language == "CHINESE" and current.transcript is not None:
+            return await self._organize(current)
         try:
             transcript_text = await self._stt.transcribe(
                 audio=audio, content_type=answer.audio_content_type or "application/octet-stream"
@@ -180,13 +266,45 @@ class CourseAnswerService:
         transcript = CourseTranscript(
             answer_id=answer.id,
             user_id=answer.user_id,
-            source_language="ENGLISH",
+            source_language=answer.answer_language,
             transcript=transcript_text,
             stt_provider=self._stt.provider_name,
             created_at=now,
             updated_at=now,
         )
+        if answer.answer_language == "CHINESE":
+            draft = await self._repository.save_draft(answer, transcript)
+            return await self._organize(draft)
         aggregate, pending_cleanup = await self._repository.save_transcript(answer, transcript)
+        return await self._after_save(aggregate, pending_cleanup)
+
+    async def _organize(self, aggregate: CourseAnswerAggregate) -> CourseAnswerAggregate:
+        if self._chinese_organizer is None or aggregate.transcript is None:
+            return await self._fail(aggregate.answer, "ORGANIZER_UNAVAILABLE")
+        try:
+            draft = await self._chinese_organizer.organize(aggregate.transcript.transcript)
+            english = validate_organized_draft(aggregate.transcript.transcript, draft)
+            if not await self._chinese_organizer.verify(aggregate.transcript.transcript, draft):
+                raise ValueError("Chinese organization failed fidelity validation.")
+        except Exception:
+            return await self._fail(aggregate.answer, "CHINESE_ORGANIZER_FAILED")
+        transcript = aggregate.transcript.model_copy(
+            update={
+                "organized_english": english,
+                "organizer_prompt_version": ORGANIZER_PROMPT_VERSION,
+                "organizer_provider": self._chinese_organizer.provider_name,
+                "organizer_model": self._chinese_organizer.model_name,
+                "fidelity_prompt_version": FIDELITY_PROMPT_VERSION,
+                "updated_at": datetime.now(UTC),
+            }
+        )
+        return await self._repository.save_draft(aggregate.answer, transcript)
+
+    async def _after_save(
+        self, aggregate: CourseAnswerAggregate, pending_cleanup
+    ) -> CourseAnswerAggregate:
+        answer = aggregate.answer
+        transcript_text = aggregate.transcript.transcript if aggregate.transcript else ""
         if self._memory_capture is not None:
             try:
                 await self._memory_capture.capture_course_answer(
@@ -241,8 +359,12 @@ class CourseAnswerService:
 
     @staticmethod
     def _validate_idempotent_target(
-        aggregate: CourseAnswerAggregate, course_id: str, question_id: str
+        aggregate: CourseAnswerAggregate, course_id: str, question_id: str, language="ENGLISH"
     ) -> None:
         answer = aggregate.answer
-        if answer.course_id != course_id or answer.question_id != question_id:
+        if (
+            answer.course_id != course_id
+            or answer.question_id != question_id
+            or answer.answer_language != language
+        ):
             raise ValueError("The idempotency key belongs to another Course Question.")

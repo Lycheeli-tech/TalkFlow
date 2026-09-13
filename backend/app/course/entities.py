@@ -5,7 +5,9 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 AnswerLanguage = Literal["ENGLISH", "CHINESE"]
-AnswerStatus = Literal["PROCESSING", "SAVED", "PROCESSING_FAILED", "DISCARDED"]
+AnswerStatus = Literal[
+    "PROCESSING", "AWAITING_CONFIRMATION", "SAVED", "PROCESSING_FAILED", "DISCARDED"
+]
 AudioRetentionStatus = Literal["RETAINED", "PENDING_CLEANUP", "EXPIRED", "CLEANUP_FAILED"]
 FeedbackStatus = Literal["NOT_REQUESTED", "PENDING", "READY", "FAILED"]
 
@@ -46,6 +48,9 @@ class CourseTranscript(BaseModel):
     stt_provider: str
     stt_model: str | None = None
     organizer_prompt_version: str | None = None
+    organizer_provider: str | None = None
+    organizer_model: str | None = None
+    fidelity_prompt_version: str | None = None
     created_at: datetime
     updated_at: datetime
 

@@ -58,6 +58,35 @@ async def retry_feedback(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
 
 
+@router.post("/{answer_id}/confirm", response_model=CourseAnswerView)
+async def confirm_chinese_draft(
+    answer_id: UUID,
+    current_user: AuthenticatedUser = Depends(get_course_current_user),
+    service: CourseAnswerService = Depends(get_course_answer_service),
+) -> CourseAnswerView:
+    try:
+        return CourseAnswerView.from_aggregate(
+            await service.confirm(user_id=current_user.id, answer_id=answer_id)
+        )
+    except LookupError as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+    except ValueError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+
+
+@router.delete("/{answer_id}/draft", status_code=204)
+async def discard_chinese_draft(
+    answer_id: UUID,
+    current_user: AuthenticatedUser = Depends(get_course_current_user),
+    service: CourseAnswerService = Depends(get_course_answer_service),
+) -> Response:
+    try:
+        await service.discard_draft(user_id=current_user.id, answer_id=answer_id)
+    except ValueError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+    return Response(status_code=204)
+
+
 @router.get("/{answer_id}/audio")
 async def get_answer_audio(
     answer_id: UUID,

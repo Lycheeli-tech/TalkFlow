@@ -3,8 +3,8 @@
 ## Last Updated
 
 - 2026-09-13
-- Branch: `codex/course-core-stage-5`
-- Checkpoint: `course-core-stage-5`; product UI approved; merge/push authorized
+- Branch: `codex/course-core-stage-6`
+- Checkpoint: Stage 6 implementation checkpoint; safe baseline `course-core-stage-5` / `9f08381`
 
 ## Product
 
@@ -15,20 +15,19 @@ source-validated Memory to help users express truthful experience in clearer, mo
 ## Current Lifecycle
 
 The v1.1 Legacy Loop implementation and Phase 2 local acceptance are complete at `8cc986d`. Product
-architecture has moved to Build Spec v2.1. Course Core Stages 1–4 are complete and merged: Legacy remains
+architecture has moved to Build Spec v2.1. Course Core Stages 1–5 are complete and merged: Legacy remains
 preserved for rollback but is not mounted by default; Course 11 has the isolated English Answer loop,
 and About Me plus source-validated AI Memory now use dedicated Course Core boundaries.
 
 ## Current Work
 
 - Phase: Course Core
-- Stage: 5 — On-demand AI support and Course Feedback
-- Status: COMPLETE — implementation and verification complete; TBD-003/TBD-004 approved.
-- Hints, expression materials, safe reference answers, and Answer-scoped Feedback use a bounded,
-  ownership-filtered Course Context Builder and versioned prompts.
-- Feedback failure remains isolated from saved Answers; deterministic validation checks exact quotes,
-  source-backed reference segments, and unsupported numbers.
-- Chinese Answer, remaining-Course answering, and Practice V2 remain disabled.
+- Stage: 6 — Chinese Answer loop
+- Status: IN PROGRESS — implementation checkpoint; end-to-end/browser release gates remain.
+- Uploaded Chinese Drafts support refresh recovery under approved TBD-010 / ADR-031.
+- Confirmation is required before History, Feedback, or Memory; discard queues private audio cleanup.
+- Transcript-only organization uses exact excerpts, number checks, and a separate fidelity check.
+- Remaining-Course answering and Practice V2 remain disabled.
 
 ## Stable Baseline
 
@@ -36,7 +35,7 @@ The final Legacy code baseline is tag `legacy-loop-final-baseline` at `8cc986d`.
 tag `course-core-stage-0-v2.1`; Stage 1 is merged to `main` and closed at tag
 `course-core-stage-1`; Stage 2 is merged to `main` and closed at tag `course-core-stage-2`; Stage 3
 is merged to `main` and closed at tag `course-core-stage-3`; Stage 4 is merged to `main` and closed
-at tag `course-core-stage-4`. Stage 5 closes at `course-core-stage-5` on `codex/course-core-stage-5`.
+at tag `course-core-stage-4`. Stage 5 is merged/pushed to `main` at `course-core-stage-5` / `9f08381`.
 
 ## Legacy Implementation Preserved
 
@@ -49,17 +48,18 @@ at tag `course-core-stage-4`. Stage 5 closes at `course-core-stage-5` on `codex/
 
 ## Course Core Not Yet Implemented
 
-- Chinese flow, remaining-Course answering, and Practice V2 are not implemented.
+- Chinese flow release validation is pending; remaining-Course answering and Practice V2 are not implemented.
 
 ## Current Blockers
 
-No Stage 5 blocker remains. TBD-003/TBD-004 are approved in ADR-030.
+No unresolved P6 product choice remains. TBD-010 is approved in ADR-031.
+P6 migration has only been transactionally verified, not persistently applied/registered.
 Failed Answer/Draft audio TTL remains three days under ADR-028.
 
 ## Next Steps
 
-1. Complete the explicitly authorized Stage 5 merge and push.
-2. Stop after closeout; do not begin Stage 6 without explicit instruction.
+1. Finish P6 real Chinese-audio and authenticated desktop/375px browser validation and migration rollout.
+2. Close P6 only after its release gates pass; do not merge/push or begin P7 without explicit instruction.
 
 ## Stage 4 Verification Snapshot
 

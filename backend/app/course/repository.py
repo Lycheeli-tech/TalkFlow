@@ -31,6 +31,10 @@ class CourseAnswerRepository(Protocol):
     async def save_transcript(
         self, answer: CourseAnswer, transcript: CourseTranscript
     ) -> tuple[CourseAnswerAggregate, list[PendingAudioCleanup]]: ...
+    async def save_draft(
+        self, answer: CourseAnswer, transcript: CourseTranscript
+    ) -> CourseAnswerAggregate: ...
+    async def list_drafts(self, user_id: UUID, question_id: str) -> list[CourseAnswerAggregate]: ...
     async def list_history(
         self, user_id: UUID, question_id: str
     ) -> list[CourseAnswerAggregate]: ...
@@ -40,7 +44,9 @@ class CourseAnswerRepository(Protocol):
     ) -> list[PendingAudioCleanup]: ...
     async def mark_cleanup_complete(self, user_id: UUID, answer_id: UUID) -> None: ...
     async def mark_cleanup_failed(self, user_id: UUID, answer_id: UUID) -> None: ...
-    async def delete(self, user_id: UUID, answer_id: UUID) -> PendingAudioCleanup | None: ...
+    async def delete(
+        self, user_id: UUID, answer_id: UUID, *, draft_only: bool = False
+    ) -> PendingAudioCleanup | None: ...
 
 
 class SQLCourseAnswerRepository:
@@ -97,6 +103,8 @@ class SQLCourseAnswerRepository:
         self, answer: CourseAnswer, *, error_code: str, expires_at: datetime
     ) -> CourseAnswerAggregate:
         row = await self._owned_row(answer.user_id, answer.id)
+        if row.status in {"SAVED", "AWAITING_CONFIRMATION"}:
+            return await self._aggregate(row)
         row.status = "PROCESSING_FAILED"
         row.provider_error_code = error_code
         row.failure_expires_at = expires_at
@@ -109,6 +117,17 @@ class SQLCourseAnswerRepository:
         self, answer: CourseAnswer, transcript: CourseTranscript
     ) -> tuple[CourseAnswerAggregate, list[PendingAudioCleanup]]:
         row = await self._owned_row(answer.user_id, answer.id)
+        if row.status == "SAVED":
+            return await self._aggregate(row), []
+        # Serialize retention decisions for the entire owner/question/language group.
+        await self._session.execute(
+            text("select pg_advisory_xact_lock(hashtextextended(:group_key, 0))"),
+            {"group_key": f"{answer.user_id}:{answer.question_id}:{answer.answer_language}"},
+        )
+        if answer.answer_language == "CHINESE":
+            if row.status != "AWAITING_CONFIRMATION" or not transcript.organized_english:
+                raise ValueError("Chinese Draft is not ready for confirmation.")
+            row.confirmed_at = transcript.updated_at
         existing_transcript = await self._session.get(CourseTranscriptRow, answer.id)
         if existing_transcript is None:
             self._session.add(CourseTranscriptRow(**transcript.model_dump()))
@@ -154,6 +173,49 @@ class SQLCourseAnswerRepository:
         await self._session.commit()
         await self._session.refresh(row)
         return await self._aggregate(row), pending
+
+    async def save_draft(
+        self, answer: CourseAnswer, transcript: CourseTranscript
+    ) -> CourseAnswerAggregate:
+        row = await self._owned_row(answer.user_id, answer.id)
+        if row.status in {"SAVED", "AWAITING_CONFIRMATION"}:
+            return await self._aggregate(row)
+        existing = await self._session.get(CourseTranscriptRow, answer.id)
+        if existing is None:
+            self._session.add(CourseTranscriptRow(**transcript.model_dump()))
+        else:
+            if existing.transcript != transcript.transcript:
+                raise ValueError("Chinese Transcript is immutable.")
+            existing.organized_english = transcript.organized_english
+            existing.organizer_prompt_version = transcript.organizer_prompt_version
+            existing.organizer_provider = transcript.organizer_provider
+            existing.organizer_model = transcript.organizer_model
+            existing.fidelity_prompt_version = transcript.fidelity_prompt_version
+            existing.updated_at = transcript.updated_at
+        row.status = "AWAITING_CONFIRMATION" if transcript.organized_english else "PROCESSING"
+        row.provider_error_code = None
+        row.failure_expires_at = None
+        row.updated_at = transcript.updated_at
+        await self._session.commit()
+        await self._session.refresh(row)
+        return await self._aggregate(row)
+
+    async def list_drafts(self, user_id: UUID, question_id: str) -> list[CourseAnswerAggregate]:
+        rows = (
+            await self._session.scalars(
+                select(CourseAnswerRow)
+                .where(
+                    CourseAnswerRow.user_id == user_id,
+                    CourseAnswerRow.question_id == question_id,
+                    CourseAnswerRow.answer_language == "CHINESE",
+                    CourseAnswerRow.status.in_(
+                        ["PROCESSING", "PROCESSING_FAILED", "AWAITING_CONFIRMATION"]
+                    ),
+                )
+                .order_by(CourseAnswerRow.created_at.desc())
+            )
+        ).all()
+        return [await self._aggregate(row) for row in rows]
 
     async def list_history(self, user_id: UUID, question_id: str) -> list[CourseAnswerAggregate]:
         rows = (
@@ -264,7 +326,9 @@ class SQLCourseAnswerRepository:
         row.updated_at = datetime.now(row.updated_at.tzinfo)
         await self._session.commit()
 
-    async def delete(self, user_id: UUID, answer_id: UUID) -> PendingAudioCleanup | None:
+    async def delete(
+        self, user_id: UUID, answer_id: UUID, *, draft_only: bool = False
+    ) -> PendingAudioCleanup | None:
         row = await self._session.scalar(
             select(CourseAnswerRow)
             .where(CourseAnswerRow.id == answer_id, CourseAnswerRow.user_id == user_id)
@@ -272,6 +336,8 @@ class SQLCourseAnswerRepository:
         )
         if row is None:
             raise LookupError("Course Answer was not found.")
+        if draft_only and (row.answer_language != "CHINESE" or row.status == "SAVED"):
+            raise ValueError("A saved Answer cannot be discarded as a Draft.")
         pending = None
         if row.audio_path:
             pending = PendingAudioCleanup(
@@ -309,9 +375,10 @@ class SQLCourseAnswerRepository:
 
     async def _owned_row(self, user_id: UUID, answer_id: UUID) -> CourseAnswerRow:
         row = await self._session.scalar(
-            select(CourseAnswerRow).where(
-                CourseAnswerRow.id == answer_id, CourseAnswerRow.user_id == user_id
-            )
+            select(CourseAnswerRow)
+            .where(CourseAnswerRow.id == answer_id, CourseAnswerRow.user_id == user_id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
         )
         if row is None:
             raise LookupError("Course Answer was not found.")
@@ -379,6 +446,8 @@ class InMemoryCourseAnswerRepository:
         current = await self.get(answer.user_id, answer.id)
         if current is None:
             raise LookupError("Course Answer was not found.")
+        if current.answer.status in {"SAVED", "AWAITING_CONFIRMATION"}:
+            return current
         failed = current.answer.model_copy(
             update={
                 "status": "PROCESSING_FAILED",
@@ -396,6 +465,12 @@ class InMemoryCourseAnswerRepository:
         current = await self.get(answer.user_id, answer.id)
         if current is None:
             raise LookupError("Course Answer was not found.")
+        if current.answer.status == "SAVED":
+            return current, []
+        if answer.answer_language == "CHINESE" and (
+            current.answer.status != "AWAITING_CONFIRMATION" or not transcript.organized_english
+        ):
+            raise ValueError("Chinese Draft is not ready for confirmation.")
         self._saved_sequence += 1
         saved = current.answer.model_copy(
             update={
@@ -404,6 +479,9 @@ class InMemoryCourseAnswerRepository:
                 "failure_expires_at": None,
                 "saved_at": transcript.updated_at,
                 "saved_sequence": self._saved_sequence,
+                "confirmed_at": transcript.updated_at
+                if answer.answer_language == "CHINESE"
+                else None,
                 "updated_at": transcript.updated_at,
             }
         )
@@ -436,6 +514,40 @@ class InMemoryCourseAnswerRepository:
                 )
             )
         return self._aggregate(saved), pending
+
+    async def save_draft(
+        self, answer: CourseAnswer, transcript: CourseTranscript
+    ) -> CourseAnswerAggregate:
+        current = await self.get(answer.user_id, answer.id)
+        if current is None:
+            raise LookupError("Course Answer was not found.")
+        if current.answer.status in {"SAVED", "AWAITING_CONFIRMATION"}:
+            return current
+        existing = self.transcripts.get(answer.id)
+        if existing and existing.transcript != transcript.transcript:
+            raise ValueError("Chinese Transcript is immutable.")
+        self.transcripts[answer.id] = transcript
+        self.answers[answer.id] = current.answer.model_copy(
+            update={
+                "status": "AWAITING_CONFIRMATION" if transcript.organized_english else "PROCESSING",
+                "provider_error_code": None,
+                "failure_expires_at": None,
+                "updated_at": transcript.updated_at,
+            }
+        )
+        return self._aggregate(self.answers[answer.id])
+
+    async def list_drafts(self, user_id: UUID, question_id: str) -> list[CourseAnswerAggregate]:
+        return [
+            self._aggregate(item)
+            for item in sorted(
+                self.answers.values(), key=lambda item: item.created_at, reverse=True
+            )
+            if item.user_id == user_id
+            and item.question_id == question_id
+            and item.answer_language == "CHINESE"
+            and item.status in {"PROCESSING", "PROCESSING_FAILED", "AWAITING_CONFIRMATION"}
+        ]
 
     async def list_history(self, user_id: UUID, question_id: str) -> list[CourseAnswerAggregate]:
         answers = sorted(
@@ -511,11 +623,15 @@ class InMemoryCourseAnswerRepository:
             update={"audio_retention_status": "CLEANUP_FAILED", "audio_cleanup_pending": True}
         )
 
-    async def delete(self, user_id: UUID, answer_id: UUID) -> PendingAudioCleanup | None:
+    async def delete(
+        self, user_id: UUID, answer_id: UUID, *, draft_only: bool = False
+    ) -> PendingAudioCleanup | None:
         aggregate = await self.get(user_id, answer_id)
         if aggregate is None:
             raise LookupError("Course Answer was not found.")
         answer = aggregate.answer
+        if draft_only and (answer.answer_language != "CHINESE" or answer.status == "SAVED"):
+            raise ValueError("A saved Answer cannot be discarded as a Draft.")
         pending = None
         if answer.audio_path:
             pending = PendingAudioCleanup(

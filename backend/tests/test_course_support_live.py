@@ -45,9 +45,7 @@ async def test_live_course_support_is_structured_and_source_bound() -> None:
     grounded_reference = await provider.reference_answer(
         context.model_copy(
             update={
-                "supplemental_facts": [
-                    "I led a synthetic migration and chose a phased rollout."
-                ]
+                "supplemental_facts": ["I led a synthetic migration and chose a phased rollout."]
             }
         )
     )

@@ -11,6 +11,11 @@ from app.api.about_me_dependencies import get_about_me_repository, get_about_me_
 from app.api.core_dependencies import get_course_stt_service, get_course_tts_service
 from app.core.config import get_settings
 from app.course.answer_service import CourseAnswerService
+from app.course.chinese_organizer import (
+    BailianChineseAnswerOrganizer,
+    ChineseAnswerOrganizer,
+    FakeChineseAnswerOrganizer,
+)
 from app.course.context import CourseContextBuilder
 from app.course.repository import CourseAnswerRepository, SQLCourseAnswerRepository
 from app.course.storage import (
@@ -63,6 +68,20 @@ def get_course_support_service(
     )
 
 
+@lru_cache
+def get_chinese_answer_organizer() -> ChineseAnswerOrganizer:
+    settings = get_settings()
+    if settings.llm_provider == "bailian":
+        if not settings.bailian_api_key:
+            raise RuntimeError("BAILIAN_API_KEY is required for Chinese organization.")
+        return BailianChineseAnswerOrganizer(
+            api_key=settings.bailian_api_key,
+            base_url=settings.bailian_compatible_base_url,
+            model=settings.bailian_text_model,
+        )
+    return FakeChineseAnswerOrganizer()
+
+
 def get_course_answer_service(
     repository: CourseAnswerRepository = Depends(get_course_answer_repository),
     stt: SpeechToTextService = Depends(get_course_stt_service),
@@ -70,6 +89,7 @@ def get_course_answer_service(
     audio: CourseAudioStorage = Depends(get_course_audio_storage),
     memory_capture: AboutMeService = Depends(get_about_me_service),
     feedback_generator: CourseSupportService = Depends(get_course_support_service),
+    chinese_organizer: ChineseAnswerOrganizer = Depends(get_chinese_answer_organizer),
 ) -> CourseAnswerService:
     return CourseAnswerService(
         repository=repository,
@@ -78,4 +98,5 @@ def get_course_answer_service(
         audio=audio,
         memory_capture=memory_capture,
         feedback_generator=feedback_generator,
+        chinese_organizer=chinese_organizer,
     )

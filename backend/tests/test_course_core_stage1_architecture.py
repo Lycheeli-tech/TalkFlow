@@ -71,6 +71,9 @@ def test_default_runtime_mounts_no_legacy_product_routes(client: TestClient) -> 
         "/api/v1/course-answers/{answer_id}/retry": frozenset({"post"}),
         "/api/v1/course-answers/{answer_id}/audio": frozenset({"get"}),
         "/api/v1/course-answers/{answer_id}/feedback/retry": frozenset({"post"}),
+        "/api/v1/course-answers/{answer_id}/confirm": frozenset({"post"}),
+        "/api/v1/course-answers/{answer_id}/draft": frozenset({"delete"}),
+        "/api/v1/courses/{course_id}/questions/{question_id}/drafts": frozenset({"get"}),
         "/api/v1/about-me": frozenset({"get", "patch"}),
         "/api/v1/about-me/target-roles": frozenset({"get", "post"}),
         "/api/v1/about-me/target-roles/{role_id}": frozenset({"delete"}),
@@ -98,6 +101,8 @@ def test_default_runtime_exposes_only_approved_course_core_product_write_paths()
         ("/api/v1/course-answers/{answer_id}", "DELETE"),
         ("/api/v1/course-answers/{answer_id}/retry", "POST"),
         ("/api/v1/course-answers/{answer_id}/feedback/retry", "POST"),
+        ("/api/v1/course-answers/{answer_id}/confirm", "POST"),
+        ("/api/v1/course-answers/{answer_id}/draft", "DELETE"),
         ("/api/v1/courses/{course_id}/questions/{question_id}/hints", "POST"),
         (
             "/api/v1/courses/{course_id}/questions/{question_id}/expression-materials",

@@ -52,7 +52,9 @@ def test_stage_five_support_is_bounded_and_has_no_legacy_business_dependency() -
 def test_auxiliary_panel_is_independent_from_recording_state() -> None:
     workspace = source("frontend/components/course-core/course-workspace.tsx")
     assert 'type AuxiliaryPanel = "NONE"' in workspace
-    assert 'setState("RECORDING_ENGLISH")' in workspace
+    assert (
+        'setState(language === "CHINESE" ? "RECORDING_CHINESE" : "RECORDING_ENGLISH")' in workspace
+    )
     assert "setAuxiliaryPanel(panel)" in workspace
     assert "generateCourseHints" in workspace
     assert "retryCourseFeedback" in workspace

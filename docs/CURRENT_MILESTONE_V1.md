@@ -17,7 +17,7 @@
 | 阶段 3 | COMPLETE | Course 11 英文 Answer 最小闭环已确认、合并并推送；checkpoint 为 `course-core-stage-3` |
 | 阶段 4 | COMPLETE | 已由产品负责人确认并合并、推送；checkpoint 为 `course-core-stage-4` |
 | 阶段 5 | COMPLETE | 功能与验证已完成；产品负责人已确认 TBD-003 / TBD-004 并授权 merge/push；checkpoint 为 `course-core-stage-5` |
-| 阶段 6 | 未开始 | 复用阶段 3 的 Answer、Audio 和 Transcript 基础设施 |
+| 阶段 6 | IN PROGRESS | 中文 Answer 闭环；已批准未确认 Draft 跨刷新恢复（TBD-010） |
 | 阶段 7 | 未开始 | 所有 Course 必须复用同一通用引擎 |
 | 阶段 8 | 未开始 | 依赖 Catalog、录音、STT 和 Feedback 基础设施 |
 
@@ -173,6 +173,10 @@
 
 ## 阶段 6：中文 Answer 闭环
 
+- 分支：`codex/course-core-stage-6`；安全基线：`course-core-stage-5` / `9f08381`。
+- 2026-09-13 产品负责人授权开始 P6，并批准支持未确认中文 Draft 跨刷新恢复。
+- Draft 仅为可恢复暂存，确认前不进入 History、Feedback 或 Memory；放弃/重新回答清理旧 Draft。
+
 1. 中文录音和最终 STT；
 2. 中文转英文整理；
 3. 同时展示中文与英文稿；
@@ -180,6 +184,18 @@
 5. 重新回答和放弃 Draft；
 6. 接入最近两条录音；
 7. 验证不补充用户未表达事实。
+
+### 阶段 6 当前 checkpoint
+
+- 状态：IN PROGRESS；实现 checkpoint，未关闭发布门、未创建完成 tag、未 merge/push。
+- 已实现：中文录音/最终 STT、独立组织 Prompt 与忠实度检查、持久 Draft 列表/恢复、双稿只读展示、确认幂等、放弃/重新回答、确认后 Feedback/Memory 与按语言最近两条录音。
+- 整理只接收当前中文 Transcript；逐段来源摘录和来源外数字由代码验证，语义忠实度由独立结构化检查过滤。不使用 About Me、Resume、Memory 或历史补全中文事实。
+- 新迁移：`202609130020_chinese_answer_drafts.sql`；新增待确认状态、确认约束、双稿延迟约束和 organizer 追踪字段。20 个迁移本地顺序验证通过；真实数据库只在事务内验证并回滚，尚未持久应用/登记 P6 迁移。
+- 后端：151 passed、10 opt-in skipped；Ruff check/format passed。真实 PostgreSQL Draft/确认/RLS/Legacy 快照及 Bailian 忠实翻译/编造拒绝首轮：2 passed。
+- 前端：TypeScript、ESLint、production build passed，包括最终麦克风卸载安全补丁。真实 PostgreSQL 最终双稿/确认约束复跑：1 passed；末尾新增忠实度 Prompt 追踪字段尚需下一轮真实库复核。
+- 剩余发布门：最终 Prompt 追踪字段真实库复核、真实中文音频 STT→整理→确认/放弃闭环、认证后桌面与 375px 浏览器录音/恢复 smoke，以及迁移应用与登记。
+- 已知限制：Auth 仍为 sessionStorage 生命周期；未上传设备录音不能跨刷新恢复，只有已归属服务端的 Draft 可恢复；忠实度语义检查依赖模型，不能把精确摘录当作完整语义证明。
+- 范围：仍只有 Course 11 可回答；P7/P8 未开始；Legacy 保持冻结。
 
 ## 阶段 7：开放其余 29 个 Course
 

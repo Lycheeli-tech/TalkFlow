@@ -20,6 +20,7 @@ await database.exec(`
   create schema if not exists auth;
   create schema if not exists storage;
   create role authenticated;
+  create role service_role;
   create table auth.users (
     id uuid primary key
   );
@@ -60,16 +61,25 @@ if (result.rows.length !== 1) {
 }
 
 const expectedRlsTables = [
+  "about_me_profiles",
   "attempts",
+  "course_answers",
+  "course_audio_cleanup_jobs",
+  "course_feedback",
+  "course_transcripts",
+  "document_cleanup_jobs",
   "error_patterns",
   "expression_attempts",
   "expressions",
   "learner_assessments",
+  "memory_items",
+  "memory_sources",
   "profiles",
   "retrieval_opportunities",
   "sessions",
   "source_documents",
   "stories",
+  "target_roles",
   "users",
 ];
 const rlsResult = await database.query(

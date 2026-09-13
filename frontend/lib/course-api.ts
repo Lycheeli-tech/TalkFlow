@@ -31,7 +31,7 @@ export type CourseAnswer = {
   course_id: string;
   question_id: string;
   answer_language: "ENGLISH" | "CHINESE";
-  status: "PROCESSING" | "SAVED" | "PROCESSING_FAILED" | "DISCARDED";
+  status: "PROCESSING" | "AWAITING_CONFIRMATION" | "SAVED" | "PROCESSING_FAILED" | "DISCARDED";
   response_duration_ms: number | null;
   audio_available: boolean;
   audio_retention_status: "RETAINED" | "PENDING_CLEANUP" | "EXPIRED" | "CLEANUP_FAILED";
@@ -141,9 +141,11 @@ export function submitCourseAnswer(
   recording: Blob,
   durationMs: number,
   idempotencyKey: string,
+  language: "ENGLISH" | "CHINESE" = "ENGLISH",
 ): Promise<CourseAnswer> {
   const form = new FormData();
   form.append("idempotency_key", idempotencyKey);
+  form.append("answer_language", language);
   form.append("response_duration_ms", String(durationMs));
   form.append("recording", recording, "course-answer.webm");
   return authenticatedFetch<CourseAnswer>(
@@ -196,6 +198,24 @@ export function retryCourseAnswer(token: string, answerId: string): Promise<Cour
     `/api/v1/course-answers/${encodeURIComponent(answerId)}/retry`,
     { method: "POST" },
   );
+}
+
+export function getCourseDrafts(token: string, courseId: string, questionId: string): Promise<CourseHistory> {
+  return authenticatedFetch<CourseHistory>(token,
+    `/api/v1/courses/${encodeURIComponent(courseId)}/questions/${encodeURIComponent(questionId)}/drafts`);
+}
+
+export function confirmCourseDraft(token: string, answerId: string): Promise<CourseAnswer> {
+  return authenticatedFetch<CourseAnswer>(token,
+    `/api/v1/course-answers/${encodeURIComponent(answerId)}/confirm`, { method: "POST" });
+}
+
+export async function discardCourseDraft(token: string, answerId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/course-answers/${encodeURIComponent(answerId)}/draft`, {
+    method: "DELETE", headers: { Authorization: `Bearer ${token}` },
+  });
+  if (response.status === 401) clearAccessToken();
+  if (!response.ok) throw new Error("Draft discard failed.");
 }
 
 export function retryCourseFeedback(token: string, answerId: string): Promise<CourseAnswer> {
