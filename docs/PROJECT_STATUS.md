@@ -3,7 +3,7 @@
 ## Last Updated
 
 - 2026-09-13
-- Branch: `codex/course-core-stage-7`
+- Branch: `main`
 - Checkpoint: `course-core-stage-7`; safe baseline `main` / `71f606b`, P6 tag / `3f71595`
 
 ## Product
@@ -15,17 +15,17 @@ source-validated Memory to help users express truthful experience in clearer, mo
 ## Current Lifecycle
 
 The v1.1 Legacy Loop implementation and Phase 2 local acceptance are complete at `8cc986d`. Product
-architecture has moved to Build Spec v2.1. Course Core Stages 1–6 are complete and merged; Stage 7 is
-complete on its review branch. All 30 Courses use the isolated English/Chinese Answer engine; About Me
+architecture has moved to Build Spec v2.1. Course Core Stages 1–7 are complete and locally merged;
+Stage 7 push is pending GitHub connectivity. All 30 Courses use the isolated English/Chinese Answer engine; About Me
 and source-validated AI Memory use dedicated boundaries. Legacy is preserved but unmounted by default.
 
 ## Current Work
 
 - Phase: Course Core
 - Stage: 7 — All Courses
-- Status: COMPLETE — authorized on 2026-09-13; all 30 Courses / 59 Questions use one engine.
-  Backend, frontend, real PostgreSQL and desktop/375px browser checks passed. Awaiting review;
-  P7 is not merged or pushed, and P8 is not authorized.
+- Status: COMPLETE — merge/push authorized on 2026-09-13; local main fast-forwarded to `ac360dd`.
+  Push is blocked by GitHub HTTPS connectivity (GIT-07). P8 is authorized after P7 push completes;
+  implementation has not begun. Practice Run TTL approval (TBD-007) is still needed.
 - Uploaded Chinese Drafts support refresh recovery under approved TBD-010 / ADR-031.
 - Confirmation is required before History, Feedback, or Memory; discard queues private audio cleanup.
 - Transcript-only organization uses exact excerpts, number checks, and a separate fidelity check.
@@ -54,16 +54,17 @@ at tag `course-core-stage-4`. Stage 5 is merged/pushed to `main` at `course-core
 
 ## Current Blockers
 
-No unresolved P7 blocker remains. TBD-010 is approved in ADR-031.
+P7 push is blocked by GitHub HTTPS connectivity; P8 Run TTL needs approval (TBD-007).
+TBD-010 is approved in ADR-031.
 P6 migration `202609130020` is persistently applied/registered in the configured test database.
 User-operated IAB device recording now passed; the previous microphone blocker is resolved.
 Failed Answer/Draft audio TTL remains three days under ADR-028.
 
 ## Next Steps
 
-1. Review P7 at `course-core-stage-7`; see CURRENT_MILESTONE_V1.md for acceptance evidence.
-2. Await explicit merge/push or P8 authorization. Retained P6 device data remain available locally;
-   clean only the owner-scoped disposable review data after review.
+1. Restore GitHub connectivity, retry the authorized P7 atomic push and verify remote refs (GIT-07).
+2. Confirm the proposed Practice Run TTL in CURRENT_MILESTONE_V1.md; then begin the authorized P8.
+3. Retained P6 device data remain available locally; clean only the owner-scoped disposable review data after review.
 
 ## Stage 4 Verification Snapshot
 

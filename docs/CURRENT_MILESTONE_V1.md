@@ -219,7 +219,7 @@
 
 ### 阶段 7 完成 checkpoint
 
-- 状态：COMPLETE，等待产品负责人 review；分支 `codex/course-core-stage-7`，完成 checkpoint `course-core-stage-7`。未 merge/push，未开始 P8。
+- 状态：COMPLETE；完成 checkpoint `course-core-stage-7` / `ac360dd`。2026-09-13 产品负责人授权 merge/push，已快进合并到本地 `main`；GitHub HTTPS 连接失败，push 待恢复网络后重试（GIT-07）。
 - 移除前后端 Course 11 rollout allowlist；全部 30 Course / 59 Question 复用英文/中文录音、确认、History、TTS、按需支持和 Feedback 引擎。Catalog 内容、ID、顺序和回答重点未变，Course 30 的 follow-up 为 null，非法或跨 Course Question 请求返回 404。
 - Course Workspace 按 Course ID 重新挂载；加载时核对当前 ID，忽略过期 Catalog 请求，避免沿用上一门 Course 的题目与状态。页眉动态显示课程序号。
 - 空上下文参考回答改为当前静态 Question 加中性真实细节占位符；不再默认要求项目职责/决策/结果，不创建用户经历。
@@ -230,6 +230,11 @@
 - 限制：无新增 migration；未上传录音不跨刷新恢复，已上传中文 Draft 恢复遵循 ADR-031。空 About Me 的参考回答仅提供真实细节占位模板。P6 临时设备 review 数据继续保留，P7 数据库合成记录已回滚。Practice V2 保持禁用；Legacy 冻结。
 
 ## 阶段 8：Practice V2
+
+- 2026-09-13 产品负责人授权在 P7 merge/push 完成后开始 P8；当前已 merge，push 尚未成功，依照该顺序暂不开始实现。
+- 已阅读 Practice 选题、语音过程、整场 Feedback、临时数据/API 和 Legacy 边界要求；TBD-007 尚无批准记录。
+- 待确认方案：进行中 Run 从创建起保留 24 小时；完成/放弃立即撤销读取并删除临时文本与 Feedback，私有音频进入幂等清理；过期 Run 使用相同清理路径，失败任务仅保留清理所需信息并重试。不提供已完成 Practice History。该方案是提案，未设置生产默认值或定稿 schema。
+- 下一步：恢复 GitHub 连接，推送并核对 P7 refs；产品负责人确认 TBD-007 后在 `codex/course-core-stage-8` 开始独立 Practice V2 实现。
 
 1. 随机抽取 3 / 5 题；
 2. 逐题语音回答；

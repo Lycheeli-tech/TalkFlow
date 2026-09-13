@@ -3,18 +3,21 @@
 ## Updated
 
 - 2026-09-13
-- Branch: `codex/course-core-stage-7`
+- Branch: `main`
 - Completion checkpoint: `course-core-stage-7`
 - Safe baseline: pushed main `71f606b`; P6 tag `course-core-stage-6` / `3f71595`
 
 ## Current State
 
-P7 is COMPLETE and awaiting review. The product owner explicitly authorized starting P7 on
+P7 is COMPLETE and locally merged. The product owner authorized P7 merge/push, then P8 on
 2026-09-13. All 30 Courses / 59 Questions now reuse the English/Chinese Answer, support, TTS,
 History and Feedback engine. Catalog IDs, wording, focus and order are unchanged. Course 30 has
 one core Question and no follow-up. No migration was needed; no Legacy file or schema changed.
 
-P7 has not been merged or pushed. P8 is not authorized; Practice V2 remains disabled.
+Local main fast-forwarded to P7 `ac360dd`. Push failed because GitHub HTTPS cannot connect (GIT-07);
+P8 is authorized after push completes, so implementation has not begun. Practice V2 remains disabled.
+P8 TTL decision TBD-007 is still unapproved; a concrete 24-hour active Run / immediate completion
+and abandonment deletion proposal is recorded in CURRENT_MILESTONE_V1.md, not a production rule.
 The full acceptance evidence is in `docs/CURRENT_MILESTONE_V1.md`, Stage 7. Stable decisions
 remain in DECISIONS.md; Chinese Draft recovery continues under ADR-031.
 
@@ -35,7 +38,7 @@ remain in DECISIONS.md; Chinese Draft recovery continues under ADR-031.
 
 - P7 backend: local uvicorn 127.0.0.1:8000, owned exec session 52240 (PID 11376).
 - P7 frontend: production Next server 127.0.0.1:3100, owned exec session 42757.
-- Existing user IAB tab 2 remains on Course 11. Refresh to load the new P7 build.
+- Existing user IAB tab 2 remains on Course 11 and was refreshed to the P7 build; History still has three Answers.
 - Retained P6 disposable confirmed Auth account has two English and one Chinese device Answers
   for review. No real inbox is needed. Credentials are only in the OS temporary state file:
   `C:\Users\Galatea\AppData\Local\Temp\fluentloop-p6-607ae176946542cc96fed5b0c6d1cf67.json`.
@@ -48,5 +51,7 @@ remain in DECISIONS.md; Chinese Draft recovery continues under ADR-031.
 
 ## Next Action
 
-Review P7. Await explicit merge/push or next-stage authorization. Preserve retained review data
-until review is done. Stop only owned local services if restarting; do not kill unrelated processes.
+Restore GitHub connectivity; follow GIT-07 to fetch/check, retry the already-authorized P7 atomic
+push and verify all refs. Confirm TBD-007 before Practice schema/storage policy is finalized, then
+create `codex/course-core-stage-8` from pushed main and implement P8. Preserve retained review data.
+Stop only owned local services if restarting; do not kill unrelated processes.

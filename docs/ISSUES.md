@@ -1,5 +1,20 @@
 # FluentLoop Issues
 
+## GIT-07: P7 remote push blocked by GitHub HTTPS connectivity
+
+Status: OPEN — local merge complete; remote push not successful.
+
+- 2026-09-13 user authorized P7 merge/push, then P8. Local main fast-forwarded from `71f606b`
+  to P7 checkpoint `ac360dd`; original `frontend/next-env.d.ts` changes were preserved.
+- Two escalated `git fetch origin` attempts failed: connection reset, then GitHub port 443 timeout.
+  Atomic push with HTTP/1.1 also failed to connect after 21s. This was a network failure, not an
+  automatic approval rejection, authentication error or non-fast-forward conflict.
+- DNS resolved github.com to 20.205.243.166. Independent IPv4 HTTPS HEAD timed out after 8s;
+  no environment/Git HTTP proxy was detected. No credentials or network settings were changed.
+- Recovery: restore external GitHub HTTPS connectivity; fetch/check remote main, then retry
+  `git -c http.version=HTTP/1.1 push --atomic origin main codex/course-core-stage-7 refs/tags/course-core-stage-7`.
+  Verify all three refs remotely before beginning P8 implementation. P8 TBD-007 TTL also needs approval.
+
 ## AUTH-02: P6 device smoke used an unconfirmed disposable account
 
 Status: CLOSED — replacement confirmed device account successfully used for recording and saved Answers.
