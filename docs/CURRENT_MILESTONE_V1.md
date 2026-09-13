@@ -196,6 +196,7 @@
 - 真实服务：一次性账号、合成中文 TTS 音频经实际上传→中文 ASR→忠实整理→待确认→确认保存，重复确认幂等；双稿与 fidelity Prompt 版本实际落库。三个同题同语言确认 Answer 的最旧音频 EXPIRED，最近两条 RETAINED；真实服务操作前后 Legacy 快照不变。
 - 浏览器：认证后桌面 1280px 恢复双稿、刷新再恢复、确认及 History 通过；375px 双稿、History 抽屉、放弃和重新回答进入中文引导通过，无横向溢出或最终页面控制台错误。
 - 剩余发布门仅为真实设备麦克风录音 smoke：用户已批准 localhost 麦克风及改用 Chrome，但内置浏览器 getUserMedia 请求不返回，当前浏览器工具报告 Chrome 不可用。没有伪造录音或将合成音频测试等同于设备录音；P6 保持 IN PROGRESS，不创建完成 tag。
+- 2026-09-13 本次恢复复核：后端 153 passed / 10 opt-in skipped、Ruff check/format、前端 TypeScript/ESLint/production build、20 个 migration 校验均通过；只读真实库登记核对确认 `202609130020` 已存在，未重复迁移。系统 Chrome 窗口存在，但 browser connector 不可用；原生 sky 读取被自动审批拒绝（要求使用 cua_repl，其原生控制当前禁用）。需用户在 Chrome 完成设备 smoke，不能追认为阶段完成。
 - 清理：一次性 Auth 账号、Answer/Feedback/Memory、私有音频及本地凭据/合成音频已删除；持久 Answer 与 Storage 对象残留计数为零。
 - 已知限制：Auth 仍为 sessionStorage 生命周期；未上传设备录音不能跨刷新恢复，只有已归属服务端的 Draft 可恢复；忠实度语义检查依赖模型，不能把精确摘录当作完整语义证明。
 - 范围：仍只有 Course 11 可回答；P7/P8 未开始；Legacy 保持冻结。

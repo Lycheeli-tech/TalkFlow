@@ -73,6 +73,27 @@ the explicit rollback test app only. `docs/CURRENT_MILESTONE_V1.md` contains ful
 
 ## Next Action
 
-Resume only the actual-device browser microphone gate once an operational browser surface is available.
+2026-09-13 resume: backend 153 passed / 10 opt-in skipped, Ruff check/format, frontend
+TypeScript/lint/production build, 20-migration validation, and read-only live P6 registry verification
+passed. No implementation changes, migrations, or disposable data were added. Chrome exists natively
+but its connector is unavailable; native sky activation/read was rejected by automatic approval because
+the required interface is cua_repl (whose native control is disabled). See COURSE-06; do not bypass it.
+
+Local acceptance servers remain running: production frontend `127.0.0.1:3100`, backend
+`127.0.0.1:8000`; Course 11 and health return 200. Backend CORS permits localhost/127.0.0.1:3100.
+Processes started for this resume: backend PID 9480; frontend is the `next start --port 3100` process.
+Stop only these acceptance services after device evidence is collected; do not stop unrelated processes.
+
+User-operated Chrome smoke at `http://localhost:3100/courses/course-11`:
+1. Sign in, open Chinese guide, start recording and approve microphone if requested.
+2. Speak a short Chinese answer using only actual facts; while recording verify Question/navigation
+   locks, no Transcript, playback disabled, and opening/closing History does not stop the timer.
+3. Finish recording; verify Chinese Transcript plus organized English appear and History stays unchanged.
+4. Refresh, resume the Draft, verify both texts, then confirm; verify exactly one saved History entry,
+   unchanged Question selection, and no forced English recording. Repeat confirmation must not duplicate.
+5. Verify recording/stop at 375px with both drawers and no horizontal overflow; a second Draft can be
+   discarded through the explicit confirmation and must not enter History.
+
+Resume only the actual-device browser microphone gate once device evidence or an operational browser surface is available.
 Do not repeat the completed audio, responsive Draft or migration gates without new evidence.
 Record final acceptance evidence before creating a P6 completion tag; do not start P7.

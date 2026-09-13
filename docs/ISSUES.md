@@ -14,6 +14,13 @@ Status: code defects fixed; actual device microphone smoke OPEN.
 - User authorized localhost:3100 microphone and Chrome fallback. IAB getUserMedia remains pending
   without a visible permission result; `createBrowserTab('chrome', ...)` reports browser unavailable.
   No fake microphone injection or alternate unapproved UI automation was used.
+- 2026-09-13 resume: Chrome exists as a native window, but its browser connector still reports
+  unavailable. Automatic approval rejected native `sky` activation/read because the active interface
+  requires `cua_repl`; native control is disabled there. Do not retry through shell/CDP or change privacy
+  settings. User-operated Chrome is the remaining device-smoke path.
+- Resume checks passed: backend 153 passed / 10 opt-in skipped, Ruff check/format, frontend
+  TypeScript/ESLint/production build, 20-migration validation, and read-only live migration registry
+  verification of `202609130020`. No migration was reapplied and no test account/data was created.
 - Next: provide an operational Chrome/browser surface or manual device smoke, verify actual recording,
   navigation guard, stop/upload and refresh recovery at desktop/375px, then close P6. Migration and
   synthetic real-provider audio gates are already passed; do not reapply migration or start P7.

@@ -59,7 +59,8 @@ Failed Answer/Draft audio TTL remains three days under ADR-028.
 
 ## Next Steps
 
-1. Finish P6 real Chinese-audio and authenticated desktop/375px browser validation and migration rollout.
+1. Finish only the actual-device microphone smoke in user-operated Chrome; real Chinese-audio,
+   authenticated desktop/375px Draft flows, and migration rollout have already passed.
 2. Close P6 only after its release gates pass; do not merge/push or begin P7 without explicit instruction.
 
 ## Stage 4 Verification Snapshot
