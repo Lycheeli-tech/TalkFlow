@@ -96,3 +96,10 @@ history, personalization, Course Answer/Memory writes or Legacy changes. Active 
 P8 COMPLETE; publish main/source branch and completion tags and verify matching remote refs. Completed reports cannot be
 recovered after refresh/lost response by design; unuploaded device blobs are not refresh recoverable.
 Audio cleanup is asynchronous with durable backoff; semantic feedback quality remains model-dependent.
+
+2026-09-14 delivery: local main fast-forwarded to `b5bd05b`, matching the P8 source branch and
+`course-core-stage-8-complete`. P8 is COMPLETE including all review fixes. Remote fetch and two
+atomic push attempts failed (connection reset / GitHub port 443 unreachable). No successful push
+or current remote verification is claimed; last verified remote main was `66de471` (GIT-08).
+Authorization persists: retry `git push --atomic origin main codex/course-core-stage-8
+refs/tags/course-core-stage-8 refs/tags/course-core-stage-8-complete`, then verify remote refs.

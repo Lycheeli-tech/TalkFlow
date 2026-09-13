@@ -61,6 +61,9 @@ at tag `course-core-stage-4`. Stage 5 is merged/pushed to `main` at `course-core
 
 ## Current Blockers
 
+GIT-08: P8 locally merged and COMPLETE; GitHub connection reset / port 443 unreachable prevents
+push and fresh remote verification (2026-09-14). Retry remains authorized, with no force push.
+
 P7 push connectivity is resolved (GIT-07); P8 TTL is approved (ADR-032).
 P8 feedback citation, device-silence and mobile navigation defects are resolved; no current blocker.
 P8 migration `202609130021` is applied/registered in the configured development/test database.
